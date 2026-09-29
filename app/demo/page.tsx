@@ -4,11 +4,11 @@ import {CalendarDays,Clock3,Target,Workflow} from 'lucide-react';
 export const dynamic='force-dynamic';
 
 const opportunities=[
- {name:'Mariana Souza',title:'Proposta comercial',stage:'Proposta',owner:'Murilo',next:'Hoje · 14:30',value:'R$ 4.800',state:'Hoje'},
- {name:'Empresa Horizonte',title:'Projeto sob medida',stage:'Negociação',owner:'Murilo',next:'Vencido · ontem',value:'R$ 8.200',state:'Vencido'},
- {name:'Carlos Almeida',title:'Pedido de orçamento',stage:'Em análise',owner:'Murilo',next:'Amanhã · 10:00',value:'R$ 2.900',state:'Programado'},
- {name:'Grupo Aurora',title:'Revisão de proposta',stage:'Aguardando decisão',owner:'Murilo',next:'Sem próxima ação',value:'R$ 6.500',state:'Sem próxima ação'},
- {name:'Fernanda Lima',title:'Consulta inicial',stage:'Novo',owner:'Murilo',next:'03/10 · 09:00',value:'R$ 1.700',state:'Programado'},
+ {name:'Mariana Souza',title:'Proposta comercial',stage:'Proposta',owner:'Equipe Comercial',next:'Hoje · 14:30',value:'R$ 4.800',state:'Hoje'},
+ {name:'Empresa Horizonte',title:'Projeto sob medida',stage:'Negociação',owner:'Equipe Comercial',next:'Vencido · ontem',value:'R$ 8.200',state:'Vencido'},
+ {name:'Carlos Almeida',title:'Pedido de orçamento',stage:'Em análise',owner:'Equipe Comercial',next:'Amanhã · 10:00',value:'R$ 2.900',state:'Programado'},
+ {name:'Grupo Aurora',title:'Revisão de proposta',stage:'Aguardando decisão',owner:'Equipe Comercial',next:'Sem próxima ação',value:'R$ 6.500',state:'Sem próxima ação'},
+ {name:'Fernanda Lima',title:'Consulta inicial',stage:'Novo',owner:'Equipe Comercial',next:'03/10 · 09:00',value:'R$ 1.700',state:'Programado'},
 ];
 
 export default async function DemoPage({searchParams}:{searchParams:Promise<{access?:string}>}){
