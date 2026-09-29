@@ -1,5 +1,24 @@
-import {createClient} from '@/lib/supabase/server';import {NextResponse} from 'next/server';
-export async function GET(request:Request){const url=new URL(request.url),hash=url.searchParams.get('token_hash'),type=url.searchParams.get('type'),code=url.searchParams.get('code');const s=await createClient();
- if(hash&&(type==='invite'||type==='recovery'||type==='email')){const {error}=await s.auth.verifyOtp({token_hash:hash,type:type as 'invite'|'recovery'|'email'});if(!error)return NextResponse.redirect(new URL('/activate',url.origin))}
- if(code){const {error}=await s.auth.exchangeCodeForSession(code);if(!error)return NextResponse.redirect(new URL('/activate',url.origin))}
- return NextResponse.redirect(new URL('/login?invite=invalid',url.origin));}
+import {createClient} from '@/lib/supabase/server';
+import {NextResponse} from 'next/server';
+import type {EmailOtpType} from '@supabase/supabase-js';
+
+const otpTypes=new Set<EmailOtpType>(['signup','invite','magiclink','recovery','email_change','email']);
+
+export async function GET(request:Request){
+ const url=new URL(request.url),hash=url.searchParams.get('token_hash'),type=url.searchParams.get('type'),code=url.searchParams.get('code');
+ const requested=url.searchParams.get('next'),next=requested?.startsWith('/')&&!requested.startsWith('//')?requested:'/';
+ const s=await createClient();
+
+ if(hash&&type&&otpTypes.has(type as EmailOtpType)){
+  const {error}=await s.auth.verifyOtp({token_hash:hash,type:type as EmailOtpType});
+  if(!error){
+   const target=type==='invite'||type==='recovery'?'/activate':next;
+   return NextResponse.redirect(new URL(target,url.origin));
+  }
+ }
+ if(code){
+  const {error}=await s.auth.exchangeCodeForSession(code);
+  if(!error)return NextResponse.redirect(new URL(next,url.origin));
+ }
+ return NextResponse.redirect(new URL('/login?access=invalid',url.origin));
+}
