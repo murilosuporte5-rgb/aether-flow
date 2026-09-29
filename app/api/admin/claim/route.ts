@@ -8,8 +8,7 @@ export async function POST(request:Request){
  const body=await request.json().catch(()=>({})) as {key?:string};
  const key=String(body.key||'');
  if(key.length<20)return NextResponse.json({error:'Link de ativação inválido.'},{status:400});
- const {data,error}=await supabase.rpc('claim_initial_admin',{claim_key:key});
- if(error)return NextResponse.json({error:'Não foi possível ativar o administrador.'},{status:400});
- if(!data)return NextResponse.json({error:'Este link é inválido, já foi usado ou já existe um administrador.'},{status:403});
+ const {error}=await supabase.from('admin_bootstrap_claims').insert({user_id:user.id,claim_key:key});
+ if(error)return NextResponse.json({error:'Este link é inválido, já foi usado ou já existe um administrador.'},{status:403});
  return NextResponse.json({ok:true});
 }
