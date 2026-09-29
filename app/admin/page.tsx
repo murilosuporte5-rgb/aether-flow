@@ -10,12 +10,13 @@ export default async function AdminPage(){
  const {data:{user}}=await supabase.auth.getUser();
  if(!user)redirect('/login');
  if(!await isAetherAdmin(supabase,user.id))redirect('/');
- const inviteEnabled=Boolean(process.env.SUPABASE_SECRET_KEY);
+
  return <main className="admin-page">
   <a href="/">← Voltar ao ambiente</a>
-  <div className="eyebrow">AETHER WORKS · ADMINISTRAÇÃO</div>
-  <h1>Liberar acesso a uma empresa</h1>
-  <p>Crie um ambiente separado e envie um convite individual ao responsável. Os dados demonstrativos não serão copiados para a empresa.</p>
-  {inviteEnabled?<AdminForm/>:<div className="alert">Seu acesso administrativo está ativo. O envio de convites reais fica habilitado quando a chave secreta do Supabase for configurada no ambiente de produção.</div>}
+  <div className="eyebrow">AETHER FLOW · ADMINISTRAÇÃO</div>
+  <h1>Criar acesso</h1>
+  <p>Defina o e-mail e a senha do cliente. O acesso nasce confirmado, sem convite ou confirmação por e-mail.</p>
+  <AdminForm/>
+  <div className="alert">Link para o cliente entrar: <strong>https://aether-flow-production-0798.up.railway.app/entrar</strong></div>
  </main>;
 }

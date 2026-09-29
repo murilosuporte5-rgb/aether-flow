@@ -22,6 +22,5 @@ export default function LoginForm(){
   <label>Senha<input type="password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" required/></label>
   {error&&<p role="alert" className="form-error">{error}</p>}
   <button type="submit" className="primary login-action" disabled={busy}>{busy?'Entrando…':'Entrar'}</button>
-  <a className="secondary login-action" href="/cadastro">Criar conta</a>
  </form>;
 }
