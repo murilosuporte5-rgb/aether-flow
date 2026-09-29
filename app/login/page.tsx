@@ -1,0 +1,2 @@
+import LoginForm from './form';
+export default function LoginPage(){return <main className="login"><div className="login-card"><div className="brand-mark">A</div><div className="eyebrow">AETHER WORKS</div><h1>O próximo passo, sempre à vista.</h1><p>Acesse as oportunidades e ações da sua empresa.</p><LoginForm/><small>O acesso é individual e liberado por convite da Aether Works.</small></div></main>}

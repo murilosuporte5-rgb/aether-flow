@@ -1,0 +1,3 @@
+import {redirect} from 'next/navigation';import {createClient} from '@/lib/supabase/server';import {serviceClient,isAetherAdmin} from '@/lib/provision';import AdminForm from './form';
+export const dynamic='force-dynamic';
+export default async function AdminPage(){const {data:{user}}=await (await createClient()).auth.getUser();if(!user)redirect('/login');if(!await isAetherAdmin(serviceClient(),user.id))redirect('/');return <main className="admin-page"><a href="/">← Voltar ao ambiente</a><div className="eyebrow">AETHER WORKS · ADMINISTRAÇÃO</div><h1>Liberar acesso a uma empresa</h1><p>Crie um ambiente separado e envie um convite individual ao responsável. Os dados demonstrativos não serão copiados para a empresa.</p><AdminForm/></main>}
