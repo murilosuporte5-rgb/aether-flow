@@ -1,0 +1,3 @@
+-- This migration version was applied to the production Supabase project during MVP hardening.
+-- Its effective final state is reproduced and simplified by
+-- 20260929112358_simplify_self_service_demo_policies.sql.

@@ -1,6 +1,6 @@
 import {createClient} from '@/lib/supabase/server';
 import {templates,type TemplateKey} from '@/lib/templates';
-import {serviceClient,isAetherAdmin,seedDemo} from '@/lib/provision';
+import {seedDemo} from '@/lib/provision';
 import type {SupabaseClient} from '@supabase/supabase-js';
 export const dynamic='force-dynamic';
 const fail=(error:string,status=400)=>Response.json({error},{status});
@@ -21,8 +21,12 @@ async function access(s:SupabaseClient, userId:string, requestedCompany?:unknown
 }
 async function context(requestedCompany?:unknown,requestedTemplate?:unknown){
  const s=await createClient(),{data:{user},error}=await s.auth.getUser();if(error||!user)return null;
- if(!requestedCompany){const admin=serviceClient();if(await isAetherAdmin(admin,user.id))await seedDemo(admin,user.id,templateKey(requestedTemplate))}
- return {s,user,...await access(s,user.id,requestedCompany,requestedTemplate)};
+ let state=await access(s,user.id,requestedCompany,requestedTemplate);
+ if(!requestedCompany){
+  const template=templateKey(requestedTemplate),hasReal=state.companies.some(x=>!x.is_demo),hasDemo=state.companies.some(x=>x.is_demo&&x.company_template===template);
+  if(!hasReal&&!hasDemo){await seedDemo(s,user.id,template);state=await access(s,user.id,requestedCompany,requestedTemplate)}
+ }
+ return {s,user,...state};
 }
 async function snapshot(s:SupabaseClient,c:string){
  const [stages,opps,contacts,acts,history,profiles,memberships]=await Promise.all([

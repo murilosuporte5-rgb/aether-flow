@@ -1,0 +1,44 @@
+name: MVP CI
+
+on:
+  push:
+    branches:
+      - main
+      - finish-mvp-20260929
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        id: install
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee ci-install.log
+      - name: Typecheck
+        if: success()
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run check 2>&1 | tee ci-typecheck.log
+      - name: Build
+        if: success()
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee ci-build.log
+      - name: Upload diagnostic logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mvp-ci-logs
+          path: ci-*.log
+          if-no-files-found: warn
