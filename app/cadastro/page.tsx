@@ -1,0 +1,2 @@
+import SignupForm from './form';
+export default function CadastroPage(){return <main className="login"><div className="login-card"><div className="brand-mark">A</div><div className="eyebrow">AETHER FLOW</div><h1>Crie seu acesso.</h1><p>Depois de confirmar seu e-mail, você configura a empresa e entra no seu ambiente.</p><SignupForm/><small>Cada conta recebe acesso somente ao próprio workspace.</small></div></main>}
