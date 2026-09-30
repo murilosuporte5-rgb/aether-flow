@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { templates, type TemplateKey } from "@/lib/templates";
 import { seedDemo } from "@/lib/provision";
+import { isRequestOriginAllowed } from "@/lib/request-origin";
 import type { SupabaseClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 const fail = (error: string, status = 400) =>
@@ -168,7 +169,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const origin = request.headers.get("origin");
-    if (origin && origin !== new URL(request.url).origin)
+    if (!isRequestOriginAllowed(origin, request.url, process.env.RAILWAY_PUBLIC_DOMAIN))
       return fail("Origem não permitida.", 403);
     if (Number(request.headers.get("content-length") || 0) > 12000)
       return fail("Comando muito grande.", 413);
