@@ -215,6 +215,7 @@ try {
 
     await page.reload();
     await page.getByRole("button", { name: "Nova oportunidade", exact: true }).waitFor();
+    await poll("reloaded workspace ready", () => page.getByRole("button", { name: "Nova oportunidade", exact: true }).isEnabled());
     assert.equal(await count("opportunities", tenant.company), 2);
     await page.getByRole("button", { name: "Nova oportunidade", exact: true }).click();
     await core(page).waitFor();

@@ -167,7 +167,9 @@ export default function Workspace({
     [duplicate, setDuplicate] = useState<Duplicate>(null),
     [closingStage, setClosingStage] = useState<Stage | null>(null);
   const writeLock = useRef(false),
-    retries = useRef(new Map<string, string>());
+    retries = useRef(new Map<string, string>()),
+    fetchSequence = useRef(0);
+  const snapshotReady = !!data.company && data.company.id === companyId && data.template === template;
   const changeStage = (opportunity: Row, stageId: string) => {
     const target = data.stages.find((s) => s.id === stageId);
     if (!target) return;
@@ -190,6 +192,7 @@ export default function Workspace({
   }, [modal, busy]);
   const fetchData = useCallback(
     async (t: TemplateKey, c: string | null, quiet = false) => {
+      const sequence = ++fetchSequence.current;
       if (!quiet) setLoading(true);
       setError("");
       try {
@@ -200,20 +203,23 @@ export default function Workspace({
           }),
           j = (await r.json()) as Data & { error?: string };
         if (!r.ok) throw new Error(j.error || "Falha ao carregar");
+        if (sequence !== fetchSequence.current) return;
         setData(j);
         if (j.company?.id !== c) setCompanyId(j.company?.id || null);
         if (j.template && j.template !== t) setTemplate(j.template);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Falha ao carregar");
+        if (sequence === fetchSequence.current) setError(e instanceof Error ? e.message : "Falha ao carregar");
       } finally {
-        setLoading(false);
+        if (sequence === fetchSequence.current) setLoading(false);
       }
     },
     [],
   );
   useEffect(() => {
+    // Server normalization already supplied this snapshot; do not fetch it again.
+    if (data.company?.id === companyId && data.template === template) return;
     void fetchData(template, companyId);
-  }, [template, companyId, fetchData]);
+  }, [template, companyId, fetchData, data.company?.id, data.template]);
   const run = async (kind: string, payload: Record<string, unknown> = {}) => {
     if (writeLock.current) return false;
     writeLock.current = true;
@@ -533,9 +539,9 @@ export default function Workspace({
             </div>
             <button
               className="primary"
-              disabled={loading || !data.company || data.company.id !== companyId || !data.stages.some((stage) => stage.kind === "open")}
+              disabled={loading || !snapshotReady || !data.stages.some((stage) => stage.kind === "open")}
               onClick={() => {
-                if (loading || !data.company || data.company.id !== companyId) return;
+                if (loading || !snapshotReady) return;
                 setSelected(null);
                 setModal("create");
               }}
@@ -546,6 +552,10 @@ export default function Workspace({
           {loading ? (
             <div className="loading" role="status">
               Carregando oportunidades…
+            </div>
+          ) : !snapshotReady ? (
+            <div className="empty-line" role="status">
+              Não foi possível carregar este ambiente. <button className="text-button" onClick={() => void fetchData(template, companyId)}>Tentar novamente</button>
             </div>
           ) : tab === "today" ? (
             <Dashboard
