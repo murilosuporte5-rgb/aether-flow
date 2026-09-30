@@ -43,13 +43,9 @@ Deno.serve(async (req: Request) => {
     try{return JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS")||"{}").default||Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||""}
     catch{return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||""}
   })();
-
   if(!url||!publishable||!secret) return json({error:"Configuração do Supabase indisponível."},500);
 
-  const userClient=createClient(url,publishable,{
-    global:{headers:{Authorization:authHeader}},
-    auth:{persistSession:false,autoRefreshToken:false}
-  });
+  const userClient=createClient(url,publishable,{global:{headers:{Authorization:authHeader}},auth:{persistSession:false,autoRefreshToken:false}});
   const admin=createClient(url,secret,{auth:{persistSession:false,autoRefreshToken:false}});
 
   const {data:{user},error:userError}=await userClient.auth.getUser(token);
@@ -61,34 +57,32 @@ Deno.serve(async (req: Request) => {
 
   let body:any={};
   try{body=await req.json()}catch{return json({error:"Dados inválidos."},400)}
-
   const email=String(body.email||"").trim().toLowerCase();
   const password=String(body.password||"");
   const template=templates[String(body.template||"generic")]?String(body.template||"generic"):"generic";
-  const requestedName=String(body.name||"").trim();
-  const companyName=requestedName.slice(0,120)
-    ||email.split("@")[0].replace(/[._-]+/g," ").replace(/\b\w/g,(c)=>c.toUpperCase()).slice(0,120)
-    ||"Novo cliente";
+  const emailName=email.split("@")[0].replace(/[._-]+/g," ").replace(/\b\w/g,(c)=>c.toUpperCase()).slice(0,100);
+  const clientName=String(body.clientName||"").trim().slice(0,100)||emailName||"Cliente";
+  const requestedCompanyName=String(body.companyName??body.name??"").trim();
+  const companyName=requestedCompanyName.slice(0,120)||clientName;
 
   if(!/^\S+@\S+\.\S+$/.test(email)) return json({error:"E-mail inválido."},400);
-  if(password.length<8) return json({error:"A senha precisa ter pelo menos 8 caracteres."},400);
+  if(clientName.length<2) return json({error:"Informe o nome do cliente."},400);
+  if(password.length<12) return json({error:"A senha precisa ter pelo menos 12 caracteres."},400);
 
   let createdUserId:string|null=null;
   let companyId:string|null=null;
-
   try{
     const created=await admin.auth.admin.createUser({
       email,
       password,
       email_confirm:true,
-      user_metadata:{full_name:companyName},
+      user_metadata:{full_name:clientName,company_name:companyName}
     });
-
     if(created.error||!created.data.user){
+      const code=created.error?.code||"";
       const msg=(created.error?.message||"").toLowerCase();
-      if(msg.includes("already")||msg.includes("registered")||msg.includes("exists")){
-        return json({error:"Este e-mail já possui acesso."},409);
-      }
+      if(code==="weak_password") return json({error:"A senha precisa ter pelo menos 12 caracteres."},400);
+      if(code==="email_exists"||msg.includes("already")||msg.includes("registered")||msg.includes("exists")) return json({error:"Este e-mail já possui acesso."},409);
       throw created.error||new Error("Auth não retornou usuário.");
     }
     createdUserId=created.data.user.id;
@@ -97,31 +91,20 @@ Deno.serve(async (req: Request) => {
       name:companyName,
       company_template:template,
       is_demo:false,
-      owner_user_id:createdUserId,
+      owner_user_id:createdUserId
     }).select("id").single();
-
     if(company.error||!company.data) throw company.error||new Error("Empresa não criada.");
     companyId=company.data.id;
 
-    const membership=await admin.from("memberships").insert({
-      company_id:companyId,
-      user_id:createdUserId,
-      role:"owner",
-    });
+    const membership=await admin.from("memberships").insert({company_id:companyId,user_id:createdUserId,role:"owner"});
     if(membership.error) throw membership.error;
 
     const stages=templates[template];
-    const stageInsert=await admin.from("pipeline_stages").insert(
-      stages.map((name,index)=>({
-        company_id:companyId,
-        name,
-        position:index,
-        kind:stageKind(index,stages.length),
-      }))
-    );
+    const stageRows=stages.map((name,index)=>({company_id:companyId,name,position:index,kind:stageKind(index,stages.length)}));
+    const stageInsert=await admin.from("pipeline_stages").insert(stageRows);
     if(stageInsert.error) throw stageInsert.error;
 
-    return json({ok:true,email,companyName,companyId});
+    return json({ok:true,email,clientName,companyName,companyId});
   }catch(error){
     if(companyId) await admin.from("companies").delete().eq("id",companyId);
     if(createdUserId) await admin.auth.admin.deleteUser(createdUserId);

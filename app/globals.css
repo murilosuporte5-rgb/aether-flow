@@ -122,3 +122,10 @@
  .modal{border-radius:16px;padding:20px 17px}
  .modal-footer{position:sticky;bottom:-1px;background:#fff;padding-bottom:3px}
 }
+
+/* Personalized client greeting */
+.welcome-heading{margin-bottom:24px}.welcome-heading h1{font-size:clamp(29px,3vw,36px)}.welcome-heading>div>p{margin-top:2px}
+.welcome-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:11px;color:#8a97a8;font-size:11px}
+.welcome-meta i{width:3px;height:3px;border-radius:50%;background:#bdc5cf}.welcome-meta strong{color:#496b92;font-weight:800}
+.access-company{font-size:11px!important;color:#6f8a7f!important;margin:-8px 0 11px!important}
+@media(max-width:760px){.welcome-heading h1{font-size:28px}.welcome-meta{gap:7px;font-size:10px}.welcome-heading{margin-bottom:18px}}

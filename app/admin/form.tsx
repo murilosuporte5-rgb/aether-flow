@@ -5,7 +5,7 @@ import {FunctionsHttpError} from '@supabase/supabase-js';
 import {createClient} from '@/lib/supabase/browser';
 import {templates,type TemplateKey} from '@/lib/templates';
 
-type CreatedAccess={email:string;password:string;company:string};
+type CreatedAccess={clientName:string;email:string;password:string;company:string};
 
 function randomPassword(){
  const upper='ABCDEFGHJKLMNPQRSTUVWXYZ';
@@ -24,10 +24,11 @@ function randomPassword(){
 }
 
 export default function AdminForm(){
+ const [clientName,setClientName]=useState('');
  const [email,setEmail]=useState('');
  const [password,setPassword]=useState('');
  const [showPassword,setShowPassword]=useState(false);
- const [name,setName]=useState('');
+ const [companyName,setCompanyName]=useState('');
  const [template,setTemplate]=useState<TemplateKey>('generic');
  const [busy,setBusy]=useState(false);
  const [created,setCreated]=useState<CreatedAccess|null>(null);
@@ -42,16 +43,25 @@ export default function AdminForm(){
 
  async function copyAccess(){
   if(!created)return;
-  const message=`Aether Flow\nLogin: ${created.email}\nSenha: ${created.password}\nAcesso: ${window.location.origin}/entrar`;
-  await navigator.clipboard.writeText(message);
-  setCopied(true);
-  window.setTimeout(()=>setCopied(false),1800);
+  const message=`Aether Flow\nCliente: ${created.clientName}\nLogin: ${created.email}\nSenha: ${created.password}\nAcesso: ${window.location.origin}/entrar`;
+  try{
+   await navigator.clipboard.writeText(message);
+   setCopied(true);
+   window.setTimeout(()=>setCopied(false),1800);
+  }catch{
+   setError('Não consegui copiar automaticamente. Copie os dados abaixo manualmente.');
+  }
  }
 
  async function submit(e:React.FormEvent){
   e.preventDefault();
   setCreated(null);setCopied(false);setError('');
 
+  const cleanClientName=clientName.trim();
+  if(cleanClientName.length<2){
+   setError('Informe o nome do cliente.');
+   return;
+  }
   if(password.length<12){
    setError('Use uma senha com pelo menos 12 caracteres.');
    return;
@@ -60,10 +70,10 @@ export default function AdminForm(){
   setBusy(true);
   try{
    const cleanEmail=email.trim().toLowerCase();
-   const cleanName=name.trim();
+   const cleanCompanyName=companyName.trim();
    const supabase=createClient();
    const {data,error}=await supabase.functions.invoke('create-access',{
-    body:{email:cleanEmail,password,name:cleanName,template}
+    body:{email:cleanEmail,password,clientName:cleanClientName,companyName:cleanCompanyName,template}
    });
 
    if(error instanceof FunctionsHttpError){
@@ -77,8 +87,13 @@ export default function AdminForm(){
    if(error)throw error;
    if(data?.error)throw new Error(data.error);
 
-   setCreated({email:cleanEmail,password,company:cleanName||data?.companyName||'Cliente'});
-   setEmail('');setPassword('');setName('');setTemplate('generic');setShowPassword(false);
+   setCreated({
+    clientName:data?.clientName||cleanClientName,
+    email:cleanEmail,
+    password,
+    company:data?.companyName||cleanCompanyName||cleanClientName
+   });
+   setClientName('');setEmail('');setPassword('');setCompanyName('');setTemplate('generic');setShowPassword(false);
   }catch(e){
    setError(e instanceof Error?e.message:'Não foi possível criar o acesso.');
   }finally{setBusy(false)}
@@ -87,9 +102,14 @@ export default function AdminForm(){
  return <div className="admin-form-wrap">
   <form className="admin-form admin-form-v2" onSubmit={submit}>
    <div className="admin-fields-grid">
-    <label className="field-wide">
+    <label>
+     <span>Nome do cliente</span>
+     <input required maxLength={100} value={clientName} onChange={e=>setClientName(e.target.value)} autoComplete="off" placeholder="Ex.: João Silva"/>
+    </label>
+
+    <label>
      <span>E-mail do cliente</span>
-     <input required type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="off" placeholder="cliente@empresa.com"/>
+     <input required type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="off" placeholder="joao@empresa.com"/>
     </label>
 
     <label className="field-wide">
@@ -103,7 +123,7 @@ export default function AdminForm(){
 
     <label>
      <span>Empresa <small>opcional</small></span>
-     <input maxLength={120} value={name} onChange={e=>setName(e.target.value)} placeholder="Ex.: Horizonte Eventos"/>
+     <input maxLength={120} value={companyName} onChange={e=>setCompanyName(e.target.value)} placeholder="Ex.: Horizonte Eventos"/>
     </label>
 
     <label>
@@ -126,7 +146,8 @@ export default function AdminForm(){
    <div className="access-success-icon"><Check size={22}/></div>
    <div className="access-success-main">
     <span>ACESSO CRIADO</span>
-    <h3>{created.company}</h3>
+    <h3>{created.clientName}</h3>
+    {created.company&&created.company!==created.clientName&&<p className="access-company">{created.company}</p>}
     <div className="credential-row"><small>E-mail</small><strong>{created.email}</strong></div>
     <div className="credential-row"><small>Senha</small><strong>{created.password}</strong></div>
     <div className="success-actions">
