@@ -1,20 +1,21 @@
-# Daily Work — validação e publicação em andamento
+# Daily Work — release gates confirmados
 
-Base: main 4eaca8718de5a0546486ddd495d574ee00c69bc2, core deployment 60e16b16-6bde-40f2-a205-053dc4e82661 SUCCESS.
+Implementado: fila Resolver pendências sequencial; espera com revisão e início preservado; pipeline proprietário/admin/versionamento; tempo de estágio; Contatos; busca; timeline estruturada/ator; origem; empty states; feedback. Onboarding próprio agora é RPC transacional, inclusive recuperação de ambiente incompleto.
 
-## Evidência confirmada
-CI run 36782015438, job 110114317500, head aed2943e4cb01def6b7224e45b84c7d8b12eaeb7: SUCCESS.
-15 testes unitários; TypeScript; build; ACL core e pipeline; 52 grupos core e 55 grupos daily PASS. Ambiente descartável com Supabase Auth/Postgres/REST/RLS reais. Os 55 grupos incluem quatro larguras (360/390/412/768), fila de 20 resoluções reais, contatos/busca, configuração concorrente de pipeline, rejeição de membro não proprietário na empresa alvo, feedback e 3 casos de onboarding atômico. Sem falhas ou falhas de limpeza nos relatórios. Artefato 11127673947, retenção até 07/10/2026. Isto não substitui teste de produção ou inspeção visual humana dos novos screenshots.
+## Evidências
+- CI head d6237971d26b9005bb4277d03a117d4a739f934c, run 36783901851, job 110120577406: 15 unit, TypeScript, build, 52 core e 55 daily PASS. Auth/Postgres/REST/RLS reais descartáveis, quatro viewports 360/390/412/768; concorrência de pipeline, resolução de 20 itens e 3 cenários de onboarding.
+- Runtime temporário Railway head 954e6dd96bc233febec86267ddc82a06a4e6867a: deployment 17f0e1e4-b5e0-4e5a-87a4-0dc5fc1e0a10 SUCCESS, Next Ready, uma réplica online. App idêntico ao head d623 (diferença apenas smoke test/CI).
+- CI GET público de produção: /api/health 200 com status ok/product Aether Flow; /login 200; /contatos sem sessão redireciona /login. Nenhuma credencial de produção usada.
+- Banco de produção após fronteira pipeline: testes ACL PASS e 7 grupos de RPC/espera/próxima ação/onboarding/feedback PASS em transação ROLLBACK, sem gravações persistentes. tests/daily-production-rollback.sql guarda o procedimento.
+- Navegador do executor desconectado: inspeção visual/authenticated UI em produção NOT_TESTED; não equivale aos testes descartáveis ou SQL. Mobile automatizado e overflow passaram, mas inspeção visual humana de novos screenshots ainda pendente.
 
-## Banco
-Migração additive daily_work_engine aplicada ao projeto xffwvvcmeqzimnuqqtus, versão remota 20260930220201. Arquivo reconciliado; não reaplicar versão gerada original 20260930212058.
-Pipeline ainda mantém os grants legados durante a troca de runtime. Ativar docs/pending/daily_mutation_boundary.sql somente após o novo onboarding atômico estar em produção e verificado; registrar a ativação como NOVA migração.
+## Banco sincronizado
+20260930220201_daily_work_engine e 20260930221310_daily_final_mutation_boundary aplicadas remotamente.
+Migration aditiva foi gerada originalmente pela CLI como 20260930212058; fronteira gerada pela CLI no CI como 20260930221243 e reconciliada às versões remotas. Não reaplicar nomes antigos.
+Pipeline authenticated SELECT-only, anon sem acesso; escrita só por configure_pipeline/ensure_owned_workspace/ensure_demo_workspace com autorização. Fronteira já ativa.
 
-## Estado da entrega
-Fila, espera com revisão, pipeline proprietário/admin/versionamento, tempo de estágio, Contatos, busca, timeline estruturada, origem, empty states e feedback implementados. Nenhum envio comercial ou troca de senha.
-Railway branch runtime/health/QA: PENDING.
-Merge e deployment main diário: PENDING.
-Ambiente executor local desconectado; continuação via GitHub/CI e conectores, sem declarar testes locais adicionais.
+## Release
+Merge/main Railway ainda PENDING até último CI deste commit PASS; registrar confirmação final no PR após deploy. Nenhum contato real/senha/env secret alterado. Ambiente local offline, continuação GitHub/CI.
 
 ## Rollback
-Imagem core main 4eaca871 (60e16b16) preservada. Após ativação da fronteira pipeline, rollback para core requer NOVA migração restaurando apenas grants legados necessários de pipeline antes do onboarding antigo. Operações de contatos/oportunidades/atividades/histórico permanecem RPC-only. Não remover colunas nem dados; não executar down migration destrutiva.
+Core main 4eaca871, deployment60e16b16 ainda disponível para rollback/redeploy (agora REMOVED após troca normal). Antes de rollback para core, NOVA migration restaurando apenas grants legados necessários de pipeline; contatos/oportunidades/atividades/histórico ficam RPC-only. Manter colunas e dados. Nenhuma down migration destrutiva.

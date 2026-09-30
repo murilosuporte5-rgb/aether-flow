@@ -1,0 +1,14 @@
+{
+  "ciHead": "d6237971d26b9005bb4277d03a117d4a739f934c",
+  "ciRun": 36783901851,
+  "core": 52,
+  "daily": 55,
+  "unit": 15,
+  "railwayBranchDeployment": "17f0e1e4-b5e0-4e5a-87a4-0dc5fc1e0a10",
+  "railwayStatus": "SUCCESS",
+  "publicHealth": "PASS",
+  "productionDbRollbackGroups": 7,
+  "productionDbPersistentWrites": false,
+  "productionVisual": "NOT_TESTED",
+  "mainDeployment": "PENDING"
+}

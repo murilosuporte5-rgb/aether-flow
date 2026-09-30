@@ -76,16 +76,6 @@ jobs:
         run: node tests/daily-acceptance.mjs
       - name: Read-only production HTTP smoke
         run: node tests/public-release-smoke.mjs
-      - name: Generate final pipeline boundary migration
-        run: |
-          set -euo pipefail
-          npx --yes supabase@2.118.0 migration new daily_final_mutation_boundary
-          generated=$(find supabase/migrations -name '*_daily_final_mutation_boundary.sql' -print -quit)
-          test -n "$generated"
-          cp docs/pending/daily_mutation_boundary.sql "$generated"
-          mkdir -p qa-results
-          cp "$generated" qa-results/
-          echo "Generated boundary migration: $(basename "$generated")"
       - name: Safe QA evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
