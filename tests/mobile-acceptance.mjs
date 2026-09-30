@@ -15,7 +15,7 @@ const clientOptions = { auth: { persistSession: false, autoRefreshToken: false }
 const admin = createClient(api, secret, clientOptions);
 const fixtures = [];
 const results = [];
-const dir = ".qa-results";
+const dir = "qa-results";
 await fs.mkdir(dir, { recursive: true });
 let browser;
 let activePage;

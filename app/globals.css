@@ -143,3 +143,5 @@
 @media(max-width:600px){.heading>.primary{position:fixed;right:16px;bottom:18px;z-index:30;box-shadow:0 6px 22px #20355030;min-height:48px}.page-body{padding-bottom:90px}.modal-overlay{padding:8px}.core-form{max-height:96dvh;width:100%}.core-form .form-grid{grid-template-columns:1fr}.core-form .modal-footer{gap:8px}.core-form .modal-footer .primary{flex:1}.duplicate-actions{flex-direction:column}.whatsapp-action button{min-height:44px}.message-tools .whatsapp-action{margin:8px 0 0}}
 
 .stale-indicator.attention{color:#99621a}.stale-indicator.stale{color:#a33d2e;font-weight:700}.modal-overlay{z-index:50}
+/* Keep capture above the mobile navigation, including device safe areas. */
+@media(max-width:600px){.heading>.primary{bottom:calc(90px + env(safe-area-inset-bottom))}.page-body{padding-bottom:calc(160px + env(safe-area-inset-bottom))}}
