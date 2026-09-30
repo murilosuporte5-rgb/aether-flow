@@ -533,7 +533,9 @@ export default function Workspace({
             </div>
             <button
               className="primary"
+              disabled={loading || !data.company || data.company.id !== companyId || !data.stages.some((stage) => stage.kind === "open")}
               onClick={() => {
+                if (loading || !data.company || data.company.id !== companyId) return;
                 setSelected(null);
                 setModal("create");
               }}

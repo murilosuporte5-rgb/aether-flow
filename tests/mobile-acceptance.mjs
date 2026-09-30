@@ -111,12 +111,15 @@ try {
     await page.getByRole("button", { name: "Entrar no Aether Flow", exact: true }).click();
     await page.waitForURL(base + "/");
     await page.getByRole("button", { name: "Nova oportunidade", exact: true }).waitFor();
+    await poll("workspace ready", () => page.getByRole("button", { name: "Nova oportunidade", exact: true }).isEnabled());
     await noOverflow(page, "authenticated workspace");
     record("real_auth_login", width);
 
     const title = "QA Núcleo " + width;
     const phone = "+1 202 555 0126";
     await createUI(page, title, "");
+    assert.equal(await core(page).getByLabel("Nome do cliente", { exact: false }).inputValue(), "QA Cliente fictício");
+    assert.equal(await core(page).getByLabel("Oportunidade", { exact: false }).inputValue(), title);
     await submit(page);
     assert.equal(await count("contacts", tenant.company), 0);
     await core(page).getByLabel("WhatsApp / telefone", { exact: false }).fill("000");

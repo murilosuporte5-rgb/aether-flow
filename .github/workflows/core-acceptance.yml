@@ -36,9 +36,9 @@ jobs:
           set -euo pipefail
           npm install --no-save --package-lock=false playwright@1.63.0
           npx playwright install --with-deps chromium
-          npx --yes supabase init
-          npx --yes supabase start -x studio,imgproxy,storage-api,postgres-meta,realtime,edge-runtime,logflare,vector,supavisor > "$RUNNER_TEMP/local-stack.log" 2>&1
-          npx --yes supabase status -o json > "$RUNNER_TEMP/local-supabase.json"
+          npx --yes supabase@2.118.0 init
+          npx --yes supabase@2.118.0 start -x studio,imgproxy,storage-api,postgres-meta,realtime,edge-runtime,logflare,vector,supavisor > "$RUNNER_TEMP/local-stack.log" 2>&1
+          npx --yes supabase@2.118.0 status -o json > "$RUNNER_TEMP/local-supabase.json"
           echo "Local stack started; credentials retained only in runner temporary files."
       - name: Enforce local mutation boundary
         run: |
@@ -76,4 +76,4 @@ jobs:
           retention-days: 7
       - name: Stop disposable local stack
         if: always()
-        run: npx --yes supabase stop --no-backup
+        run: npx --yes supabase@2.118.0 stop --no-backup
