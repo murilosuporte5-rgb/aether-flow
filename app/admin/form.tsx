@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import {FunctionsHttpError} from '@supabase/supabase-js';
 import {createClient} from '@/lib/supabase/browser';
 import {templates,type TemplateKey} from '@/lib/templates';
 
@@ -14,14 +15,31 @@ export default function AdminForm(){
 
  async function submit(e:React.FormEvent){
   e.preventDefault();
-  setBusy(true);setResult('');setError('');
+  setResult('');setError('');
+
+  if(password.length<12){
+   setError('A senha precisa ter pelo menos 12 caracteres.');
+   return;
+  }
+
+  setBusy(true);
   try{
    const supabase=createClient();
    const {data,error}=await supabase.functions.invoke('create-access',{
     body:{email:email.trim().toLowerCase(),password,name:name.trim(),template}
    });
+
+   if(error instanceof FunctionsHttpError){
+    let message='Não foi possível criar o acesso.';
+    try{
+     const payload=await error.context.json() as {error?:string};
+     if(payload?.error)message=payload.error;
+    }catch{}
+    throw new Error(message);
+   }
    if(error)throw error;
    if(data?.error)throw new Error(data.error);
+
    setResult(`Acesso criado. Cliente: ${email.trim().toLowerCase()} · entra com a senha definida acima.`);
    setEmail('');setPassword('');setName('');setTemplate('generic');
   }catch(e){
@@ -34,7 +52,7 @@ export default function AdminForm(){
    <input required type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="off"/>
   </label>
   <label>Senha inicial
-   <input required type="text" minLength={8} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="off" placeholder="Mínimo de 8 caracteres"/>
+   <input required type="text" minLength={12} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="off" placeholder="Mínimo de 12 caracteres"/>
   </label>
   <label>Empresa <small>(opcional)</small>
    <input maxLength={120} value={name} onChange={e=>setName(e.target.value)} placeholder="Se vazio, usamos o nome do e-mail"/>
