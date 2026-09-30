@@ -1,3 +1,7 @@
+# Estado atual — atualização 21:17 UTC
+
+Núcleo validado no commit 1bfc34c; 52 grupos mobile/Auth/RLS PASS em CI isolada e fluxo desktop autenticado PASS na Railway. Fronteira RPC-only definitiva aplicada em 20260930211138 e retestada PASS. Merge/main deployment ainda são o último gate. Prompts 2–4 pendentes. Veja CORE_RELEASE.md para o estado vigente; o registro abaixo é histórico e seus estados antigos não representam o estado atual.
+
 # Aether Flow — estado da implementação em 30/09/2026
 
 **O programa de quatro prompts não está concluído.** O núcleo do Prompt 1 foi implementado na branch `core-execution-20260930`, com PR #13 em rascunho. Os testes de código e banco abaixo passaram. O acesso autenticado foi confirmado após o login do usuário; nenhuma senha foi lida ou alterada. O fluxo principal passou no navegador desktop e no banco. A Railway voltou para `main`, commit f08f915, deployment 5c02f4be-f7fa-4305-af81-28dea223c9ad SUCCESS, confirmado pelo conector independente. Mobile autenticado e ativação definitiva da fronteira de escrita continuam pendentes. O Jarvis verificou o login público em quatro viewports. A fronteira RPC-only passou nos testes, mas seus grants foram revertidos para compatibilidade com main antes do restore. Não houve merge.
