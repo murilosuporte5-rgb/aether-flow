@@ -562,7 +562,7 @@ export default function Workspace({
               }}
               reschedule={(r) => {
                 setSelected(r.id);
-                setModal("reschedule");
+                setModal(r.next_action_at ? "reschedule" : "schedule");
               }}
               viewList={(f) => {
                 setTab("list");

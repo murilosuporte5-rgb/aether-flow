@@ -250,7 +250,7 @@ export default function Dashboard({
                         </button>
                       ) : (
                         <button
-                          onClick={() => open(r)}
+                          onClick={() => reschedule(r)}
                           aria-label={`Agendar ação de ${r.contact_name}`}
                         >
                           <CalendarDays size={17} />
@@ -272,6 +272,7 @@ export default function Dashboard({
                           phone={r.phone}
                           name={r.contact_name}
                           compact
+                          onRecorded={onWhatsAppRecorded}
                         />
                       )}
                     </div>
