@@ -185,7 +185,7 @@ try {
 
     await page.getByRole("button", { name: "Concluir ação", exact: true }).click();
     await core(page).getByLabel("Próximo passo", { exact: false }).selectOption("close");
-    await core(page).getByLabel("Resultado *", { exact: true }).selectOption("lost");
+    await core(page).getByLabel(/Resultado\s*\*/).selectOption("lost");
     await core(page).getByLabel("Motivo da perda", { exact: false }).selectOption("Outro");
     await submit(page);
     assert.equal((await opp(first.id)).status, "open");
@@ -249,13 +249,13 @@ try {
 
     assert.deepEqual(errors, [], "No uncaught browser errors");
     assert.deepEqual(external, [], "No production or unexpected external requests");
-    await page.screenshot({ path: dir + "/mobile-" + width + ".png", fullPage: true });
+    await page.screenshot({ path: dir + "/mobile-" + width + ".png", fullPage: false });
     await context.close();
     activePage = null;
   }
 } catch (error) {
   results.push({ name: "failure", status: "FAIL", message: error.message });
-  if (activePage) await activePage.screenshot({ path: dir + "/failure.png", fullPage: true }).catch(() => {});
+  if (activePage) await activePage.screenshot({ path: dir + "/failure.png", fullPage: false }).catch(() => {});
   process.exitCode = 1;
 } finally {
   if (browser) await browser.close();
