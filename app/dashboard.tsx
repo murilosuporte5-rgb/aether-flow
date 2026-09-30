@@ -32,7 +32,7 @@ type Props = {
   wa: (phone: string | null) => string | null;
   formatDate: (date: string | null) => string;
   money: (value: number | null) => string;
-  onWhatsAppRecorded:()=>void;
+  onWhatsAppRecorded: () => void;
 };
 const dateKey = (s: string) => {
   const p = new Intl.DateTimeFormat("en-US", {

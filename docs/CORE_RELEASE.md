@@ -29,10 +29,10 @@ Scope: Prompt 1. Prompts 2–4 remain gated until this layer passes authenticate
 
 ## Evidence collected
 
-- npm test: 7 domain acceptance tests PASS.
+- npm test: 8 domain acceptance tests PASS.
 - npm run check: PASS.
 - npm run build: PASS.
-- tests/core-acceptance.sql: 20 PostgreSQL checks PASS, all fixtures rolled back.
+- tests/core-acceptance.sql: 23 PostgreSQL checks PASS, all fixtures rolled back.
 - tests/demo-acceptance.sql: 5 PostgreSQL checks PASS, all fixtures rolled back.
 - Local production-mode /api/health and /login: HTTP 200.
 - Repeated requests returned one contact/opportunity, and repeated identical IDs returned the same result. MCP SQL calls were serialized (timestamps did not overlap): these are NOT evidence of true simultaneous HTTP/session concurrency. Required simultaneous test remains pending.
@@ -41,7 +41,7 @@ Scope: Prompt 1. Prompts 2–4 remain gated until this layer passes authenticate
 ## Release sequence
 
 1. Verify current main has not advanced; rebase/retest if it has.
-2. Confirm rollback of the recorded SUCCESS image remains available in Railway.
+2. Confirm rollback of the recorded SUCCESS image remains available in Railway. Baseline restore 63e8783f-5832-4cb3-a5f1-1562dc7907d0 reached SUCCESS in this run.
 3. Apply additive migrations, sync their actual versions with migration files.
 4. Push the feature branch, switch ONLY this service's source branch temporarily, deploy it.
 5. Validate /api/health, login, authenticated core flow and mobile.
@@ -62,4 +62,11 @@ Select the recorded successful deployment in Railway's deployment list and use i
 - create-access compensation is unchecked and currently claims no partial access even if compensation fails. Requires Prompt 4 correction and its acceptance tests.
 - Supabase leaked-password protection is disabled (security advisor WARN); availability/configuration must be verified before enabling or recording a justified limitation.
 - Existing multiple permissive INSERT policies need a semantics-preserving consolidation in hardening.
-- Authenticated E2E, mobile/browser QA, actual simultaneous request test, Railway feature deployment and final main release are not yet PASS.
+- Temporary Railway branch deployment dbcd9a0abca7097326e00854348661c7b2a52c19 reached SUCCESS (4d08f1ab-594b-4ff0-8e3e-99fe6906fd32); public health returned HTTP 200.
+- Authenticated E2E/mobile and actual simultaneous request test remain NOT_TESTED: the app rejected the secure login attempt with “E-mail ou senha inválidos”. No password was accessed by the agent.
+- The permission activation SQL in docs/pending/core_mutation_boundary.sql is NOT_APPLIED; it is intentionally outside the migration directory until deployment gates pass. Legacy direct writes must remain available while the old runtime is restored. Core is not released into main.
+- Two new security-advisor WARN findings identify intentionally authenticated SECURITY DEFINER RPCs. They have empty search_path, verified auth.uid(), scoped membership/ownership checks, bounded inputs, revoked anon/PUBLIC execution and composite FKs. Tenant adversarial tests passed; final independent security review remains part of Prompt 4.
+
+## Production restored
+
+After the secure login was rejected, source was returned to main at f08f9157fc0786afd2b0d20529f1e260d87f38a5, healthcheck /login, deployment 63e8783f-5832-4cb3-a5f1-1562dc7907d0 SUCCESS. Later phone-storage/accessibility refinements remain on the feature branch and require another temporary production test. No merge was performed.

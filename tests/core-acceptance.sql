@@ -95,7 +95,13 @@ begin
  select id into st from public.pipeline_stages where company_id=cb and kind='open' order by position limit 1;
  r:=public.apply_workspace_command(cb,gen_random_uuid(),jsonb_build_object('kind','create','contactName','QA B','title','Same number different tenant','stageId',st,'phone','71999999999'));
  if not (r->>'ok')::boolean or (select count(*) from public.contacts where company_id=cb)<>1 then raise exception 'FAIL company-scoped uniqueness';end if;
+ r:=public.apply_workspace_command(cb,gen_random_uuid(),jsonb_build_object('kind','create','contactName','QA international','title','International round-trip','stageId',st,'phone','+1 415 555 2671'));
+ if not (r->>'ok')::boolean then raise exception 'FAIL international create';end if;
+ if not exists(select 1 from public.contacts where company_id=cb and phone='+14155552671' and phone_normalized='14155552671') then raise exception 'FAIL international storage';end if;
+ r:=public.apply_workspace_command(cb,gen_random_uuid(),jsonb_build_object('kind','create','contactName','QA international','title','Duplicate international','stageId',st,'phone','+14155552671'));
+ if r->>'code'<>'DUPLICATE_CONTACT' or (select count(*) from public.contacts where company_id=cb)<>2 then raise exception 'FAIL international duplicate';end if;
+
 end $$;
 reset role;
-select jsonb_build_object('status','PASS','checks',array['invalid_phone','valid_phone','no_phone','duplicate_phone','explicit_reuse','idempotency','idempotency_conflict','complete_without_next_rejected','rollback_next_action_failure','complete_next','complete_lost','complete_won','loss_reason_required','other_note_required','whatsapp_audit','whatsapp_no_fake_interaction','history_append_only','tenant_reads','tenant_rpc','company_scoped_uniqueness'],'fixtures','ROLLED_BACK') as acceptance_result;
+select jsonb_build_object('status','PASS','checks',array['invalid_phone','valid_phone','no_phone','duplicate_phone','explicit_reuse','idempotency','idempotency_conflict','complete_without_next_rejected','rollback_next_action_failure','complete_next','complete_lost','complete_won','loss_reason_required','other_note_required','whatsapp_audit','whatsapp_no_fake_interaction','history_append_only','tenant_reads','tenant_rpc','company_scoped_uniqueness','international_create','international_storage','international_duplicate'],'fixtures','ROLLED_BACK') as acceptance_result;
 rollback;

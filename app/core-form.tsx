@@ -7,6 +7,7 @@ import {
   TIME_ZONE,
   formatPhone,
   normalizePhone,
+  phoneForStorage,
 } from "@/lib/execution";
 import type { Data, Row, Stage } from "./workspace";
 
@@ -187,7 +188,7 @@ export default function CoreForm({
           const payload: Record<string, unknown> = capture
             ? {
                 contactName: name,
-                phone: normalizePhone(phone),
+                phone: phoneForStorage(phone),
                 title,
                 value,
                 organization,
@@ -514,7 +515,7 @@ export default function CoreForm({
                   await onSave({
                     requestId: requestId.current,
                     contactName: name,
-                    phone: normalizePhone(phone),
+                    phone: phoneForStorage(phone),
                     title,
                     value,
                     organization,

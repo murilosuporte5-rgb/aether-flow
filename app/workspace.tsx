@@ -287,44 +287,48 @@ export default function Workspace({
     ? user.email.split("@")[0].replace(/[._-]+/g, " ")
     : user.name;
   const firstName = rawDisplayName.trim().split(/\s+/)[0] || "cliente";
-  const attentionCount = open.filter(r=>priorityRank(r)<=3).length;
+  const attentionCount = open.filter((r) => priorityRank(r) <= 3).length;
   const greeting = greetingForNow(),
     todayLabel = longToday();
   const filtered = useMemo(
     () =>
-      data.opportunities.filter((x) => {
-        if (
-          search &&
-          !`${x.contact_name} ${x.title} ${x.organization || ""}`
-            .toLocaleLowerCase("pt-BR")
-            .includes(search.toLocaleLowerCase("pt-BR"))
-        )
-          return false;
-        if (stageFilter !== "all" && x.stage_id !== stageFilter) return false;
-        if (ownerFilter !== "all" && x.owner_id !== ownerFilter) return false;
-        if (filter === "overdue")
-          return (
-            x.status === "open" &&
-            !!x.next_action_at &&
-            Date.parse(x.next_action_at) < Date.now()
-          );
-        if (filter === "today")
-          return (
-            x.status === "open" &&
-            !!x.next_action_at &&
-            Date.parse(x.next_action_at) >= Date.now() &&
-            day(x.next_action_at) === todayKey()
-          );
-        if (filter === "week")
-          return (
-            x.status === "open" &&
-            !!x.next_action_at &&
-            new Date(x.next_action_at).getTime() <= Date.now() + 7 * 86400000 &&
-            new Date(x.next_action_at).getTime() >= Date.now() - 86400000
-          );
-        if (filter === "none") return x.status === "open" && !x.next_action_at;
-        return true;
-      }).sort(comparePriority),
+      data.opportunities
+        .filter((x) => {
+          if (
+            search &&
+            !`${x.contact_name} ${x.title} ${x.organization || ""}`
+              .toLocaleLowerCase("pt-BR")
+              .includes(search.toLocaleLowerCase("pt-BR"))
+          )
+            return false;
+          if (stageFilter !== "all" && x.stage_id !== stageFilter) return false;
+          if (ownerFilter !== "all" && x.owner_id !== ownerFilter) return false;
+          if (filter === "overdue")
+            return (
+              x.status === "open" &&
+              !!x.next_action_at &&
+              Date.parse(x.next_action_at) < Date.now()
+            );
+          if (filter === "today")
+            return (
+              x.status === "open" &&
+              !!x.next_action_at &&
+              Date.parse(x.next_action_at) >= Date.now() &&
+              day(x.next_action_at) === todayKey()
+            );
+          if (filter === "week")
+            return (
+              x.status === "open" &&
+              !!x.next_action_at &&
+              new Date(x.next_action_at).getTime() <=
+                Date.now() + 7 * 86400000 &&
+              new Date(x.next_action_at).getTime() >= Date.now() - 86400000
+            );
+          if (filter === "none")
+            return x.status === "open" && !x.next_action_at;
+          return true;
+        })
+        .sort(comparePriority),
     [data.opportunities, search, stageFilter, ownerFilter, filter],
   );
   const activity = (r: Row) =>
@@ -333,7 +337,7 @@ export default function Workspace({
     );
   const statusText = (r: Row) =>
     r.status === "won"
-      ? "Concluído"
+      ? "Ganho"
       : r.status === "lost"
         ? "Perdido"
         : !r.next_action_at
@@ -564,7 +568,9 @@ export default function Workspace({
                 setTab("list");
                 setFilter(f);
               }}
-              onWhatsAppRecorded={()=>void fetchData(template,data.company!.id,true)}
+              onWhatsAppRecorded={() =>
+                void fetchData(template, data.company!.id, true)
+              }
               wa={wa}
               formatDate={formatDate}
               money={money}
@@ -806,6 +812,7 @@ export default function Workspace({
       </main>
       {row && (
         <div
+          aria-hidden={!!modal}
           className="overlay"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) setSelected(null);
@@ -889,7 +896,7 @@ export default function Workspace({
               </div>
               <div>
                 <span>Empresa</span>
-                <strong>{row.organization || "Pessoa física"}</strong>
+                <strong>{row.organization || "Não informada"}</strong>
               </div>
               <div>
                 <span>Origem</span>

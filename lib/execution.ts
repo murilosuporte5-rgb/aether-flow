@@ -58,6 +58,10 @@ export function formatPhone(value: string | null): string {
   }
   return `+${phone}`;
 }
+export function phoneForStorage(value: string): string | null {
+  const normalized = normalizePhone(value);
+  return normalized ? `+${normalized}` : null;
+}
 export function whatsappUrl(phone: string | null, message = ""): string | null {
   const normalized = normalizePhone(phone);
   return normalized

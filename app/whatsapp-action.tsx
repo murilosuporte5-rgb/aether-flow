@@ -66,7 +66,7 @@ export default function WhatsAppAction({
             });
             const result = await response.json();
             if (!response.ok || !result.ok) {
-              if(response.status<500) pending.current = null;
+              if (response.status < 500) pending.current = null;
               throw new Error(
                 result.error || "Não foi possível registrar a abertura.",
               );

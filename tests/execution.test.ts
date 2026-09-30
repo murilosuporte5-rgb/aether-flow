@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   normalizePhone,
+  phoneForStorage,
   formatPhone,
   whatsappUrl,
   daysSinceInteraction,
@@ -92,4 +93,19 @@ test("same deadline priority has deterministic stable ID tie-breaker", () => {
     created_at: "2026-09-30T12:00:00Z",
   };
   assert.ok(comparePriority({ ...base, id: "a" }, { ...base, id: "b" }) < 0);
+});
+
+test("phone storage round-trip preserves country and normalized identity", () => {
+  for (const input of [
+    "71999999999",
+    "(71) 99999-9999",
+    "+55 71 99999-9999",
+    "+1 415 555 2671",
+  ]) {
+    const stored = phoneForStorage(input);
+    assert.ok(stored?.startsWith("+"));
+    assert.equal(normalizePhone(stored), normalizePhone(input));
+    assert.ok(whatsappUrl(stored));
+  }
+  assert.equal(phoneForStorage("999999999"), null);
 });
