@@ -76,3 +76,41 @@
 .sidebar nav .admin-nav{display:flex;align-items:center;border-radius:8px}.sidebar nav .admin-nav:hover{background:#26374f;color:#fff}
 @media(max-width:900px){.admin-layout{grid-template-columns:1fr}.admin-help-card{order:-1}.auth-shell{grid-template-columns:1fr;max-width:540px;min-height:0}.auth-visual{display:none}.mobile-auth-brand{display:flex}.login-card-v2{padding:42px}}
 @media(max-width:620px){.admin-page-v2{padding:20px 14px 50px}.admin-topbar{margin-bottom:28px}.admin-badge{display:none}.admin-hero{gap:11px}.admin-hero-icon{width:42px;height:42px;border-radius:12px}.admin-hero h1{font-size:27px}.admin-layout{gap:12px}.admin-card,.admin-help-card{border-radius:14px}.admin-card-head{padding:18px}.admin-form-v2{padding:18px}.admin-fields-grid{grid-template-columns:1fr}.admin-fields-grid .field-wide{grid-column:auto}.admin-form-footer{align-items:stretch;flex-direction:column}.admin-create-button{width:100%}.admin-security-note{order:2}.login{padding:12px}.auth-shell{border-radius:18px}.login-card-v2{padding:34px 22px}.credential-row{grid-template-columns:1fr;gap:2px}.success-actions>*{width:100%;justify-content:center}}
+
+
+/* Workspace UX completion */
+@media(min-width:761px){
+ .sidebar nav .admin-nav{gap:13px}
+ .page-body{padding-top:36px}
+ .signal-card,.priority-panel,.insight-panel,.upcoming-panel,.table-wrap,.column,.kanban-card{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+ .signal-card:hover,.kanban-card:hover{transform:translateY(-1px)}
+}
+@media(max-width:760px){
+ .app{display:block;background:#f5f7fa}
+ .sidebar{position:relative;height:auto;min-height:0;background:#fff;color:#2e4057;padding:12px 14px 10px;border-bottom:1px solid #e3e8ee}
+ .brand{padding:0 0 10px}.brand strong{color:#1e3047}.brand small{color:#8a98aa}
+ .workspace-label{display:none}
+ .company-sidebar-name{margin:0;padding:9px 11px;border-radius:10px;background:#f4f7fb;color:#455a73;border:1px solid #e0e7ef}
+ .select-wrap{margin:0}.select-wrap select{background:#f4f7fb;color:#40556d;border-color:#dee6ee;border-radius:10px}
+ .sidebar-bottom{display:none}
+ .sidebar nav{position:fixed;z-index:50;left:0;right:0;bottom:0;display:flex;gap:5px;overflow:visible;background:#fff;border-top:1px solid #dde4ec;box-shadow:0 -10px 30px #14283d12;padding:8px 8px calc(8px + env(safe-area-inset-bottom))}
+ .sidebar nav button,.sidebar nav .admin-nav{flex:1;min-width:0;margin:0;border:0;border-radius:10px;background:transparent;color:#77879a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;font-size:10px;font-weight:800;white-space:nowrap}
+ .sidebar nav button svg,.sidebar nav .admin-nav svg{width:17px;height:17px}
+ .sidebar nav button:hover,.sidebar nav button.active,.sidebar nav .admin-nav:hover{background:#edf4fd;color:#245d9e}
+ .topbar{display:none}
+ .page-body{padding:21px 14px calc(108px + env(safe-area-inset-bottom))}
+ .heading{display:block;margin-bottom:20px}.heading h1{font-size:25px;line-height:1.15}.heading p{font-size:12px;line-height:1.55}.heading .primary{width:100%;margin-top:15px;min-height:44px}
+ .focus-banner{padding:21px;border-radius:15px;min-height:0}.focus-visual{display:none}.focus-banner p{font-size:12px}
+ .signal-grid{grid-template-columns:1fr 1fr;gap:8px}.signal-card{min-height:122px;padding:13px;border-radius:13px}.signal-card strong{font-size:24px}
+ .dashboard-grid{grid-template-columns:1fr;gap:12px}.priority-panel,.insight-panel,.upcoming-panel{border-radius:13px}
+ .priority-row{padding:14px 12px 14px 18px}.priority-actions{max-width:none}
+ .filters,.pipeline-filters{display:grid;grid-template-columns:1fr;gap:7px}.filters label,.pipeline-filters label{width:100%;min-width:0!important}.filters input,.filters select,.pipeline-filters input,.pipeline-filters select{width:100%}
+ .table-wrap{border-radius:12px}.table-wrap table{min-width:850px}
+ .board{min-height:430px;gap:10px}.column{flex-basis:82vw;max-width:310px;border-radius:12px}
+ .detail{width:100%;padding:20px 17px calc(92px + env(safe-area-inset-bottom))}.detail-controls{flex-wrap:wrap}.detail-controls>*{flex:1;justify-content:center}
+ .modal{padding:20px 17px;border-radius:16px}.modal-footer{position:sticky;bottom:-1px;background:#fff;padding-bottom:3px}
+}
+@media(max-width:420px){
+ .signal-grid{grid-template-columns:1fr 1fr}.signal-label{font-size:10px}.signal-card small{font-size:9px}
+ .sidebar nav button,.sidebar nav .admin-nav{font-size:9px}
+}
