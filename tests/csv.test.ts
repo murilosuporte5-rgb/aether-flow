@@ -17,3 +17,6 @@ test('CSV accepts 100+ records without changing legitimate repeated contacts', (
   const rows = Array.from({ length: 150 }, (_, i) => ['Cliente', '71999999999', `Oportunidade ${i}`]);
   assert.equal(parseCsv(exportCsv(['nome', 'telefone', 'oportunidade'], rows)).length, 151);
 });
+test('CSV detects delimiters outside quoted header names',()=>{
+ assert.deepEqual(parseCsv('"nome;completo",telefone\nJoão,71999999999'),[['nome;completo','telefone'],['João','71999999999']]);
+});

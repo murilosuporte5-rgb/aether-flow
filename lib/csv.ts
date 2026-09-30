@@ -2,7 +2,13 @@
 export function parseCsv(input: string): string[][] {
   if (new TextEncoder().encode(input).length > 1_000_000) throw new Error('Arquivo excede 1 MB.');
   const text = input.replace(/^\uFEFF/, '');
-  const delimiter = text.split(/\r?\n/, 1)[0].includes(';') ? ';' : ',';
+  let inQuotes=false,semicolons=0,commas=0;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(ch==='"'){if(inQuotes&&text[i+1]==='"')i++;else inQuotes=!inQuotes;}
+    else if(!inQuotes){if(ch==='\r'||ch==='\n')break;if(ch===';')semicolons++;if(ch===',')commas++;}
+  }
+  const delimiter = semicolons>commas ? ';' : ',';
   const rows: string[][] = [];
   let row: string[] = [], value = '', quoted = false, ended = false;
   const cell = () => { row.push(value); value = ''; ended = false; };

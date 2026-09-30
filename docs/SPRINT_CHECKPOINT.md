@@ -19,3 +19,5 @@
 - Docker daemon indisponível: aceitar SQL/security/E2E somente após CI isolado. Migration NÃO APLICADA; Edge NÃO PUBLICADA. Não fazer merge antes de todos os gates.
 - Pendências reais: testes SQL de lifecycle/admin/import; teste Edge e falhas de compensação; runtime autenticado/mobile; suporte auditado/abrir ambiente; revisão de rate limits/CSV datas; export snapshot/paginação; trial no onboarding; advisors/integridade/performance/recovery; gates finais e merge.
 - Railway permaneceu main 19c868b / SUCCESS na inspeção inicial. Não houve troca de deployment ou alteração de dados.
+- Final local: 24/24 testes PASS, TypeScript PASS, build PASS. Runtime Next Ready; health/login 200. Railway reconfirmada SUCCESS, deployment 5ac916c7, sem staged work.
+- Push inicial rejeitado por auto-review (publicação pública). Usuário autorizou explicitamente push e PR draft; nova tentativa permitida. Sem merge/release antes dos gates.

@@ -22,3 +22,7 @@ test('Metrics use Bahia month, exclude unknown closure and show empty denominato
  ],[],'2026-09',new Date('2026-09-30T12:00:00Z'));
  assert.equal(result.won,1);assert.equal(result.lost,0);assert.equal(result.winRate,1);assert.equal(result.wonValue,100);assert.equal(result.sample,1);assert.equal(result.unknownClosure,1);assert.equal(result.open,1);
 });
+test('Import rejects impossible calendar dates rather than rolling them forward',()=>{
+ const result=validateImport('nome;telefone;oportunidade;estágio;próxima_acao;data_proxima_acao\nJoão;71999999999;Venda;Novo;Ligação;2026-02-30T10:00',stages);
+ assert.ok(result.errors.some(e=>e.includes('inexistente')));
+});
