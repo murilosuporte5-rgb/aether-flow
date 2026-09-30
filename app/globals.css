@@ -129,3 +129,13 @@
 .welcome-meta i{width:3px;height:3px;border-radius:50%;background:#bdc5cf}.welcome-meta strong{color:#496b92;font-weight:800}
 .access-company{font-size:11px!important;color:#6f8a7f!important;margin:-8px 0 11px!important}
 @media(max-width:760px){.welcome-heading h1{font-size:28px}.welcome-meta{gap:7px;font-size:10px}.welcome-heading{margin-bottom:18px}}
+
+/* WhatsApp contact actions */
+.whatsapp-button{background:#ecf9f1!important;border-color:#c8ead5!important;color:#157347!important;font-weight:800!important}
+.whatsapp-button:hover{background:#dcf4e6!important;border-color:#9fd6b6!important;color:#0f633d!important}
+.whatsapp-button.compact{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:7px 10px;border:1px solid #c8ead5;border-radius:8px;font-size:11px;white-space:nowrap}
+.whatsapp-cell{white-space:nowrap}.no-whatsapp{font-size:10px;color:#a1acb9}
+.card-contact-row{display:flex;align-items:center;justify-content:space-between;gap:8px}.card-contact-row>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.whatsapp-icon-button{width:29px;height:29px;display:grid;place-items:center;border:1px solid #c8ead5;border-radius:8px;background:#ecf9f1;color:#157347;flex:none}
+.whatsapp-icon-button:hover{background:#dcf4e6;border-color:#9fd6b6}
+@media(max-width:760px){.whatsapp-button.compact{min-height:34px}.whatsapp-cell{position:sticky;right:0;background:#fff}}
