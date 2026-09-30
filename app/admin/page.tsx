@@ -23,7 +23,7 @@ export default async function AdminPage(){
    <div>
     <div className="eyebrow">GESTÃO DE ACESSOS</div>
     <h1>Criar acesso de cliente</h1>
-    <p>Defina as credenciais, crie o ambiente e envie somente o login e a senha para o cliente.</p>
+    <p>Informe o nome da pessoa, defina as credenciais e crie o ambiente do cliente em poucos segundos.</p>
    </div>
   </section>
 
@@ -43,7 +43,7 @@ export default async function AdminPage(){
     <div className="admin-help-icon"><KeyRound size={19}/></div>
     <h3>Como funciona</h3>
     <ol>
-     <li><span>1</span><div><strong>Preencha</strong><small>E-mail, senha e empresa.</small></div></li>
+     <li><span>1</span><div><strong>Preencha</strong><small>Nome, e-mail, senha e empresa.</small></div></li>
      <li><span>2</span><div><strong>Crie o acesso</strong><small>O usuário já nasce confirmado.</small></div></li>
      <li><span>3</span><div><strong>Envie ao cliente</strong><small>Ele entra direto com e-mail + senha.</small></div></li>
     </ol>
