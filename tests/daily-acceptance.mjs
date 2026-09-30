@@ -420,10 +420,10 @@ try {
       "Pipeline changes must use the guarded command",
     );
     assert.ok(
-      (await configure(other, listed, 0)).error,
+      (await configure({ ...other, company: tenant.company }, listed, 0)).error,
       "Member must not configure even with spoofed metadata",
     );
-    assert.ok((await configure(other, other.stages, 0)).error);
+    assert.ok((await configure({ ...other, company: tenant.company }, other.stages, 0)).error);
     record("pipeline_owner_authorization", width);
     const empty = listed.find((s) => s.name === "Negociação");
     const revised = listed
