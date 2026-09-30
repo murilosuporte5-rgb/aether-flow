@@ -53,8 +53,7 @@ for each row execute function private.enrich_operational_event();
 alter table public.pipeline_stages drop constraint pipeline_stages_company_id_position_key;
 alter table public.pipeline_stages add constraint pipeline_stages_company_id_position_key
  unique(company_id,position) deferrable initially immediate;
-revoke all on public.pipeline_stages from authenticated,anon;
-grant select on public.pipeline_stages to authenticated;
+-- Final pipeline write ACL activates separately after the new onboarding runtime.
 
 create function public.configure_pipeline(p_company_id uuid,p_request_id uuid,p_command jsonb)
 returns jsonb language plpgsql security definer set search_path='' as $$
@@ -137,3 +136,44 @@ begin
 end $$;
 revoke all on function public.submit_product_feedback(uuid,uuid,text,text) from public,anon;
 grant execute on function public.submit_product_feedback(uuid,uuid,text,text) to authenticated;
+
+-- Existing self-service setup used multiple REST writes. Keep it atomic and repair
+-- an owned incomplete workspace without changing its existing company/template.
+create function public.ensure_owned_workspace(p_name text,p_template text,p_stages jsonb)
+returns jsonb language plpgsql security definer set search_path='' as $$
+declare actor uuid:=(select auth.uid()); c public.companies%rowtype; s jsonb; pos integer:=0;
+begin
+ if actor is null then raise exception using errcode='42501',message='Sessão ausente.'; end if;
+ if length(btrim(coalesce(p_name,''))) not between 2 and 120
+  or p_template is null or p_template not in ('generic','events','real_estate','hvac','marble','construction','furniture','dental','aesthetics','pools','equipment_rental','glass_aluminum')
+  or jsonb_typeof(p_stages) is distinct from 'array' or jsonb_array_length(p_stages) not between 3 and 30 or length(p_stages::text)>10000 then raise exception 'Configuração inválida.'; end if;
+ if (select count(*) from jsonb_array_elements(p_stages) x where x->>'kind'='won')<>1
+  or (select count(*) from jsonb_array_elements(p_stages) x where x->>'kind'='lost')<>1
+  or not exists(select 1 from jsonb_array_elements(p_stages) x where x->>'kind'='open') then raise exception 'Etapas inválidas.'; end if;
+ perform pg_advisory_xact_lock(hashtextextended(actor::text||'owned_workspace',0));
+ select co.* into c from public.companies co join public.memberships m on m.company_id=co.id
+ where m.user_id=actor and not co.is_demo order by co.created_at limit 1;
+ if found then
+  if exists(select 1 from public.pipeline_stages where company_id=c.id) then
+   if (select count(*) from public.pipeline_stages where company_id=c.id and kind='won')<>1
+    or (select count(*) from public.pipeline_stages where company_id=c.id and kind='lost')<>1
+    or not exists(select 1 from public.pipeline_stages where company_id=c.id and kind='open') then raise exception 'O pipeline existente precisa de revisão. Contate a Aether Works.'; end if;
+   return jsonb_build_object('ok',true,'companyId',c.id,'name',c.name,'existing',true);
+  end if;
+  if c.owner_user_id is distinct from actor then raise exception 'A configuração desta empresa está incompleta. Contate o proprietário.'; end if;
+ end if;
+ select * into c from public.companies where owner_user_id=actor and not is_demo for update;
+ if not found then insert into public.companies(name,company_template,is_demo,owner_user_id)
+  values(btrim(p_name),p_template,false,actor) returning * into c;
+ elsif c.company_template<>p_template then raise exception 'A configuração anterior usa outro segmento. Selecione esse segmento ou contate a Aether Works.'; end if;
+ insert into public.memberships(company_id,user_id,role) values(c.id,actor,'owner') on conflict do nothing;
+ if not exists(select 1 from public.pipeline_stages where company_id=c.id) then
+  for s in select value from jsonb_array_elements(p_stages) loop
+   if length(btrim(coalesce(s->>'name',''))) not between 1 and 100 or s->>'kind' is null or s->>'kind' not in ('open','won','lost') then raise exception 'Etapa inválida.'; end if;
+   insert into public.pipeline_stages(company_id,name,kind,position) values(c.id,btrim(s->>'name'),s->>'kind',pos);pos:=pos+1;
+  end loop;
+ end if;
+ return jsonb_build_object('ok',true,'companyId',c.id,'name',c.name);
+end $$;
+revoke all on function public.ensure_owned_workspace(text,text,jsonb) from public,anon;
+grant execute on function public.ensure_owned_workspace(text,text,jsonb) to authenticated;

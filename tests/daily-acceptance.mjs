@@ -107,6 +107,28 @@ async function fixture(label) {
   await checked(f.client.auth.signInWithPassword({ email, password }));
   return f;
 }
+async function bareUser(label) {
+  const email = "qa-" + randomUUID() + "@example.invalid",
+    password = randomBytes(24).toString("base64url");
+  const created = await checked(
+    admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { full_name: label },
+    }),
+  );
+  const f = {
+    user: created.user.id,
+    email,
+    password,
+    company: null,
+    client: createClient(api, anon, clientOptions),
+  };
+  fixtures.push(f);
+  await checked(f.client.auth.signInWithPassword({ email, password }));
+  return f;
+}
 const core = (page) => page.locator("form.core-form");
 const submit = (page) => core(page).locator('button[type="submit"]').click();
 const configure = (tenant, stages, expectedVersion, requestId = randomUUID()) =>
@@ -385,6 +407,18 @@ try {
         .eq("company_id", tenant.company)
         .order("position"),
     );
+    const directPipeline = await tenant.client
+      .from("pipeline_stages")
+      .insert({
+        company_id: tenant.company,
+        name: "Forbidden direct stage",
+        position: 25,
+        kind: "open",
+      });
+    assert.ok(
+      directPipeline.error,
+      "Pipeline changes must use the guarded command",
+    );
     assert.ok(
       (await configure(other, listed, 0)).error,
       "Member must not configure even with spoofed metadata",
@@ -571,6 +605,127 @@ try {
     await context.close();
     activePage = null;
   }
+  const setup = await bareUser("QA atomic onboarding");
+  const validStages = [
+    { name: "Novo", kind: "open" },
+    { name: "Ganho", kind: "won" },
+    { name: "Perdido", kind: "lost" },
+  ];
+  const onboard = (f, stages = validStages) =>
+    f.client.rpc("ensure_owned_workspace", {
+      p_name: "QA atomic workspace",
+      p_template: "generic",
+      p_stages: stages,
+    });
+  const invalid = await onboard(setup, [
+    validStages[0],
+    { name: "", kind: "won" },
+    validStages[2],
+  ]);
+  assert.ok(invalid.error);
+  const before = await admin
+    .from("companies")
+    .select("id", { count: "exact", head: true })
+    .eq("owner_user_id", setup.user);
+  assert.equal(
+    before.count,
+    0,
+    "Failed setup must not leave a company/membership/stage",
+  );
+  record("onboarding_partial_write_rollback", 360);
+  const setupContext = await browser.newContext({
+    viewport: { width: 360, height: 844 },
+  });
+  await setupContext.route("**/*", (route) => {
+    const host = new URL(route.request().url()).hostname;
+    if (["localhost", "127.0.0.1", "[::1]"].includes(host))
+      return route.continue();
+    if (
+      ["fonts.googleapis.com", "fonts.gstatic.com"].includes(host) &&
+      route.request().method() === "GET" &&
+      ["stylesheet", "font"].includes(route.request().resourceType())
+    )
+      return route.continue();
+    return route.abort();
+  });
+  const setupPage = await setupContext.newPage();
+  activePage = setupPage;
+  await setupPage.goto(base + "/login");
+  await setupPage.getByLabel("E-mail", { exact: true }).fill(setup.email);
+  await setupPage.getByLabel("Senha", { exact: true }).fill(setup.password);
+  await setupPage
+    .getByRole("button", { name: "Entrar no Aether Flow", exact: true })
+    .click();
+  await setupPage
+    .getByLabel("Nome da empresa", { exact: true })
+    .fill("QA atomic workspace");
+  await setupPage
+    .getByRole("button", { name: "Criar meu ambiente", exact: true })
+    .click();
+  await poll("onboarding UI ready", () =>
+    setupPage
+      .getByRole("button", { name: "Nova oportunidade", exact: true })
+      .isEnabled(),
+  );
+  const owned = await checked(
+    admin
+      .from("companies")
+      .select("*")
+      .eq("owner_user_id", setup.user)
+      .single(),
+  );
+  setup.company = owned.id;
+  assert.equal(await count("memberships", owned.id), 1);
+  assert.ok((await count("pipeline_stages", owned.id)) >= 3);
+  await overflow(setupPage, "mobile onboarding");
+  const repeated = await Promise.all([onboard(setup), onboard(setup)]);
+  assert.ok(repeated.every((r) => r.data?.companyId === owned.id));
+  record("onboarding_real_ui_concurrent_idempotency", 360);
+  await setupPage.screenshot({
+    path: dir + "/onboarding-360.png",
+    fullPage: false,
+  });
+  await setupContext.close();
+  activePage = null;
+  const repair = await bareUser("QA setup repair");
+  repair.company = (
+    await checked(
+      admin
+        .from("companies")
+        .insert({
+          name: "QA existing incomplete",
+          company_template: "generic",
+          is_demo: false,
+          owner_user_id: repair.user,
+        })
+        .select("id")
+        .single(),
+    )
+  ).id;
+  await checked(
+    admin
+      .from("memberships")
+      .insert({
+        company_id: repair.company,
+        user_id: repair.user,
+        role: "owner",
+      }),
+  );
+  assert.equal((await onboard(repair)).data?.companyId, repair.company);
+  assert.equal(await count("pipeline_stages", repair.company), 3);
+  assert.equal(
+    (
+      await checked(
+        admin
+          .from("companies")
+          .select("name")
+          .eq("id", repair.company)
+          .single(),
+      )
+    ).name,
+    "QA existing incomplete",
+  );
+  record("owned_incomplete_onboarding_repair_without_overwrite", 360);
 } catch (error) {
   results.push({ name: "failure", status: "FAIL", message: error.message });
   if (activePage)
