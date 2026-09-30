@@ -1,0 +1,215 @@
+"use client";
+import { useEffect, useRef, useState } from "react";
+import type { Data } from "./workspace";
+import { formatPhone, TIME_ZONE } from "@/lib/execution";
+import { matchesSearch } from "@/lib/daily-work";
+import OperationalTimeline from "./operational-timeline";
+import WhatsAppAction from "./whatsapp-action";
+
+const date = (s: string | null) =>
+  s
+    ? new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short",
+        timeZone: TIME_ZONE,
+      }).format(new Date(s))
+    : "Sem contato registrado";
+const money = (n: number) =>
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+    n,
+  );
+export default function Contacts({
+  data,
+  selected,
+  onSelect,
+  openOpportunity,
+  create,
+  refresh,
+}: {
+  data: Data;
+  selected: string | null;
+  onSelect: (id: string | null) => void;
+  openOpportunity: (id: string) => void;
+  create: () => void;
+  refresh: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const dialog = useRef<HTMLElement>(null),
+    closeRef = useRef(onSelect);
+  closeRef.current = onSelect;
+  useEffect(() => {
+    if (!selected) return;
+    const previous = document.activeElement as HTMLElement | null;
+    dialog.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeRef.current(null);
+      if (e.key === "Tab") {
+        const all = [
+          ...(dialog.current?.querySelectorAll<HTMLElement>(
+            "button:not(:disabled),a[href],input",
+          ) || []),
+        ].filter((el) => el.getClientRects().length);
+        if (e.shiftKey && document.activeElement === all[0]) {
+          e.preventDefault();
+          all.at(-1)?.focus();
+        } else if (!e.shiftKey && document.activeElement === all.at(-1)) {
+          e.preventDefault();
+          all[0]?.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => {
+      document.removeEventListener("keydown", key);
+      previous?.focus();
+    };
+  }, [selected]);
+  const contacts = data.contacts
+    .filter((c) => matchesSearch(c, query))
+    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+  const related = (id: string) =>
+    data.opportunities
+      .filter((o) => o.contact_id === id)
+      .sort((a, b) => b.created_at.localeCompare(a.created_at));
+  const last = (id: string) =>
+    related(id)
+      .map((o) => o.last_interaction_at)
+      .filter((v): v is string => !!v)
+      .sort()
+      .at(-1) || null;
+  const contact = data.contacts.find((c) => c.id === selected),
+    ops = contact ? related(contact.id) : [],
+    ids = new Set(ops.map((o) => o.id));
+  return (
+    <>
+      <label className="contact-search">
+        Buscar contatos
+        <input
+          aria-label="Buscar contatos"
+          placeholder="Nome, telefone ou empresa"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </label>
+      {!data.contacts.length ? (
+        <section className="first-opportunity">
+          <h2>Seus contatos aparecerão aqui</h2>
+          <p>Cadastre uma oportunidade para incluir seu primeiro cliente.</p>
+          <button className="primary" onClick={create}>
+            Criar primeira oportunidade
+          </button>
+        </section>
+      ) : (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Contato</th>
+                <th>Empresa</th>
+                <th>Oportunidades</th>
+                <th>Valor total registrado</th>
+                <th>Última interação</th>
+                <th>Última oportunidade</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contacts.map((c) => {
+                const list = related(c.id);
+                return (
+                  <tr key={c.id}>
+                    <td>
+                      <button
+                        className="text-button"
+                        onClick={() => onSelect(c.id)}
+                      >
+                        {c.name}
+                      </button>
+                      <small>{formatPhone(c.phone)}</small>
+                    </td>
+                    <td>{c.organization || "Não informada"}</td>
+                    <td>{list.length}</td>
+                    <td>
+                      {money(
+                        list.reduce((n, o) => n + (o.estimated_value || 0), 0),
+                      )}
+                    </td>
+                    <td>{date(last(c.id))}</td>
+                    <td>{list[0]?.title || "Sem oportunidades"}</td>
+                    <td>
+                      {list.some((o) => o.status === "open")
+                        ? "Com oportunidade aberta"
+                        : list.length
+                          ? "Sem oportunidade aberta"
+                          : "Sem oportunidades"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {!contacts.length && (
+            <p className="empty-table">Nenhum contato corresponde à busca.</p>
+          )}
+        </div>
+      )}
+      {contact && (
+        <div
+          className="overlay"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) onSelect(null);
+          }}
+        >
+          <aside
+            ref={dialog}
+            className="detail"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Contato ${contact.name}`}
+          >
+            <button onClick={() => onSelect(null)} aria-label="Fechar contato">
+              Fechar
+            </button>
+            <h2>{contact.name}</h2>
+            <p>
+              {formatPhone(contact.phone)} ·{" "}
+              {contact.organization || "Empresa não informada"}
+            </p>
+            <p>Último contato: {date(last(contact.id))}</p>
+            {ops[0] && (
+              <WhatsAppAction
+                companyId={data.company!.id}
+                opportunityId={ops[0].id}
+                phone={contact.phone}
+                name={contact.name}
+                onRecorded={refresh}
+              />
+            )}
+            <h3>Oportunidades deste contato</h3>
+            {ops.map((o) => (
+              <button
+                className="contact-opportunity"
+                key={o.id}
+                onClick={() => openOpportunity(o.id)}
+              >
+                <strong>{o.title}</strong>
+                <span>
+                  {o.stage_name} ·{" "}
+                  {o.estimated_value == null
+                    ? "Valor não informado"
+                    : money(o.estimated_value)}
+                </span>
+              </button>
+            ))}
+            {!ops.length && <p>Sem oportunidades relacionadas.</p>}
+            <h3>Histórico do contato</h3>
+            <OperationalTimeline
+              events={data.history.filter((h) => ids.has(h.opportunity_id))}
+              owners={data.owners}
+            />
+          </aside>
+        </div>
+      )}
+    </>
+  );
+}

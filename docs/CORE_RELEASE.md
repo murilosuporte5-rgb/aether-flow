@@ -1,11 +1,11 @@
 # Aether Flow — release do núcleo
 
-Referência: 30/09/2026, 21:17 UTC. Escopo: Prompt 1; o programa de quatro prompts ainda não está concluído. Nenhuma mensagem comercial/WhatsApp enviada. Nenhuma senha lida/trocada.
+Referência: 30/09/2026, 21:21 UTC. Escopo: Prompt 1; o programa de quatro prompts ainda não está concluído. Nenhuma mensagem comercial/WhatsApp enviada. Nenhuma senha lida/trocada.
 
 ## Estado verificado
 
 - Código validado: 1bfc34cfa8fc3cff78687eca34d5e7092b2657bc, branch core-execution-20260930, PR #13.
-- Railway QA: d38216c2-1a8a-4bbc-bc6f-949d8e668370 SUCCESS, SHA exato acima; /api/health e /login HTTP 200. Fonte temporariamente core-execution; retorno main após merge é o último gate de publicação.
+- Railway QA: d38216c2-1a8a-4bbc-bc6f-949d8e668370 SUCCESS, SHA exato acima; /api/health e /login HTTP 200. Fonte temporariamente core-execution; release final main confirmado: merge 4eaca8718de5a0546486ddd495d574ee00c69bc2, deployment 60e16b16-6bde-40f2-a205-053dc4e82661 SUCCESS às 21:20:16 UTC; fonte main/SHA/healthcheck preservados. Sessão autenticada e snapshot vazia após limpeza confirmados no runtime final.
 - Supabase: xffwvvcmeqzimnuqqtus, 16 migrations sincronizadas. 20260930211138_core_final_mutation_boundary aplicada após QA do runtime aprovado. Escrita operacional direta authenticated/anon revogada; authenticated SELECT preservado. Escritas usam RPCs protegidas.
 - Dados finais após limpeza exclusiva dos fixtures criados nesta auditoria: 2 empresas, 3 perfis e zero contatos/oportunidades/atividades/histórico/receipts. Empresas/usuários preexistentes preservados.
 

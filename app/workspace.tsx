@@ -13,12 +13,18 @@ import {
   Search,
   SlidersHorizontal,
   X,
+  Users,
 } from "lucide-react";
 import { templates, type TemplateKey } from "../lib/templates";
 import Dashboard from "./dashboard";
 import CoreForm, { type CoreMode, type Duplicate } from "./core-form";
 import WhatsAppAction from "./whatsapp-action";
 import StaleIndicator from "./stale-indicator";
+import OperationalTimeline from "./operational-timeline";
+import ProductFeedback from "./product-feedback";
+import PipelineSettings from "./pipeline-settings";
+import Contacts from "./contacts";
+import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
 import {
   comparePriority,
   priorityRank,
@@ -26,6 +32,7 @@ import {
   messageTemplate,
   staleLabel,
   whatsappUrl,
+  STAGE_STALE_DAYS,
 } from "@/lib/execution";
 export type Row = {
   id: string;
@@ -48,12 +55,21 @@ export type Row = {
   details: string | null;
   last_interaction_at: string | null;
   created_at: string;
+  stage_entered_at: string | null;
+  waiting_started_at: string | null;
 };
 export type Stage = {
   id: string;
   name: string;
   position: number;
   kind: string;
+};
+export type Contact = {
+  id: string;
+  name: string;
+  phone: string | null;
+  organization: string | null;
+  created_at: string;
 };
 type Activity = {
   id: string;
@@ -62,17 +78,30 @@ type Activity = {
   due_at: string;
   type: string;
   note: string | null;
+  created_at: string;
 };
-type Event = {
+export type Event = {
   id: string;
   opportunity_id: string;
   event: string;
   description: string;
   created_at: string;
-  payload: { due_at?: string; result?: string; note?: string };
+  actor_id: string;
+  payload: {
+    due_at?: string;
+    result?: string;
+    note?: string;
+    from_name?: string;
+    to_name?: string;
+  };
 };
 export type Data = {
-  company?: { id: string; name: string; demo: boolean };
+  company?: {
+    id: string;
+    name: string;
+    demo: boolean;
+    pipelineVersion: number;
+  };
   companies?: {
     id: string;
     name: string;
@@ -86,6 +115,7 @@ export type Data = {
   activities: Activity[];
   history: Event[];
   owners: { id: string; display_name: string }[];
+  contacts: Contact[];
 };
 const initial: Data = {
   stages: [],
@@ -93,6 +123,7 @@ const initial: Data = {
   activities: [],
   history: [],
   owners: [],
+  contacts: [],
 };
 const day = (s: string) => {
   const p = new Intl.DateTimeFormat("en-US", {
@@ -145,14 +176,18 @@ export default function Workspace({
   user,
   signOut,
   adminAccess,
+  initialTab = "today",
 }: {
   user: { name: string; email: string };
   signOut: string;
   adminAccess: boolean;
+  initialTab?: "today" | "list" | "pipeline" | "contacts";
 }) {
   const [companyId, setCompanyId] = useState<string | null>(null),
     [template, setTemplate] = useState<TemplateKey>("events"),
-    [tab, setTab] = useState<"today" | "list" | "pipeline">("today"),
+    [tab, setTab] = useState<"today" | "list" | "pipeline" | "contacts">(
+      initialTab,
+    ),
     [data, setData] = useState<Data>(initial),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(""),
@@ -165,11 +200,21 @@ export default function Workspace({
     [ownerFilter, setOwnerFilter] = useState("all"),
     [busy, setBusy] = useState(false),
     [duplicate, setDuplicate] = useState<Duplicate>(null),
-    [closingStage, setClosingStage] = useState<Stage | null>(null);
+    [closingStage, setClosingStage] = useState<Stage | null>(null),
+    [queue, setQueue] = useState<{ ids: string[]; resolved: string[] } | null>(
+      null,
+    ),
+    [initialAction, setInitialAction] = useState<string | null>(null),
+    [settings, setSettings] = useState(false),
+    [contactSelected, setContactSelected] = useState<string | null>(null),
+    [globalQuery, setGlobalQuery] = useState("");
   const writeLock = useRef(false),
     retries = useRef(new Map<string, string>()),
     fetchSequence = useRef(0);
-  const snapshotReady = !!data.company && data.company.id === companyId && data.template === template;
+  const snapshotReady =
+    !!data.company &&
+    data.company.id === companyId &&
+    data.template === template;
   const changeStage = (opportunity: Row, stageId: string) => {
     const target = data.stages.find((s) => s.id === stageId);
     if (!target) return;
@@ -208,7 +253,8 @@ export default function Workspace({
         if (j.company?.id !== c) setCompanyId(j.company?.id || null);
         if (j.template && j.template !== t) setTemplate(j.template);
       } catch (e) {
-        if (sequence === fetchSequence.current) setError(e instanceof Error ? e.message : "Falha ao carregar");
+        if (sequence === fetchSequence.current)
+          setError(e instanceof Error ? e.message : "Falha ao carregar");
       } finally {
         if (sequence === fetchSequence.current) setLoading(false);
       }
@@ -260,7 +306,21 @@ export default function Workspace({
       if (kind === "create") setSelected(j.id || null);
       setDuplicate(null);
       setModal(null);
+      setInitialAction(null);
       await fetchData(template, data.company?.id || null, true);
+      if (
+        queue &&
+        selected &&
+        (["complete", "schedule", "reschedule"].includes(kind) ||
+          (kind === "stage" &&
+            data.stages.find((s) => s.id === payload.stageId)?.kind !== "open"))
+      ) {
+        const resolved = [...new Set([...queue.resolved, selected])];
+        const next = queue.ids.find((id) => !resolved.includes(id));
+        setQueue({ ...queue, resolved });
+        setSelected(next || null);
+      }
+      if (kind === "pipeline_configure") setSettings(false);
       setNotice("Alteração salva.");
       return true;
     } catch (e) {
@@ -300,13 +360,7 @@ export default function Workspace({
     () =>
       data.opportunities
         .filter((x) => {
-          if (
-            search &&
-            !`${x.contact_name} ${x.title} ${x.organization || ""}`
-              .toLocaleLowerCase("pt-BR")
-              .includes(search.toLocaleLowerCase("pt-BR"))
-          )
-            return false;
+          if (search && !matchesSearch(x, search)) return false;
           if (stageFilter !== "all" && x.stage_id !== stageFilter) return false;
           if (ownerFilter !== "all" && x.owner_id !== ownerFilter) return false;
           if (filter === "overdue")
@@ -420,6 +474,9 @@ export default function Workspace({
           >
             <Columns3 size={18} /> Pipeline
           </button>
+          <a className={tab === "contacts" ? "active" : ""} href="/contatos">
+            <Users size={18} /> Contatos
+          </a>
           {adminAccess && (
             <a className="admin-nav" href="/admin">
               Acessos
@@ -455,6 +512,65 @@ export default function Workspace({
           <div className="crumb">
             {data.company?.name || "Empresa"} <span>/</span> {conf.label}
           </div>
+          {snapshotReady && (
+            <div className="global-search">
+              <label>
+                <span className="sr-only">Busca global</span>
+                <input
+                  aria-label="Busca global"
+                  placeholder="Buscar cliente, empresa, telefone…"
+                  value={globalQuery}
+                  onChange={(e) => setGlobalQuery(e.target.value)}
+                />
+              </label>
+              {globalQuery.trim() && (
+                <div
+                  className="search-results"
+                  role="region"
+                  aria-label="Resultados da busca global"
+                >
+                  {data.opportunities
+                    .filter((r) => matchesSearch(r, globalQuery))
+                    .slice(0, 5)
+                    .map((r) => (
+                      <button
+                        key={r.id}
+                        onClick={() => {
+                          setSelected(r.id);
+                          setGlobalQuery("");
+                        }}
+                      >
+                        {r.contact_name} · {r.title}
+                      </button>
+                    ))}
+                  {data.contacts
+                    .filter((c) => matchesSearch(c, globalQuery))
+                    .slice(0, 5)
+                    .map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => {
+                          setTab("contacts");
+                          setContactSelected(c.id);
+                          setGlobalQuery("");
+                        }}
+                      >
+                        {c.name} · Contato
+                      </button>
+                    ))}
+                  {!data.opportunities.some((r) =>
+                    matchesSearch(r, globalQuery),
+                  ) &&
+                    !data.contacts.some((c) =>
+                      matchesSearch(c, globalQuery),
+                    ) && <p>Nenhum resultado encontrado.</p>}
+                  <button onClick={() => setGlobalQuery("")}>
+                    Fechar busca
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <div className="topright">
             {data.company?.demo && (
               <span className="demo-pill">DEMONSTRAÇÃO</span>
@@ -528,18 +644,30 @@ export default function Workspace({
                   <div className="eyebrow">
                     {tab === "list" ? "ACOMPANHAMENTO" : "VISÃO DO PROCESSO"}
                   </div>
-                  <h1>{tab === "list" ? "Oportunidades" : "Pipeline"}</h1>
-                  <p>
+                  <h1>
                     {tab === "list"
-                      ? `Acompanhe cada ${conf.noun.toLocaleLowerCase("pt-BR")} da primeira conversa à decisão.`
-                      : "Mova as oportunidades conforme o processo avança."}
+                      ? "Oportunidades"
+                      : tab === "contacts"
+                        ? "Contatos"
+                        : "Pipeline"}
+                  </h1>
+                  <p>
+                    {tab === "contacts"
+                      ? "Clientes e suas oportunidades em um só lugar."
+                      : tab === "list"
+                        ? `Acompanhe cada ${conf.noun.toLocaleLowerCase("pt-BR")} da primeira conversa à decisão.`
+                        : "Mova as oportunidades conforme o processo avança."}
                   </p>
                 </>
               )}
             </div>
             <button
               className="primary"
-              disabled={loading || !snapshotReady || !data.stages.some((stage) => stage.kind === "open")}
+              disabled={
+                loading ||
+                !snapshotReady ||
+                !data.stages.some((stage) => stage.kind === "open")
+              }
               onClick={() => {
                 if (loading || !snapshotReady) return;
                 setSelected(null);
@@ -549,14 +677,86 @@ export default function Workspace({
               <Plus size={17} /> Nova oportunidade
             </button>
           </div>
+          {tab === "today" && snapshotReady && !loading && (
+            <button
+              className="primary resolve-queue"
+              onClick={() => {
+                const ids = pendingQueue(data.opportunities).map((r) => r.id);
+                setQueue({ ids, resolved: [] });
+                setSelected(ids[0] || null);
+              }}
+            >
+              Resolver pendências
+            </button>
+          )}
+          {queue && (
+            <section
+              className="queue-progress"
+              aria-label="Progresso das pendências"
+            >
+              <strong>
+                {queue.resolved.length} de {queue.ids.length} pendências
+                resolvidas
+              </strong>
+              {queue.resolved.length === queue.ids.length && (
+                <span>
+                  {queue.ids.length
+                    ? "Fila concluída."
+                    : "Não há pendências para resolver."}
+                </span>
+              )}
+              <button
+                onClick={() => {
+                  setQueue(null);
+                  setSelected(null);
+                }}
+              >
+                Sair da fila
+              </button>
+            </section>
+          )}
           {loading ? (
             <div className="loading" role="status">
               Carregando oportunidades…
             </div>
           ) : !snapshotReady ? (
             <div className="empty-line" role="status">
-              Não foi possível carregar este ambiente. <button className="text-button" onClick={() => void fetchData(template, companyId)}>Tentar novamente</button>
+              Não foi possível carregar este ambiente.{" "}
+              <button
+                className="text-button"
+                onClick={() => void fetchData(template, companyId)}
+              >
+                Tentar novamente
+              </button>
             </div>
+          ) : tab === "contacts" ? (
+            <Contacts
+              data={data}
+              selected={contactSelected}
+              onSelect={setContactSelected}
+              openOpportunity={(id) => {
+                setContactSelected(null);
+                setSelected(id);
+              }}
+              create={() => {
+                setContactSelected(null);
+                setSelected(null);
+                setModal("create");
+              }}
+              refresh={() => void fetchData(template, data.company!.id, true)}
+            />
+          ) : tab === "today" && !data.opportunities.length ? (
+            <section className="first-opportunity">
+              <h2>Comece em 3 passos</h2>
+              <ol>
+                <li>Cadastre sua primeira oportunidade.</li>
+                <li>Defina o próximo passo.</li>
+                <li>Acompanhe tudo em Hoje.</li>
+              </ol>
+              <button className="primary" onClick={() => setModal("create")}>
+                Criar primeira oportunidade
+              </button>
+            </section>
           ) : tab === "today" ? (
             <Dashboard
               data={data}
@@ -672,7 +872,10 @@ export default function Workspace({
                         </td>
                         <td>{r.title}</td>
                         <td>{money(r.estimated_value)}</td>
-                        <td>{r.stage_name}</td>
+                        <td>
+                          {r.stage_name}
+                          <StageElapsed row={r} />
+                        </td>
                         <td>{r.owner_name}</td>
                         <td>
                           {formatDate(r.last_interaction_at)}
@@ -719,6 +922,19 @@ export default function Workspace({
             </>
           ) : (
             <>
+              {(adminAccess ||
+                data.companies?.find((c) => c.id === data.company!.id)?.role ===
+                  "owner") && (
+                <button
+                  className="text-button"
+                  onClick={() => {
+                    setError("");
+                    setSettings(true);
+                  }}
+                >
+                  Configurar pipeline
+                </button>
+              )}
               <div className="pipeline-filters">
                 <label>
                   <Search size={17} />
@@ -769,6 +985,7 @@ export default function Workspace({
                               </small>
                             </button>
                             <StaleIndicator date={r.last_interaction_at} />
+                            <StageElapsed row={r} />
                             <div className="card-footer">
                               <div className="card-contact-row">
                                 <span>
@@ -818,7 +1035,21 @@ export default function Workspace({
                   </section>
                 ))}
               </div>
+              {!data.opportunities.length && (
+                <section className="first-opportunity">
+                  <h2>Seu pipeline está pronto para começar</h2>
+                  <button
+                    className="primary"
+                    onClick={() => setModal("create")}
+                  >
+                    Criar primeira oportunidade
+                  </button>
+                </section>
+              )}
             </>
+          )}
+          {snapshotReady && !loading && (
+            <ProductFeedback companyId={data.company!.id} context={tab} />
           )}
         </div>
       </main>
@@ -827,7 +1058,7 @@ export default function Workspace({
           aria-hidden={!!modal}
           className="overlay"
           onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setSelected(null);
+            if (e.target === e.currentTarget && !queue) setSelected(null);
           }}
         >
           <aside
@@ -844,7 +1075,10 @@ export default function Workspace({
               <button
                 className="icon-btn"
                 aria-label="Fechar detalhes"
-                onClick={() => setSelected(null)}
+                onClick={() => {
+                  setSelected(null);
+                  setQueue(null);
+                }}
               >
                 <X size={20} />
               </button>
@@ -852,6 +1086,41 @@ export default function Workspace({
             <h2>{row.contact_name}</h2>
             <p className="detail-sub">{row.title}</p>
             <StaleIndicator date={row.last_interaction_at} />
+            <StageElapsed row={row} />
+            {queue && (
+              <div className="queue-quick-actions">
+                <strong>
+                  {queue.resolved.length} de {queue.ids.length} resolvidas
+                </strong>
+                {row.status === "open" && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setInitialAction("Aguardar cliente");
+                        setModal(
+                          row.next_action_at ? "reschedule" : "schedule",
+                        );
+                      }}
+                    >
+                      Aguardar cliente
+                    </button>
+                    {(["won", "lost"] as const).map((kind) => (
+                      <button
+                        key={kind}
+                        onClick={() => {
+                          setClosingStage(
+                            data.stages.find((s) => s.kind === kind) || null,
+                          );
+                          setModal("close");
+                        }}
+                      >
+                        {kind === "won" ? "Marcar ganho" : "Marcar perdido"}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
             <div className="detail-controls">
               <button onClick={() => setModal("edit")}>Editar dados</button>
               {wa(row.phone) && (
@@ -945,19 +1214,27 @@ export default function Workspace({
             <div className="detail-section">
               <div className="section-head">
                 <h3>Próxima ação</h3>
-                <button
-                  className="text-button"
-                  onClick={() =>
-                    setModal(row.next_action_at ? "reschedule" : "schedule")
-                  }
-                >
-                  {row.next_action_at ? "Reagendar" : "Agendar"}
-                </button>
+                {row.status === "open" && (
+                  <button
+                    className="text-button"
+                    onClick={() =>
+                      setModal(row.next_action_at ? "reschedule" : "schedule")
+                    }
+                  >
+                    {row.next_action_at ? "Reagendar" : "Agendar"}
+                  </button>
+                )}
               </div>
               {row.next_action_at ? (
                 <div className="action-box">
                   <strong>{row.next_action_type}</strong>
                   <span>{formatDate(row.next_action_at)}</span>
+                  {row.next_action_type === "Aguardar cliente" && (
+                    <p>
+                      Aguardando desde {formatDate(row.waiting_started_at)}.
+                      Revisão obrigatória em {formatDate(row.next_action_at)}.
+                    </p>
+                  )}
                   {row.next_action_note && <p>{row.next_action_note}</p>}
                   {activity(row) && (
                     <button
@@ -974,22 +1251,10 @@ export default function Workspace({
             </div>
             <div className="detail-section">
               <h3>Histórico</h3>
-              <div className="timeline">
-                {data.history
-                  .filter((h) => h.opportunity_id === row.id)
-                  .map((h) => (
-                    <div className="history-item" key={h.id}>
-                      <span className="timeline-dot" />
-                      <strong>{h.description}</strong>
-                      {h.payload?.due_at && (
-                        <span>{formatDate(h.payload.due_at)}</span>
-                      )}
-                      {h.payload?.result && <p>{h.payload.result}</p>}
-                      {h.payload?.note && <p>{h.payload.note}</p>}
-                      <small>{formatDate(h.created_at)}</small>
-                    </div>
-                  ))}
-              </div>
+              <OperationalTimeline
+                events={data.history.filter((h) => h.opportunity_id === row.id)}
+                owners={data.owners}
+              />
               <CommentForm
                 disabled={busy}
                 submit={(comment) => run("comment", { comment })}
@@ -1008,11 +1273,13 @@ export default function Workspace({
           error={error}
           duplicate={duplicate}
           closingStage={closingStage}
+          initialActionType={initialAction}
           onDuplicateReset={() => setDuplicate(null)}
           onClose={() => {
             setModal(null);
             setDuplicate(null);
             setClosingStage(null);
+            setInitialAction(null);
             setError("");
           }}
           onOpenOpportunity={(id) => {
@@ -1024,7 +1291,33 @@ export default function Workspace({
           }
         />
       )}
+      {settings && snapshotReady && (
+        <PipelineSettings
+          stages={data.stages}
+          busy={busy}
+          error={error}
+          onClose={() => setSettings(false)}
+          onSave={(stages) =>
+            run("pipeline_configure", {
+              expectedVersion: data.company!.pipelineVersion,
+              stages,
+            })
+          }
+        />
+      )}
     </div>
+  );
+}
+function StageElapsed({ row }: { row: Row }) {
+  const days = elapsedDays(row.stage_entered_at);
+  return (
+    <small
+      className={`stage-elapsed ${days !== null && days >= STAGE_STALE_DAYS ? "attention" : ""}`}
+    >
+      {days === null
+        ? "Entrada no estágio não registrada"
+        : `Há ${days} ${days === 1 ? "dia" : "dias"} neste estágio`}
+    </small>
   );
 }
 function CommentForm({
