@@ -1,0 +1,277 @@
+{
+  "environment": "DISPOSABLE_LOCAL_SUPABASE_AUTH_POSTGRES_RLS",
+  "commit": "1bfc34cfa8fc3cff78687eca34d5e7092b2657bc",
+  "productionTested": false,
+  "mockAuthentication": false,
+  "whatsappSent": false,
+  "results": [
+    {
+      "name": "real_auth_login",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "missing_and_invalid_phone",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "capture_and_normalized_persistence",
+      "width": 360,
+      "status": "PASS",
+      "automatedSubmitLatencyMs": 199,
+      "humanCaptureTime": "NOT_MEASURED"
+    },
+    {
+      "name": "whatsapp_open_only_and_snapshot_refresh",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "complete_requires_next_and_persists_next",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_next_action_failure",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "close_lost_requires_reason_and_clears_pending",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "explicit_reuse_one_contact_two_opportunities",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "close_won_and_history",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "reload_persistence_escape_and_layout",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "real_auth_tenant_isolation_and_rest_write_denied",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent_postgrest_contact_uniqueness",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent_request_id_idempotency",
+      "width": 360,
+      "status": "PASS"
+    },
+    {
+      "name": "real_auth_login",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "missing_and_invalid_phone",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "capture_and_normalized_persistence",
+      "width": 390,
+      "status": "PASS",
+      "automatedSubmitLatencyMs": 194,
+      "humanCaptureTime": "NOT_MEASURED"
+    },
+    {
+      "name": "whatsapp_open_only_and_snapshot_refresh",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "complete_requires_next_and_persists_next",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_next_action_failure",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "close_lost_requires_reason_and_clears_pending",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "explicit_reuse_one_contact_two_opportunities",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "close_won_and_history",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "reload_persistence_escape_and_layout",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "real_auth_tenant_isolation_and_rest_write_denied",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent_postgrest_contact_uniqueness",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent_request_id_idempotency",
+      "width": 390,
+      "status": "PASS"
+    },
+    {
+      "name": "real_auth_login",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "missing_and_invalid_phone",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "capture_and_normalized_persistence",
+      "width": 412,
+      "status": "PASS",
+      "automatedSubmitLatencyMs": 182,
+      "humanCaptureTime": "NOT_MEASURED"
+    },
+    {
+      "name": "whatsapp_open_only_and_snapshot_refresh",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "complete_requires_next_and_persists_next",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_next_action_failure",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "close_lost_requires_reason_and_clears_pending",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "explicit_reuse_one_contact_two_opportunities",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "close_won_and_history",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "reload_persistence_escape_and_layout",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "real_auth_tenant_isolation_and_rest_write_denied",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent_postgrest_contact_uniqueness",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent_request_id_idempotency",
+      "width": 412,
+      "status": "PASS"
+    },
+    {
+      "name": "real_auth_login",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "missing_and_invalid_phone",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "capture_and_normalized_persistence",
+      "width": 768,
+      "status": "PASS",
+      "automatedSubmitLatencyMs": 184,
+      "humanCaptureTime": "NOT_MEASURED"
+    },
+    {
+      "name": "whatsapp_open_only_and_snapshot_refresh",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "complete_requires_next_and_persists_next",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "rollback_next_action_failure",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "close_lost_requires_reason_and_clears_pending",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "explicit_reuse_one_contact_two_opportunities",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "close_won_and_history",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "reload_persistence_escape_and_layout",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "real_auth_tenant_isolation_and_rest_write_denied",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent_postgrest_contact_uniqueness",
+      "width": 768,
+      "status": "PASS"
+    },
+    {
+      "name": "concurrent_request_id_idempotency",
+      "width": 768,
+      "status": "PASS"
+    }
+  ]
+}

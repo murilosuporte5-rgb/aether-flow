@@ -1,0 +1,79 @@
+name: Core acceptance
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: core-acceptance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  isolated-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      SUPABASE_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Unit tests and TypeScript
+        run: |
+          set -euo pipefail
+          npm ci
+          npm test
+          npm run check
+          node --check scripts/local-qa-env.mjs
+          node --check tests/mobile-acceptance.mjs
+      - name: Local Supabase and browser tools
+        run: |
+          set -euo pipefail
+          npm install --no-save --package-lock=false playwright@1.63.0
+          npx playwright install --with-deps chromium
+          npx --yes supabase@2.118.0 init
+          npx --yes supabase@2.118.0 start -x studio,imgproxy,storage-api,postgres-meta,realtime,edge-runtime,logflare,vector,supavisor > "$RUNNER_TEMP/local-stack.log" 2>&1
+          npx --yes supabase@2.118.0 status -o json > "$RUNNER_TEMP/local-supabase.json"
+          echo "Local stack started; credentials retained only in runner temporary files."
+      - name: Enforce local mutation boundary
+        run: |
+          set -euo pipefail
+          export PGPASSWORD=postgres
+          psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -f docs/pending/core_mutation_boundary.sql
+          psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/core-mutation-boundary.sql
+      - name: Configure isolated runtime
+        run: |
+          set -euo pipefail
+          node scripts/local-qa-env.mjs "$RUNNER_TEMP/local-supabase.json" > .env.local
+          npm run build
+      - name: Start application
+        run: |
+          set -euo pipefail
+          npm run start -- --hostname 127.0.0.1 > "$RUNNER_TEMP/aether-runtime.log" 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/api/health > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo "Local runtime health timeout."
+          exit 1
+      - name: Authenticated mobile and isolation
+        env:
+          LOCAL_QA_STATUS_FILE: ${{ runner.temp }}/local-supabase.json
+          TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node tests/mobile-acceptance.mjs
+      - name: Safe QA evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: core-mobile-evidence
+          path: qa-results/
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Stop disposable local stack
+        if: always()
+        run: npx --yes supabase@2.118.0 stop --no-backup

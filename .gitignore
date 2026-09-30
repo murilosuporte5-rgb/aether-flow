@@ -4,3 +4,7 @@ node_modules
 .env.*.local
 .vercel
 *.tsbuildinfo
+next-env.d.ts
+supabase/.temp/
+.qa-results/
+qa-results/
