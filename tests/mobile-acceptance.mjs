@@ -99,6 +99,8 @@ try {
         links.push(url.href);
         return route.fulfill({ status: 200, contentType: "text/html", body: "Official deep link intercepted. No message sent." });
       }
+      // Existing public font assets are part of the actual UI; never allow a remote app/Auth API.
+      if (["fonts.googleapis.com", "fonts.gstatic.com"].includes(url.hostname) && route.request().method() === "GET" && ["stylesheet", "font"].includes(route.request().resourceType())) return route.continue();
       if (["127.0.0.1", "localhost", "[::1]"].includes(url.hostname)) return route.continue();
       external.push(url.hostname);
       return route.abort();
@@ -246,7 +248,7 @@ try {
     record("concurrent_request_id_idempotency", width);
 
     assert.deepEqual(errors, [], "No uncaught browser errors");
-    assert.deepEqual(external, [], "No production/external requests");
+    assert.deepEqual(external, [], "No production or unexpected external requests");
     await page.screenshot({ path: dir + "/mobile-" + width + ".png", fullPage: true });
     await context.close();
     activePage = null;
