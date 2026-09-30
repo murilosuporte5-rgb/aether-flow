@@ -4,7 +4,8 @@ import fs from "node:fs/promises";
 import { chromium } from "playwright";
 import { createClient } from "@supabase/supabase-js";
 
-const base = "http://127.0.0.1:3000";
+// Match Next's canonical local request origin without relaxing CSRF checks.
+const base = "http://localhost:3000";
 const config = JSON.parse(await fs.readFile(process.env.LOCAL_QA_STATUS_FILE, "utf8"));
 const api = config.API_URL;
 assert.ok(api && ["localhost", "127.0.0.1", "[::1]"].includes(new URL(api).hostname), "Local Supabase required");
@@ -131,7 +132,10 @@ try {
     await core(page).getByLabel("WhatsApp / telefone", { exact: false }).fill(phone);
     await noOverflow(page, "capture form");
     const captureStart = Date.now();
+    const createdResponse = page.waitForResponse(r => r.request().method() === "POST" && new URL(r.url()).pathname === "/api/workspace");
     await submit(page);
+    const response = await createdResponse;
+    if (!response.ok()) throw new Error("Capture API rejected: " + (await response.json()).error);
     await poll("capture persisted", async () => (await count("opportunities", tenant.company)) === 1);
     await page.getByRole("button", { name: "Fechar detalhes", exact: true }).waitFor();
     const first = (await checked(admin.from("opportunities").select("*").eq("company_id", tenant.company)))[0];
