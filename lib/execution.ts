@@ -1,5 +1,7 @@
 export const TIME_ZONE = "America/Bahia";
 export const STALE_THRESHOLDS = { attention: 3, stale: 7 } as const;
+export const LEAD_SOURCES = ["WhatsApp", "Instagram", "Google", "Site", "Indicação", "Ligação", "Evento", "Outro"] as const;
+export const STAGE_STALE_DAYS = 7;
 export const ACTION_TYPES = [
   "WhatsApp",
   "Ligação",

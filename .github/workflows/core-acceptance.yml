@@ -31,6 +31,7 @@ jobs:
           npm run check
           node --check scripts/local-qa-env.mjs
           node --check tests/mobile-acceptance.mjs
+          node --check tests/daily-acceptance.mjs
       - name: Local Supabase and browser tools
         run: |
           set -euo pipefail
@@ -66,6 +67,11 @@ jobs:
           LOCAL_QA_STATUS_FILE: ${{ runner.temp }}/local-supabase.json
           TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node tests/mobile-acceptance.mjs
+      - name: Daily execution and owner configuration
+        env:
+          LOCAL_QA_STATUS_FILE: ${{ runner.temp }}/local-supabase.json
+          TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node tests/daily-acceptance.mjs
       - name: Safe QA evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

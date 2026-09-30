@@ -20,7 +20,7 @@ async function access(
 ) {
   const { data, error } = await s
     .from("memberships")
-    .select("company_id,role,companies(id,name,company_template,is_demo)")
+    .select("company_id,role,companies(id,name,company_template,is_demo,pipeline_version)")
     .eq("user_id", userId);
   if (error) throw error;
   const companies = (data || []).flatMap((m) => {
@@ -33,6 +33,7 @@ async function access(
             name: co.name as string,
             company_template: co.company_template as string,
             is_demo: co.is_demo as boolean,
+            pipeline_version: co.pipeline_version as number,
           },
         ]
       : [];
@@ -156,6 +157,7 @@ export async function GET(request: Request) {
         id: ctx.company.id,
         name: ctx.company.name,
         demo: ctx.company.is_demo,
+        pipelineVersion: ctx.company.pipeline_version,
       },
       companies: ctx.companies,
       template: ctx.company.company_template,
@@ -189,11 +191,16 @@ export async function POST(request: Request) {
       return fail("Identificador de requisição inválido.");
     if (JSON.stringify(command).length > 10000)
       return fail("Comando muito grande.", 413);
-    const { data, error } = await ctx.s.rpc("apply_workspace_command", {
+    const rpcName = command.kind === "pipeline_configure" ? "configure_pipeline" : command.kind === "feedback" ? "submit_product_feedback" : "apply_workspace_command";
+    const args = command.kind === "feedback" ? {
+      p_company_id: ctx.company.id, p_request_id: requestId,
+      p_context: command.context, p_message: command.message,
+    } : {
       p_company_id: ctx.company.id,
       p_request_id: requestId,
       p_command: command,
-    });
+    };
+    const { data, error } = await ctx.s.rpc(rpcName, args);
     if (error) {
       // Do not log command contents, phone, JWT, or database error details.
       console.error("workspace command failed", {

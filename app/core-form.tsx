@@ -5,6 +5,7 @@ import {
   ACTION_TYPES,
   LOSS_REASONS,
   TIME_ZONE,
+  LEAD_SOURCES,
   formatPhone,
   normalizePhone,
   phoneForStorage,
@@ -46,6 +47,7 @@ export default function CoreForm({
   error,
   duplicate,
   closingStage,
+  initialActionType,
   onClose,
   onSave,
   onOpenOpportunity,
@@ -58,6 +60,7 @@ export default function CoreForm({
   error: string;
   duplicate: Duplicate;
   closingStage: Stage | null;
+  initialActionType?:string|null;
   onClose: () => void;
   onSave: (payload: Record<string, unknown>) => Promise<boolean>;
   onOpenOpportunity: (id: string) => void;
@@ -87,13 +90,13 @@ export default function CoreForm({
   );
   const [ownerId, setOwnerId] = useState("");
   const [type, setType] = useState(
-    mode === "schedule" || mode === "reschedule"
+    initialActionType || (mode === "schedule" || mode === "reschedule"
       ? ACTION_TYPES.includes(
           row?.next_action_type as (typeof ACTION_TYPES)[number],
         )
         ? row!.next_action_type!
         : "Ligação"
-      : "",
+      : ""),
   );
   const [due, setDue] = useState(
     mode === "reschedule" ? localInput(row?.next_action_at || null) : "",
@@ -339,11 +342,10 @@ export default function CoreForm({
                 </label>
                 <label>
                   Origem
-                  <input
+                  <select
                     value={source}
                     onChange={(e) => setSource(e.target.value)}
-                    maxLength={80}
-                  />
+                  ><option value="">Não informada</option>{source&&!LEAD_SOURCES.includes(source as (typeof LEAD_SOURCES)[number])&&<option value={source}>{source} (registro anterior)</option>}{LEAD_SOURCES.map(s=><option key={s}>{s}</option>)}</select>
                 </label>
                 {mode === "create" && (
                   <>

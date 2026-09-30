@@ -1,6 +1,6 @@
 # Estado atual — atualização 21:17 UTC
 
-Núcleo validado no commit 1bfc34c; 52 grupos mobile/Auth/RLS PASS em CI isolada e fluxo desktop autenticado PASS na Railway. Fronteira RPC-only definitiva aplicada em 20260930211138 e retestada PASS. Merge/main deployment ainda são o último gate. Prompts 2–4 pendentes. Veja CORE_RELEASE.md para o estado vigente; o registro abaixo é histórico e seus estados antigos não representam o estado atual.
+Núcleo validado no commit 1bfc34c; 52 grupos mobile/Auth/RLS PASS em CI isolada e fluxo desktop autenticado PASS na Railway. Fronteira RPC-only definitiva aplicada em 20260930211138 e retestada PASS. PR #13 merged; main 4eaca871 publicada, deployment 60e16b16 SUCCESS. O Prompt 1 está estabilizado; Prompt 2 em implementação na branch daily-work-20260930, ainda não publicado. Prompts 2–4 pendentes. Veja CORE_RELEASE.md para o estado vigente; o registro abaixo é histórico e seus estados antigos não representam o estado atual.
 
 # Aether Flow — estado da implementação em 30/09/2026
 
