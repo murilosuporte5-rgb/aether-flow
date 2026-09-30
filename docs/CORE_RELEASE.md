@@ -29,7 +29,7 @@ Scope: Prompt 1. Prompts 2–4 remain gated until this layer passes authenticate
 
 ## Evidence collected
 
-- npm test: 8 domain acceptance tests PASS.
+- npm test: 11 tests PASS (8 domain + 3 request-origin regressions).
 - npm run check: PASS.
 - npm run build: PASS.
 - tests/core-acceptance.sql: 23 PostgreSQL checks PASS, all fixtures rolled back.
@@ -63,10 +63,18 @@ Select the recorded successful deployment in Railway's deployment list and use i
 - Supabase leaked-password protection is disabled (security advisor WARN); availability/configuration must be verified before enabling or recording a justified limitation.
 - Existing multiple permissive INSERT policies need a semantics-preserving consolidation in hardening.
 - Temporary Railway branch deployment dbcd9a0abca7097326e00854348661c7b2a52c19 reached SUCCESS (4d08f1ab-594b-4ff0-8e3e-99fe6906fd32); public health returned HTTP 200.
-- Authenticated E2E/mobile and actual simultaneous request test remain NOT_TESTED: the app rejected the secure login attempt with “E-mail ou senha inválidos”. No password was accessed by the agent.
+- The initial secure login attempt was rejected; the user subsequently supplied a working authenticated session. Desktop core and simultaneous HTTP requests now passed. Mobile remains NOT_TESTED due to unavailable viewport controls. No password was accessed or changed.
 - The permission activation SQL in docs/pending/core_mutation_boundary.sql is NOT_APPLIED; it is intentionally outside the migration directory until deployment gates pass. Legacy direct writes must remain available while the old runtime is restored. Core is not released into main.
 - Two new security-advisor WARN findings identify intentionally authenticated SECURITY DEFINER RPCs. They have empty search_path, verified auth.uid(), scoped membership/ownership checks, bounded inputs, revoked anon/PUBLIC execution and composite FKs. Tenant adversarial tests passed; final independent security review remains part of Prompt 4.
 
 ## Production restored
 
 After the secure login was rejected, source was returned to main at f08f9157fc0786afd2b0d20529f1e260d87f38a5, healthcheck /login, deployment 63e8783f-5832-4cb3-a5f1-1562dc7907d0 SUCCESS. Later phone-storage/accessibility refinements remain on the feature branch and require another temporary production test. No merge was performed.
+
+## Authenticated QA update — 30 September 2026
+
+User supplied the authenticated browser session; no credentials were read or changed. Code commit 74568433127876192f09cb2900b820dc694f86d3 reached SUCCESS in Railway QA deployment f188cf1a-6f31-4d10-a5c8-52af5ff2c071. Main-origin proxy mismatch was fixed and verified by actual writes. Creation, mandatory-next-step completion, explicit phone reuse, won/lost/Other validation, persistence and Today scheduling passed. WhatsApp records only opening.
+
+Two POSTs overlapped in Railway HTTP logs at 15:57:33Z: durations 919/1264 ms, responses 200/409; one contact/opportunity remained. This supersedes the previous NOT_TESTED HTTP concurrency state, but does not prove internal database transaction overlap. Mobile viewport QA and mutation-boundary activation remain pending. No merge permitted yet.
+
+Disposable QA company was removed; baseline counts restored. Production restore to main f08f915 reached SUCCESS as deployment e63fa615-39b2-48c1-9caf-89bf08a5127a at 16:03:31 UTC; independent config inspection confirmed main, exact commit and /login healthcheck. See IMPLEMENTATION_STATUS.md for the current release state and evidence. Earlier rejected-login notes are historical and no longer describe the current access blocker.

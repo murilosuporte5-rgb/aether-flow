@@ -1,6 +1,6 @@
 # Aether Flow — estado da implementação em 30/09/2026
 
-**O programa de quatro prompts não está concluído.** O núcleo do Prompt 1 foi implementado na branch `core-execution-20260930`, com PR #13 em rascunho. Os testes de código e banco abaixo passaram. O QA autenticado foi bloqueado pela resposta “E-mail ou senha inválidos”. A Railway voltou à versão de `main`, com deployment SUCCESS. Não houve merge.
+**O programa de quatro prompts não está concluído.** O núcleo do Prompt 1 foi implementado na branch `core-execution-20260930`, com PR #13 em rascunho. Os testes de código e banco abaixo passaram. O acesso autenticado foi confirmado após o login do usuário; nenhuma senha foi lida ou alterada. O fluxo principal passou no navegador desktop e no banco. A Railway voltou para `main`, commit f08f915, deployment e63fa615-39b2-48c1-9caf-89bf08a5127a SUCCESS, confirmado pelo conector independente. Mobile e ativação da fronteira de escrita continuam pendentes. Não houve merge.
 
 Fonte canônica: https://github.com/murilosuporte5-rgb/aether-flow/pull/13.
 
@@ -26,9 +26,9 @@ Fonte canônica: https://github.com/murilosuporte5-rgb/aether-flow/pull/13.
 |---|---|
 | API | app/api/workspace/route.ts; app/api/health/route.ts |
 | Interface | app/workspace.tsx; app/dashboard.tsx; app/core-form.tsx; app/whatsapp-action.tsx; app/stale-indicator.tsx; app/globals.css; app/layout.tsx |
-| Domínio/provisionamento | lib/execution.ts; lib/provision.ts |
+| Domínio/provisionamento | lib/execution.ts; lib/provision.ts; lib/request-origin.ts |
 | Configuração | package.json; tsconfig.json; .gitignore |
-| Testes | tests/execution.test.ts; tests/core-acceptance.sql; tests/demo-acceptance.sql |
+| Testes | tests/execution.test.ts; tests/request-origin.test.ts; tests/core-acceptance.sql; tests/demo-acceptance.sql; docs/qa/aether-flow-qa-20260930-1601.jpg |
 | Migrações | três arquivos listados abaixo |
 | Operação | docs/CORE_RELEASE.md; docs/IMPLEMENTATION_STATUS.md; docs/pending/core_mutation_boundary.sql |
 
@@ -74,7 +74,7 @@ Nenhuma Edge Function foi modificada ou publicada. create-access foi lida na ver
 
 | Verificação | Resultado | Limite |
 |---|---|---|
-| npm test | PASS — 8 testes de domínio | Sem UI autenticada |
+| npm test | PASS — 11 testes | Domínio e origem HTTP; UI testada separadamente |
 | npm run check | PASS | TypeScript da aplicação; Edge Functions excluídas pelo tsconfig existente |
 | npm run build | PASS | Build de produção local |
 | tests/core-acceptance.sql | PASS — 23 verificações no PostgreSQL | Fixtures transacionais, rollback ao final |
@@ -82,9 +82,10 @@ Nenhuma Edge Function foi modificada ou publicada. create-access foi lida na ver
 | Runtime local /api/health e /login | HTTP 200 | Sem sessão autenticada |
 | Deploy temporário dbcd9a0 | SUCCESS; health/login HTTP 200 | Anterior aos refinamentos finais de telefone/acessibilidade |
 | Restore main f08f915 | SUCCESS; /login HTTP 200 | Versão anterior do produto |
-| Login seguro | REJECTED — credenciais inválidas | Não há sessão autenticada confirmada |
-| Mobile 360/390/412/768 | NOT_TESTED | Depende de login válido |
-| Duas requisições simultâneas | NOT_TESTED | O conector SQL serializou as chamadas |
+| Sessão autenticada | PASS — acesso fornecido pelo usuário | Sem leitura/troca de senha |
+| UI desktop | PASS — criação, telefone, duplicidade, próxima ação, ganho/perda, histórico e persistência | Empresa de QA separada; dados fictícios |
+| Mobile 360/390/412/768 | NOT_TESTED | Browser disponível não expõe ajuste de viewport |
+| Duas requisições HTTP simultâneas | PASS — uma 200 e outra 409; um contato/uma oportunidade | Sobreposição observada em logs Railway; sobreposição interna de transações PostgreSQL não comprovada |
 
 As verificações no PostgreSQL cobrem telefone ausente/inválido/válido, deduplicação/reutilização, idempotência, conclusão sem próximo passo rejeitada, falha após atualização da ação anterior com rollback, conclusão com nova ação, ganho/perda, motivo/Outro, histórico de WhatsApp sem falso contato, isolamento de empresas e telefone internacional.
 
@@ -111,17 +112,20 @@ As verificações no PostgreSQL cobrem telefone ausente/inválido/válido, dedup
 
 Itens 8/9 são pendências identificadas, não falhas de cliente observadas nem correções concluídas.
 
+10. POST era rejeitado por “Origem não permitida” atrás do proxy Railway. Corrigido usando RAILWAY_PUBLIC_DOMAIN no servidor e comparação estrita de origem; três regressões PASS. Escritas reais posteriores PASS.
+11. Botão Agendar da fila Hoje abria detalhes. Corrigido para abrir formulário de agendamento diretamente; gravação verificada.
+12. Abertura WhatsApp na fila não disparava atualização do snapshot; callback adicionado. A gravação do evento já foi comprovada, atualização visual desse callback ainda não testada separadamente.
+
 ## 10. Bugs corrigidos
 
-Itens 1–7 foram tratados na branch e nos testes descritos. Demo também passou a ter gravação atômica. Não foi alegada correção de todas as falhas do produto existente.
+Itens 1–7, 10 e 11 foram tratados na branch e nos testes descritos; item 12 foi corrigido no código com a limitação de QA registrada acima. Demo também passou a ter gravação atômica. Não foi alegada correção de todas as falhas do produto existente.
 
 ## 11. Limitações restantes / dependências
 
 | MISSING | WHY | DEPENDENCY | NEXT_ACTION |
 |---|---|---|---|
-| QA autenticado do núcleo | Login rejeitado | Acesso válido pelo fluxo seguro | Autenticar; redeploy temporário da versão final da branch; testar |
-| Mobile e acessibilidade visual | Sem ambiente autenticado | Sessão de QA | Testar larguras e navegação solicitadas |
-| Concorrência verdadeira | Chamadas SQL sem sobreposição | Duas sessões HTTP autenticadas ou conexões independentes | Testar criação com mesmo telefone e mesma chave idempotente |
+| QA mobile do núcleo | Viewport não configurável no browser disponível | Dispositivo ou ferramenta de viewport suportada | Testar 360/390/412/768, formulários e navegação |
+| Concorrência PostgreSQL forçada | Probe de pg_blocking_pids retornou zero | Conexões independentes instrumentadas | HTTP simultâneo passou; aprofundar se necessário sem confundir com prova de lock interno |
 | Bloqueio de mutações diretas | Runtime antigo restaurado | Novo runtime aprovado | Aplicar SQL de ativação e testar bypass/RLS novamente |
 | Merge/release do núcleo | Gates incompletos | PASS nos itens acima | Merge; fonte main; deployment final SUCCESS |
 | Prompts 2, 3 e 4 | Sua regra proíbe avançar antes de estabilizar o Prompt 1 | Núcleo aprovado | Retomar auditoria do que já existe e implementar apenas lacunas |
@@ -144,15 +148,28 @@ WhatsApp Cloud API, IA/chatbot, Stripe completo, ERP, automação multicanal, ap
 
 | Uso | ID | Commit/fonte | Estado confirmado |
 |---|---|---|---|
-| Teste temporário | 4d08f1ab-594b-4ff0-8e3e-99fe6906fd32 | dbcd9a0abca7097326e00854348661c7b2a52c19 / core-execution-20260930 | SUCCESS; substituído pela restauração |
-| Produção atual restaurada | 63e8783f-5832-4cb3-a5f1-1562dc7907d0 | f08f9157fc0786afd2b0d20529f1e260d87f38a5 / main | SUCCESS |
+| Teste temporário | f188cf1a-6f31-4d10-a5c8-52af5ff2c071 | 74568433127876192f09cb2900b820dc694f86d3 / core-execution-20260930 | SUCCESS; substituído pela restauração |
+| Restauração atual | e63fa615-39b2-48c1-9caf-89bf08a5127a | f08f9157fc0786afd2b0d20529f1e260d87f38a5 / main | SUCCESS |
 
-Configuração de produção conferida: main, commit f08f915, healthcheck /login, timeout 30s. Domínio, variáveis, réplicas e dados de clientes preservados. **Os novos recursos ainda não foram incorporados a main.**
+Configuração de produção conferida independentemente: main, commit f08f915, healthcheck /login, timeout 30s; deployment e63fa615-39b2-48c1-9caf-89bf08a5127a SUCCESS às 16:03:31 UTC. Domínio, variáveis, réplicas e dados de clientes preservados. **Os novos recursos ainda não foram incorporados a main.**
 
 ## 15. Riscos antes de operar clientes reais
 
-- Não declarar o núcleo aprovado sem QA autenticado, mobile, concorrência real e ativação da fronteira de escrita.
+- Não declarar o núcleo aprovado sem concluir QA mobile e ativação da fronteira de escrita; o desktop autenticado e as requisições HTTP sobrepostas passaram.
 - Não operar criação de acessos sem revisar a compensação e recuperação administrativa.
 - Não considerar os avisos de Auth/advisors resolvidos apenas por registrar uma justificativa.
 - Não vender trial, CSV, reset, fila ou métricas como implementados neste trabalho.
-- Para continuar, é necessário um login válido pelo formulário seguro; não enviar senha/token pela conversa. O restante do código e os testes estão preservados no PR.
+- Login já foi resolvido. Para continuar: QA mobile → ativar bloqueio de mutações diretas e retestar RLS/RPC → merge → main → deployment SUCCESS. Os Prompts 2–4 permanecem pendentes pela ordem exigida.
+
+## Evidência da rodada autenticada
+
+- QA separada: criação com telefone internacional, reutilização explícita (1 contato/2 oportunidades), conclusão com nova ação (1 done/1 pending), ganho e perda (0 pending e próximo passo nulo), motivo Outro com nota/ator/timestamp.
+- Ausência de próximo passo/motivo/descrição bloqueou envio no navegador; SQL verificou estado persistido.
+- WhatsApp abriu link oficial e registrou somente whatsapp_opened; last_interaction_at continuou nulo. Protocolo do aplicativo não pôde ser inspecionado pelo browser de QA. Nenhuma mensagem enviada.
+- Requisições POST /api/workspace em 15:57:33.400769448Z (919 ms, 200) e 15:57:33.706900038Z (1264 ms, 409) possuem intervalos sobrepostos. Banco: telefone 12025550126, 1 contato/1 oportunidade.
+- Primeiro ensaio com lock de 20 segundos gerou erro recuperável de gravação numa aba; retry exibiu duplicidade e não duplicou. Segundo probe de lock retornou 0 sessões bloqueadas: não comprova concorrência interna do banco.
+- Atualização da página preservou os dados. Agendar pela fila Hoje abriu diretamente o formulário e criou 1 ação pendente para 01/10/2026 às 11:00 Bahia (14:00 UTC).
+- Dados fictícios removidos somente da empresa QA criada nesta rodada, em transação protegida por ID/nome/dono. Contagens finais: 2 empresas, 3 perfis, zero contatos/oportunidades/atividades/histórico/receipts. Empresa real e Auth preservados.
+- Commit de código validado: 74568433127876192f09cb2900b820dc694f86d3. Railway QA f188cf1a-6f31-4d10-a5c8-52af5ff2c071 SUCCESS, health /api/health HTTP 200.
+
+![QA desktop — próxima ação e histórico](qa/aether-flow-qa-20260930-1601.jpg)
