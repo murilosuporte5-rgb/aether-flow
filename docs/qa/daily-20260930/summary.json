@@ -1,0 +1,13 @@
+{
+  "head": "aed2943e4cb01def6b7224e45b84c7d8b12eaeb7",
+  "run": 36782015438,
+  "job": 110114317500,
+  "status": "PASS",
+  "environment": "DISPOSABLE_LOCAL_SUPABASE_AUTH_POSTGRES_RLS",
+  "unitTests": 15,
+  "coreGroups": 52,
+  "dailyGroups": 55,
+  "typeScript": "PASS",
+  "build": "PASS",
+  "productionTested": false
+}
