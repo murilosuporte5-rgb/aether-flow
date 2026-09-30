@@ -1,5 +1,7 @@
 -- Additive daily execution layer. Unknown historical stage dates remain NULL.
 alter table public.opportunities add column stage_entered_at timestamptz;
+alter table public.opportunities add column waiting_started_at timestamptz;
+alter table public.opportunities add constraint waiting_requires_review check(next_action_type is distinct from 'Aguardar cliente' or next_action_at is not null);
 alter table public.companies add column pipeline_version integer not null default 0;
 with last_stage as (
  select distinct on (company_id,opportunity_id) company_id,opportunity_id,created_at,
@@ -13,6 +15,11 @@ from last_stage h where h.company_id=o.company_id and h.opportunity_id=o.id and 
 create function private.stamp_stage_entry() returns trigger language plpgsql set search_path='' as $$
 declare stage_kind text;
 begin
+ if new.next_action_type='Aguardar cliente' then
+  if tg_op='INSERT' then new.waiting_started_at:=now();
+  elsif old.next_action_type is distinct from 'Aguardar cliente' then new.waiting_started_at:=now();
+  else new.waiting_started_at:=old.waiting_started_at; end if;
+ else new.waiting_started_at:=null; end if;
  if tg_op='INSERT' or new.stage_id is distinct from old.stage_id then
   perform 1 from public.companies where id=new.company_id for share;
   select kind into stage_kind from public.pipeline_stages where company_id=new.company_id and id=new.stage_id;
@@ -28,6 +35,7 @@ for each row execute function private.stamp_stage_entry();
 create function private.enrich_operational_event() returns trigger language plpgsql set search_path='' as $$
 declare from_name text; to_name text;
 begin
+ new.created_at:=clock_timestamp();
  new.payload:=new.payload||jsonb_build_object('actor_id',new.actor_id,'timestamp',new.created_at);
  if new.event='stage_changed' then
   select name into from_name from public.pipeline_stages where company_id=new.company_id and id::text=new.payload->>'from';
@@ -45,7 +53,8 @@ for each row execute function private.enrich_operational_event();
 alter table public.pipeline_stages drop constraint pipeline_stages_company_id_position_key;
 alter table public.pipeline_stages add constraint pipeline_stages_company_id_position_key
  unique(company_id,position) deferrable initially immediate;
-revoke insert,update,delete on public.pipeline_stages from authenticated,anon;
+revoke all on public.pipeline_stages from authenticated,anon;
+grant select on public.pipeline_stages to authenticated;
 
 create function public.configure_pipeline(p_company_id uuid,p_request_id uuid,p_command jsonb)
 returns jsonb language plpgsql security definer set search_path='' as $$

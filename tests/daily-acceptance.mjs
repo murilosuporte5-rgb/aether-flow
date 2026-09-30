@@ -128,13 +128,11 @@ try {
     const tenant = await fixture("QA Daily " + width),
       other = await fixture("QA Member " + width);
     await checked(
-      admin
-        .from("memberships")
-        .insert({
-          company_id: tenant.company,
-          user_id: other.user,
-          role: "member",
-        }),
+      admin.from("memberships").insert({
+        company_id: tenant.company,
+        user_id: other.user,
+        role: "member",
+      }),
     );
     await checked(
       admin.auth.admin.updateUserById(other.user, {
@@ -302,6 +300,20 @@ try {
         .single(),
     );
     assert.ok(waiting.created_at && waiting.due_at);
+    const waitStarted = (await opp(ids[0])).waiting_started_at;
+    assert.ok(waitStarted, "Waiting begins when it is explicitly marked");
+    const revisedWait = await command(tenant, {
+      kind: "reschedule",
+      id: ids[0],
+      actionType: "Aguardar cliente",
+      dueAt: futureISO(),
+    });
+    assert.equal(revisedWait.data?.ok, true, revisedWait.error?.message);
+    assert.equal(
+      (await opp(ids[0])).waiting_started_at,
+      waitStarted,
+      "Review rescheduling must not reset the waiting start",
+    );
     record("waiting_review_required_and_queue_advance", width);
     for (let n = 1; n < 20; n++) {
       await panel

@@ -56,6 +56,7 @@ export type Row = {
   last_interaction_at: string | null;
   created_at: string;
   stage_entered_at: string | null;
+  waiting_started_at: string | null;
 };
 export type Stage = {
   id: string;
@@ -1230,9 +1231,8 @@ export default function Workspace({
                   <span>{formatDate(row.next_action_at)}</span>
                   {row.next_action_type === "Aguardar cliente" && (
                     <p>
-                      Aguardando desde{" "}
-                      {formatDate(activity(row)?.created_at || null)}. Revisão
-                      obrigatória em {formatDate(row.next_action_at)}.
+                      Aguardando desde {formatDate(row.waiting_started_at)}.
+                      Revisão obrigatória em {formatDate(row.next_action_at)}.
                     </p>
                   )}
                   {row.next_action_note && <p>{row.next_action_note}</p>}
