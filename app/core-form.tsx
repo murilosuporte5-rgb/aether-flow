@@ -60,7 +60,7 @@ export default function CoreForm({
   error: string;
   duplicate: Duplicate;
   closingStage: Stage | null;
-  initialActionType?:string|null;
+  initialActionType?: string | null;
   onClose: () => void;
   onSave: (payload: Record<string, unknown>) => Promise<boolean>;
   onOpenOpportunity: (id: string) => void;
@@ -90,13 +90,14 @@ export default function CoreForm({
   );
   const [ownerId, setOwnerId] = useState("");
   const [type, setType] = useState(
-    initialActionType || (mode === "schedule" || mode === "reschedule"
-      ? ACTION_TYPES.includes(
-          row?.next_action_type as (typeof ACTION_TYPES)[number],
-        )
-        ? row!.next_action_type!
-        : "Ligação"
-      : ""),
+    initialActionType ||
+      (mode === "schedule" || mode === "reschedule"
+        ? ACTION_TYPES.includes(
+            row?.next_action_type as (typeof ACTION_TYPES)[number],
+          )
+          ? row!.next_action_type!
+          : "Ligação"
+        : ""),
   );
   const [due, setDue] = useState(
     mode === "reschedule" ? localInput(row?.next_action_at || null) : "",
@@ -345,7 +346,20 @@ export default function CoreForm({
                   <select
                     value={source}
                     onChange={(e) => setSource(e.target.value)}
-                  ><option value="">Não informada</option>{source&&!LEAD_SOURCES.includes(source as (typeof LEAD_SOURCES)[number])&&<option value={source}>{source} (registro anterior)</option>}{LEAD_SOURCES.map(s=><option key={s}>{s}</option>)}</select>
+                  >
+                    <option value="">Não informada</option>
+                    {source &&
+                      !LEAD_SOURCES.includes(
+                        source as (typeof LEAD_SOURCES)[number],
+                      ) && (
+                        <option value={source}>
+                          {source} (registro anterior)
+                        </option>
+                      )}
+                    {LEAD_SOURCES.map((s) => (
+                      <option key={s}>{s}</option>
+                    ))}
+                  </select>
                 </label>
                 {mode === "create" && (
                   <>

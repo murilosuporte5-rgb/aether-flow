@@ -11,9 +11,12 @@ update public.opportunities o set stage_entered_at=h.created_at
 from last_stage h where h.company_id=o.company_id and h.opportunity_id=o.id and h.stage_id=o.stage_id::text;
 
 create function private.stamp_stage_entry() returns trigger language plpgsql set search_path='' as $$
+declare stage_kind text;
 begin
  if tg_op='INSERT' or new.stage_id is distinct from old.stage_id then
   perform 1 from public.companies where id=new.company_id for share;
+  select kind into stage_kind from public.pipeline_stages where company_id=new.company_id and id=new.stage_id;
+  if stage_kind is distinct from new.status then raise exception 'O pipeline mudou. Atualize a tela e tente novamente.'; end if;
   new.stage_entered_at:=now();
  else new.stage_entered_at:=old.stage_entered_at; end if;
  return new;
