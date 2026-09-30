@@ -1,0 +1,25 @@
+'use client';
+import {useCallback,useEffect,useState} from 'react';
+import {createClient} from '@/lib/supabase/browser';
+type Customer={id:string;name:string;email:string;display_name:string;owner_user_id:string;subscription_status:string;trial_ends_at:string|null;created_at:string;last_sign_in_at:string|null;open_opportunities:number;last_activity:string|null;created_7d:number;completed_7d:number;active_days_7d:number};
+type Feedback={id:string;company_name:string;user_id:string;context:string;message:string;state:string;created_at:string};
+export default function Customers(){
+ const [customers,setCustomers]=useState<Customer[]>([]),[feedback,setFeedback]=useState<Feedback[]>([]),[message,setMessage]=useState(''),[busy,setBusy]=useState(false),[editing,setEditing]=useState<Customer|null>(null),[action,setAction]=useState('rename'),[value,setValue]=useState('');
+ const reload=useCallback(async()=>{const result=await createClient().rpc('admin_customer_catalog');if(result.error){setMessage('Não foi possível carregar os clientes. Tente novamente.');return;}setCustomers(result.data.customers);setFeedback(result.data.feedback);},[]);
+ useEffect(()=>{void reload()},[reload]);
+ async function submit(e:React.FormEvent){e.preventDefault();if(!editing)return;setBusy(true);setMessage('');
+  try{const s=createClient();if(action==='reset'){
+   const result=await s.functions.invoke('create-access',{body:{action:'reset',userId:editing.owner_user_id,companyId:editing.id,password:value}});
+   if(result.error||!result.data?.ok)throw new Error(result.data?.error||'Reset não confirmado. Consulte a operação antes de repetir.');
+  }else{const result=await s.rpc('admin_update_company',{p_company_id:editing.id,p_action:action,p_value:value});if(result.error)throw new Error(result.error.message);}
+  setMessage('Operação concluída.');setValue('');setEditing(null);await reload();
+  }catch(e){setMessage(e instanceof Error?e.message:'Operação não confirmada.');}finally{setBusy(false);}
+ }
+ const date=(value:string|null)=>value?new Date(value).toLocaleString('pt-BR',{timeZone:'America/Bahia'}):'Não registrado';
+ return <section className="admin-card business-operations"><h2>Clientes e uso</h2><button disabled={busy} onClick={()=>void reload()}>Atualizar clientes</button><p>Trial expirado preserva leitura e bloqueia operações. Suspensão bloqueia dados da empresa. Ativar libera acesso manualmente. Uso: últimos 7 dias.</p>
+ <div style={{overflowX:'auto'}}><table><thead><tr><th>Cliente / empresa</th><th>Acesso</th><th>Uso</th><th>Administrar</th></tr></thead><tbody>{customers.map(c=><tr key={c.id}><td>{c.display_name}<br/>{c.name}<br/>{c.email}<br/>Criado: {date(c.created_at)}</td><td>{c.subscription_status==='trial'&&c.trial_ends_at&&Date.parse(c.trial_ends_at)<=Date.now()?'expired':c.subscription_status}<br/>Trial até {date(c.trial_ends_at)}</td><td>{c.open_opportunities} abertas<br/>Login: {date(c.last_sign_in_at)}<br/>Atividade: {date(c.last_activity)}<br/>7 dias: {c.created_7d} criadas, {c.completed_7d} concluídas, {c.active_days_7d} dias ativos</td><td><button disabled={busy} onClick={()=>{setEditing(c);setAction('rename');setValue(c.name)}}>Administrar {c.name}</button><small> Acesso ao ambiente requer vínculo; sem impersonação.</small></td></tr>)}</tbody></table></div>
+ {editing&&<form onSubmit={submit}><h3>{editing.name}</h3><label>Ação<select value={action} disabled={busy} onChange={e=>{setAction(e.target.value);setValue('')}}><option value="rename">Editar empresa</option><option value="suspend">Suspender</option><option value="activate">Reativar / ativar manualmente</option><option value="extend_trial">Estender trial</option><option value="reset">Definir nova senha</option></select></label>{['rename','extend_trial','reset'].includes(action)&&<label>{action==='reset'?'Nova senha (mínimo 12 caracteres)':action==='extend_trial'?'Dias (1 a 90)':'Nome da empresa'}<input required type={action==='reset'?'password':action==='extend_trial'?'number':'text'} min={action==='extend_trial'?1:undefined} max={action==='extend_trial'?90:undefined} minLength={action==='reset'?12:2} value={value} onChange={e=>setValue(e.target.value)} autoComplete={action==='reset'?'new-password':'off'}/></label>}<p>Confira a empresa e confirme a ação. Dados existentes serão preservados.</p><button disabled={busy}>Confirmar operação</button><button type="button" disabled={busy} onClick={()=>{setEditing(null);setValue('')}}>Cancelar</button></form>}
+ <h2>Feedback</h2>{feedback.map(f=><article key={f.id}><strong>{f.company_name} · {f.context}</strong><p>{f.message}</p><small>{date(f.created_at)} · usuário {f.user_id}</small><label>Estado<select value={f.state} disabled={busy} onChange={async e=>{setBusy(true);const result=await createClient().rpc('admin_review_feedback',{p_id:f.id,p_state:e.target.value});if(result.error)setMessage('Não foi possível atualizar o feedback.');else await reload();setBusy(false)}}><option value="open">Aberto</option><option value="reviewed">Revisado</option><option value="resolved">Resolvido</option></select></label></article>)}
+ {message&&<p role="status">{message}</p>}
+ </section>;
+}

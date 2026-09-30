@@ -3,6 +3,7 @@ import {redirect} from 'next/navigation';
 import {createClient} from '@/lib/supabase/server';
 import {isAetherAdmin} from '@/lib/provision';
 import AdminForm from './form';
+import Customers from './customers';
 
 export const dynamic='force-dynamic';
 
@@ -27,6 +28,7 @@ export default async function AdminPage(){
    </div>
   </section>
 
+  <Customers/>
   <div className="admin-layout">
    <section className="admin-card">
     <div className="admin-card-head">

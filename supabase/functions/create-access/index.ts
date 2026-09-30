@@ -55,8 +55,26 @@ Deno.serve(async (req: Request) => {
   if(adminError) return json({error:"Não foi possível validar o administrador."},500);
   if(!isAdmin) return json({error:"Acesso restrito ao administrador."},403);
 
+  if(Number(req.headers.get('content-length')||0)>12000)return json({error:'Dados excedem o limite.'},413);
   let body:any={};
   try{body=await req.json()}catch{return json({error:"Dados inválidos."},400)}
+  if(JSON.stringify(body).length>12000)return json({error:'Dados excedem o limite.'},413);
+  // Password resets use the same controlled admin boundary and never send email.
+  if(body.action==='reset'){
+    const target=String(body.userId||'');
+    const password=String(body.password||'');
+    if(!/^[0-9a-f-]{36}$/i.test(target)||password.length<12||password.length>128)return json({error:'Usuário ou senha inválidos.'},400);
+    const member=await admin.from('memberships').select('company_id').eq('user_id',target).eq('company_id',body.companyId).maybeSingle();
+    if(member.error||!member.data)return json({error:'Usuário não pertence à empresa.'},403);
+    const reserved=await userClient.rpc('begin_admin_operation',{p_event:'password_reset',p_company_id:member.data.company_id,p_target_user_id:target});
+    if(reserved.error)return json({error:'Não foi possível registrar a operação ou limite excedido.'},429);
+    const result=await admin.auth.admin.updateUserById(target,{password});
+    const audit=await admin.from('admin_operations').update({status:result.error?'failed':'success',updated_at:new Date().toISOString()}).eq('id',reserved.data);
+    if(result.error)return json({error:'Reset não concluído.',operationId:reserved.data},400);
+    if(audit.error)return json({error:'Senha atualizada; registro de conclusão requer recuperação. Não repita o reset.',operationId:reserved.data},500);
+    return json({ok:true,operationId:reserved.data});
+  }
+  if(body.action&&body.action!=='create')return json({error:'Ação inválida.'},400);
   const email=String(body.email||"").trim().toLowerCase();
   const password=String(body.password||"");
   const template=templates[String(body.template||"generic")]?String(body.template||"generic"):"generic";
@@ -71,6 +89,8 @@ Deno.serve(async (req: Request) => {
 
   let createdUserId:string|null=null;
   let companyId:string|null=null;
+  const reserved=await userClient.rpc('begin_admin_operation',{p_event:'account_created'});
+  if(reserved.error)return json({error:'Não foi possível registrar a operação ou limite excedido.'},429);
   try{
     const created=await admin.auth.admin.createUser({
       email,
@@ -79,6 +99,8 @@ Deno.serve(async (req: Request) => {
       user_metadata:{full_name:clientName,company_name:companyName}
     });
     if(created.error||!created.data.user){
+      const failureAudit=await admin.from('admin_operations').update({status:'failed',updated_at:new Date().toISOString()}).eq('id',reserved.data);
+      if(failureAudit.error)console.error('create-access audit finalization failed',{operationId:reserved.data});
       const code=created.error?.code||"";
       const msg=(created.error?.message||"").toLowerCase();
       if(code==="weak_password") return json({error:"A senha precisa ter pelo menos 12 caracteres."},400);
@@ -86,29 +108,35 @@ Deno.serve(async (req: Request) => {
       throw created.error||new Error("Auth não retornou usuário.");
     }
     createdUserId=created.data.user.id;
-
-    const company=await admin.from("companies").insert({
-      name:companyName,
-      company_template:template,
-      is_demo:false,
-      owner_user_id:createdUserId
-    }).select("id").single();
-    if(company.error||!company.data) throw company.error||new Error("Empresa não criada.");
-    companyId=company.data.id;
-
-    const membership=await admin.from("memberships").insert({company_id:companyId,user_id:createdUserId,role:"owner"});
-    if(membership.error) throw membership.error;
-
     const stages=templates[template];
-    const stageRows=stages.map((name,index)=>({company_id:companyId,name,position:index,kind:stageKind(index,stages.length)}));
-    const stageInsert=await admin.from("pipeline_stages").insert(stageRows);
-    if(stageInsert.error) throw stageInsert.error;
+    const provision=await admin.rpc('provision_customer_workspace',{
+      p_operation_id:reserved.data,p_user_id:createdUserId,p_name:companyName,p_template:template,
+      p_stages:stages.map((name,index)=>({name,position:index,kind:stageKind(index,stages.length)}))
+    });
+    if(provision.error||!provision.data)throw new Error('Workspace provisioning failed');
+    companyId=provision.data.companyId;
 
     return json({ok:true,email,clientName,companyName,companyId});
   }catch(error){
-    if(companyId) await admin.from("companies").delete().eq("id",companyId);
-    if(createdUserId) await admin.auth.admin.deleteUser(createdUserId);
-    console.error("create-access failed",error);
-    return json({error:"Não foi possível criar o acesso. Nenhum acesso parcial foi mantido."},500);
+    // Only resources created by this request may be compensated. A failed
+    // company cleanup must keep its Auth owner for recovery, rather than
+    // orphaning references or hiding a partially provisioned workspace.
+    const recoveryId=crypto.randomUUID();
+    let cleanupFailed=false;
+    if(companyId){
+      const cleanup=await admin.from("companies").delete().eq("id",companyId).select("id");
+      cleanupFailed=!!cleanup.error||cleanup.data?.length!==1;
+    }
+    if(createdUserId&&!cleanupFailed){
+      const cleanup=await admin.auth.admin.deleteUser(createdUserId);
+      cleanupFailed=!!cleanup.error;
+    }
+    // Never log the exception object: upstream errors can contain personal data.
+    console.error("create-access failure",{recoveryId,companyId,userId:createdUserId,cleanupFailed});
+    const audit=await admin.from('admin_operations').update({status:cleanupFailed?'recovery_required':'failed',target_user_id:createdUserId,metadata:{recoveryId,cleanupFailed},updated_at:new Date().toISOString()}).eq('id',reserved.data);
+    if(audit.error)cleanupFailed=true;
+    return json({error:cleanupFailed
+      ?`Criação incompleta. Não repita: solicite recuperação com referência ${recoveryId}.`
+      :"Não foi possível criar o acesso. Os recursos desta tentativa foram removidos.",recoveryId},500);
   }
 });

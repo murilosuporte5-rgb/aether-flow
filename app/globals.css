@@ -153,3 +153,11 @@
 .product-feedback{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:28px;font-size:13px;color:#65748a}.product-feedback form{width:100%;max-width:520px;display:grid;gap:8px}.product-feedback label{display:grid;gap:8px}.product-feedback textarea{border:1px solid #d7dfe9;border-radius:8px;padding:10px;min-height:88px}.pipeline-settings{width:min(800px,100%);max-height:92dvh;overflow:auto}.pipeline-settings p{font-size:13px;line-height:1.5;color:#64748b}.stage-config{display:grid;grid-template-columns:minmax(0,1fr) 100px 44px 44px auto;gap:8px;align-items:end;margin:12px 0}.stage-config label{display:grid;gap:4px;font-size:12px;min-width:0}.stage-config input,.stage-config select{width:100%;min-height:44px;border:1px solid #d6dfea;border-radius:7px;padding:8px}.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.pipeline-settings button.primary{background:#214f8f;color:#fff}
 @media(max-width:1000px){.topbar .topright{display:none}}
 @media(max-width:600px){.topbar{display:flex;padding:10px 14px;min-height:0}.topbar .crumb{display:none}.global-search{max-width:none;width:100%}.sidebar nav a:not(.admin-nav){flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;margin:0;font-size:10px;white-space:nowrap;color:#77879a}.sidebar nav a.active{background:#edf4fd;color:#245d9e}.sidebar nav a svg{width:17px;height:17px}.stage-config{grid-template-columns:minmax(0,1fr) 100px}.stage-config button{min-width:44px}.pipeline-settings{padding:18px 14px}.product-feedback button{padding:7px 12px}.queue-quick-actions{gap:6px}}
+.business-operations {margin:16px 0;padding:16px;border:1px solid #d8dfeb;border-radius:12px;background:#fff;max-width:100%;}
+.business-operations summary {cursor:pointer;font-weight:700;padding:8px;}
+.business-operations label {display:block;margin:10px 0;}
+.business-operations input,.business-operations select {max-width:100%;padding:8px;margin:4px;}
+.business-metrics {display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;}
+.business-metrics dd {margin:4px 0;font-weight:700;}
+.business-export {display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;}
+.business-operations pre {overflow:auto;max-width:100%;max-height:220px;}
