@@ -1,10 +1,11 @@
 'use client';
 import {useState} from 'react';
+import {Eye,EyeOff,LogIn} from 'lucide-react';
 import {useRouter} from 'next/navigation';
 import {createClient} from '@/lib/supabase/browser';
 
 export default function LoginForm(){
- const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[showPassword,setShowPassword]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const router=useRouter();
 
  async function passwordLogin(e:React.FormEvent){
@@ -13,14 +14,14 @@ export default function LoginForm(){
    const {error}=await createClient().auth.signInWithPassword({email:email.trim().toLowerCase(),password});
    if(error)throw error;
    router.replace('/');router.refresh();
-  }catch{setError('E-mail ou senha inválidos.')}
+  }catch{setError('E-mail ou senha inválidos. Confira os dados enviados pelo administrador.')}
   finally{setBusy(false)}
  }
 
- return <form className="login-form" onSubmit={passwordLogin}>
-  <label>E-mail<input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="username" required/></label>
-  <label>Senha<input type="password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" required/></label>
+ return <form className="login-form login-form-v2" onSubmit={passwordLogin}>
+  <label><span>E-mail</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="username" placeholder="seu@email.com" required/></label>
+  <label><span>Senha</span><div className="password-control"><input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="Sua senha" required/><button type="button" className="field-icon-btn" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?'Ocultar senha':'Mostrar senha'}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></div></label>
   {error&&<p role="alert" className="form-error">{error}</p>}
-  <button type="submit" className="primary login-action" disabled={busy}>{busy?'Entrando…':'Entrar'}</button>
+  <button type="submit" className="primary login-action" disabled={busy}><LogIn size={17}/>{busy?'Entrando…':'Entrar no Aether Flow'}</button>
  </form>;
 }

@@ -1,32 +1,69 @@
 'use client';
 import {useState} from 'react';
+import {Check,Copy,Eye,EyeOff,RefreshCw,Sparkles} from 'lucide-react';
 import {FunctionsHttpError} from '@supabase/supabase-js';
 import {createClient} from '@/lib/supabase/browser';
 import {templates,type TemplateKey} from '@/lib/templates';
 
+type CreatedAccess={email:string;password:string;company:string};
+
+function randomPassword(){
+ const upper='ABCDEFGHJKLMNPQRSTUVWXYZ';
+ const lower='abcdefghijkmnopqrstuvwxyz';
+ const digits='23456789';
+ const symbols='!@#$%&*?';
+ const all=upper+lower+digits+symbols;
+ const pick=(chars:string)=>chars[crypto.getRandomValues(new Uint32Array(1))[0]%chars.length];
+ const seed=[pick(upper),pick(lower),pick(digits),pick(symbols)];
+ while(seed.length<16)seed.push(pick(all));
+ for(let i=seed.length-1;i>0;i--){
+  const j=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);
+  [seed[i],seed[j]]=[seed[j],seed[i]];
+ }
+ return seed.join('');
+}
+
 export default function AdminForm(){
  const [email,setEmail]=useState('');
  const [password,setPassword]=useState('');
+ const [showPassword,setShowPassword]=useState(false);
  const [name,setName]=useState('');
  const [template,setTemplate]=useState<TemplateKey>('generic');
  const [busy,setBusy]=useState(false);
- const [result,setResult]=useState('');
+ const [created,setCreated]=useState<CreatedAccess|null>(null);
+ const [copied,setCopied]=useState(false);
  const [error,setError]=useState('');
+
+ function generatePassword(){
+  setPassword(randomPassword());
+  setShowPassword(true);
+  setError('');
+ }
+
+ async function copyAccess(){
+  if(!created)return;
+  const message=`Aether Flow\nLogin: ${created.email}\nSenha: ${created.password}\nAcesso: ${window.location.origin}/entrar`;
+  await navigator.clipboard.writeText(message);
+  setCopied(true);
+  window.setTimeout(()=>setCopied(false),1800);
+ }
 
  async function submit(e:React.FormEvent){
   e.preventDefault();
-  setResult('');setError('');
+  setCreated(null);setCopied(false);setError('');
 
   if(password.length<12){
-   setError('A senha precisa ter pelo menos 12 caracteres.');
+   setError('Use uma senha com pelo menos 12 caracteres.');
    return;
   }
 
   setBusy(true);
   try{
+   const cleanEmail=email.trim().toLowerCase();
+   const cleanName=name.trim();
    const supabase=createClient();
    const {data,error}=await supabase.functions.invoke('create-access',{
-    body:{email:email.trim().toLowerCase(),password,name:name.trim(),template}
+    body:{email:cleanEmail,password,name:cleanName,template}
    });
 
    if(error instanceof FunctionsHttpError){
@@ -40,31 +77,63 @@ export default function AdminForm(){
    if(error)throw error;
    if(data?.error)throw new Error(data.error);
 
-   setResult(`Acesso criado. Cliente: ${email.trim().toLowerCase()} · entra com a senha definida acima.`);
-   setEmail('');setPassword('');setName('');setTemplate('generic');
+   setCreated({email:cleanEmail,password,company:cleanName||data?.companyName||'Cliente'});
+   setEmail('');setPassword('');setName('');setTemplate('generic');setShowPassword(false);
   }catch(e){
    setError(e instanceof Error?e.message:'Não foi possível criar o acesso.');
   }finally{setBusy(false)}
  }
 
- return <form className="admin-form" onSubmit={submit}>
-  <label>E-mail do cliente
-   <input required type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="off"/>
-  </label>
-  <label>Senha inicial
-   <input required type="text" minLength={12} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="off" placeholder="Mínimo de 12 caracteres"/>
-  </label>
-  <label>Empresa <small>(opcional)</small>
-   <input maxLength={120} value={name} onChange={e=>setName(e.target.value)} placeholder="Se vazio, usamos o nome do e-mail"/>
-  </label>
-  <label>Segmento <small>(opcional)</small>
-   <select value={template} onChange={e=>setTemplate(e.target.value as TemplateKey)}>
-    {Object.entries(templates).map(([key,val])=><option key={key} value={key}>{val.label}</option>)}
-   </select>
-  </label>
-  <button className="primary" disabled={busy}>{busy?'Criando acesso…':'Criar acesso'}</button>
-  {result&&<p role="status" className="admin-success">{result}</p>}
-  {error&&<p role="alert" className="form-error">{error}</p>}
-  <p className="panel-footnote">Nenhum e-mail é enviado. O usuário é criado já confirmado e entra diretamente com e-mail + senha.</p>
- </form>;
+ return <div className="admin-form-wrap">
+  <form className="admin-form admin-form-v2" onSubmit={submit}>
+   <div className="admin-fields-grid">
+    <label className="field-wide">
+     <span>E-mail do cliente</span>
+     <input required type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="off" placeholder="cliente@empresa.com"/>
+    </label>
+
+    <label className="field-wide">
+     <span>Senha inicial <small>mínimo 12 caracteres</small></span>
+     <div className="password-control">
+      <input required type={showPassword?'text':'password'} minLength={12} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="new-password" placeholder="Crie ou gere uma senha segura"/>
+      <button type="button" className="field-icon-btn" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?'Ocultar senha':'Mostrar senha'}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button>
+     </div>
+     <button type="button" className="generate-password" onClick={generatePassword}><Sparkles size={15}/> Gerar senha forte</button>
+    </label>
+
+    <label>
+     <span>Empresa <small>opcional</small></span>
+     <input maxLength={120} value={name} onChange={e=>setName(e.target.value)} placeholder="Ex.: Horizonte Eventos"/>
+    </label>
+
+    <label>
+     <span>Segmento <small>opcional</small></span>
+     <select value={template} onChange={e=>setTemplate(e.target.value as TemplateKey)}>
+      {Object.entries(templates).map(([key,val])=><option key={key} value={key}>{val.label}</option>)}
+     </select>
+    </label>
+   </div>
+
+   {error&&<div role="alert" className="form-error admin-form-error">{error}</div>}
+
+   <div className="admin-form-footer">
+    <div className="admin-security-note"><Check size={15}/> Sem e-mail de confirmação. A conta já nasce pronta.</div>
+    <button className="primary admin-create-button" disabled={busy}>{busy?<><RefreshCw className="spin" size={16}/> Criando acesso…</>:<><Check size={16}/> Criar acesso</>}</button>
+   </div>
+  </form>
+
+  {created&&<section className="access-success" role="status">
+   <div className="access-success-icon"><Check size={22}/></div>
+   <div className="access-success-main">
+    <span>ACESSO CRIADO</span>
+    <h3>{created.company}</h3>
+    <div className="credential-row"><small>E-mail</small><strong>{created.email}</strong></div>
+    <div className="credential-row"><small>Senha</small><strong>{created.password}</strong></div>
+    <div className="success-actions">
+     <button type="button" className="primary" onClick={()=>void copyAccess()}>{copied?<><Check size={16}/> Copiado</>:<><Copy size={16}/> Copiar acesso</>}</button>
+     <a className="secondary" href="/entrar" target="_blank" rel="noreferrer">Testar login</a>
+    </div>
+   </div>
+  </section>}
+ </div>;
 }
