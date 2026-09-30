@@ -1,6 +1,6 @@
 # Aether Flow — estado da implementação em 30/09/2026
 
-**O programa de quatro prompts não está concluído.** O núcleo do Prompt 1 foi implementado na branch `core-execution-20260930`, com PR #13 em rascunho. Os testes de código e banco abaixo passaram. O acesso autenticado foi confirmado após o login do usuário; nenhuma senha foi lida ou alterada. O fluxo principal passou no navegador desktop e no banco. A Railway voltou para `main`, commit f08f915, deployment e63fa615-39b2-48c1-9caf-89bf08a5127a SUCCESS, confirmado pelo conector independente. Mobile e ativação da fronteira de escrita continuam pendentes. Não houve merge.
+**O programa de quatro prompts não está concluído.** O núcleo do Prompt 1 foi implementado na branch `core-execution-20260930`, com PR #13 em rascunho. Os testes de código e banco abaixo passaram. O acesso autenticado foi confirmado após o login do usuário; nenhuma senha foi lida ou alterada. O fluxo principal passou no navegador desktop e no banco. A Railway voltou para `main`, commit f08f915, deployment 5c02f4be-f7fa-4305-af81-28dea223c9ad SUCCESS, confirmado pelo conector independente. Mobile autenticado e ativação definitiva da fronteira de escrita continuam pendentes. O Jarvis verificou o login público em quatro viewports. A fronteira RPC-only passou nos testes, mas seus grants foram revertidos para compatibilidade com main antes do restore. Não houve merge.
 
 Fonte canônica: https://github.com/murilosuporte5-rgb/aether-flow/pull/13.
 
@@ -28,8 +28,8 @@ Fonte canônica: https://github.com/murilosuporte5-rgb/aether-flow/pull/13.
 | Interface | app/workspace.tsx; app/dashboard.tsx; app/core-form.tsx; app/whatsapp-action.tsx; app/stale-indicator.tsx; app/globals.css; app/layout.tsx |
 | Domínio/provisionamento | lib/execution.ts; lib/provision.ts; lib/request-origin.ts |
 | Configuração | package.json; tsconfig.json; .gitignore |
-| Testes | tests/execution.test.ts; tests/request-origin.test.ts; tests/core-acceptance.sql; tests/demo-acceptance.sql; docs/qa/aether-flow-qa-20260930-1601.jpg |
-| Migrações | três arquivos listados abaixo |
+| Testes | tests/execution.test.ts; tests/request-origin.test.ts; tests/core-acceptance.sql; tests/demo-acceptance.sql; tests/core-mutation-boundary.sql; docs/qa/aether-flow-qa-20260930-1601.jpg |
+| Migrações | cinco arquivos listados abaixo |
 | Operação | docs/CORE_RELEASE.md; docs/IMPLEMENTATION_STATUS.md; docs/pending/core_mutation_boundary.sql |
 
 A formatação expandiu arquivos que antes estavam comprimidos em poucas linhas. O PR contém a implementação e o procedimento de publicação/recuperação.
@@ -41,10 +41,12 @@ A formatação expandiu arquivos que antes estavam comprimidos em poucas linhas.
 | 20260930130958_core_execution_engine | APPLIED |
 | 20260930132228_core_atomic_demo | APPLIED |
 | 20260930134524_core_international_phone | APPLIED |
+| 20260930162312_core_mutation_boundary | APPLIED; testes RPC-only PASS |
+| 20260930163119_core_legacy_runtime_restore | APPLIED depois; grants mínimos para main restaurados |
 
 Os nomes/versões foram cruzados com supabase_migrations.schema_migrations. As dez migrações preexistentes também correspondem aos arquivos do repositório. Os acréscimos são compatíveis com o runtime antigo. Não houve remoção de dados de clientes.
 
-**Ativação de permissões:** docs/pending/core_mutation_boundary.sql está preparado e NÃO APLICADO. Ficou fora da pasta de migrações para não ser executado antes do runtime transacional. Depois do QA, gerar uma nova migração pelo CLI, aplicar esse SQL e sincronizar a versão efetivamente registrada.
+**Ativação de permissões:** RPC-only foi aplicado e testado nesta rodada. Antes do retorno ao runtime antigo, a migration de compatibilidade restaurou SELECT/INSERT/UPDATE em contacts/opportunities/activities e SELECT/INSERT no histórico. DELETE/TRUNCATE/REFERENCES/TRIGGER continuam revogados; anon sem acesso. A ativação definitiva exige NOVA migration após mobile autenticado e runtime aprovado. docs/pending/core_mutation_boundary.sql é o template dessa ativação, não uma migration histórica não aplicada.
 
 ## 4. Schema alterado
 
@@ -84,7 +86,9 @@ Nenhuma Edge Function foi modificada ou publicada. create-access foi lida na ver
 | Restore main f08f915 | SUCCESS; /login HTTP 200 | Versão anterior do produto |
 | Sessão autenticada | PASS — acesso fornecido pelo usuário | Sem leitura/troca de senha |
 | UI desktop | PASS — criação, telefone, duplicidade, próxima ação, ganho/perda, histórico e persistência | Empresa de QA separada; dados fictícios |
-| Mobile 360/390/412/768 | NOT_TESTED | Browser disponível não expõe ajuste de viewport |
+| Login público 360/390/412/768 pelo Jarvis | PASS — HTTP 200, sem overflow/erros observados | Não testa fluxos autenticados ou submissão de formulário |
+| Mobile autenticado core | NOT_TESTED | Dependência de ferramenta/dispositivo suportado |
+| tests/core-mutation-boundary.sql | PASS sob grants RPC-only | Grants de compatibilidade restaurados posteriormente |
 | Duas requisições HTTP simultâneas | PASS — uma 200 e outra 409; um contato/uma oportunidade | Sobreposição observada em logs Railway; sobreposição interna de transações PostgreSQL não comprovada |
 
 As verificações no PostgreSQL cobrem telefone ausente/inválido/válido, deduplicação/reutilização, idempotência, conclusão sem próximo passo rejeitada, falha após atualização da ação anterior com rollback, conclusão com nova ação, ganho/perda, motivo/Outro, histórico de WhatsApp sem falso contato, isolamento de empresas e telefone internacional.
@@ -124,9 +128,9 @@ Itens 1–7, 10 e 11 foram tratados na branch e nos testes descritos; item 12 fo
 
 | MISSING | WHY | DEPENDENCY | NEXT_ACTION |
 |---|---|---|---|
-| QA mobile do núcleo | Viewport não configurável no browser disponível | Dispositivo ou ferramenta de viewport suportada | Testar 360/390/412/768, formulários e navegação |
+| QA mobile autenticado do núcleo | Jarvis atual audita URL pública sem autenticar/submeter | Dispositivo ou ferramenta de viewport autenticado suportada | Testar 360/390/412/768, formulários e navegação |
 | Concorrência PostgreSQL forçada | Probe de pg_blocking_pids retornou zero | Conexões independentes instrumentadas | HTTP simultâneo passou; aprofundar se necessário sem confundir com prova de lock interno |
-| Bloqueio de mutações diretas | Runtime antigo restaurado | Novo runtime aprovado | Aplicar SQL de ativação e testar bypass/RLS novamente |
+| Bloqueio definitivo de mutações diretas | Teste RPC-only PASS; restore legacy aplicado para main | Novo runtime aprovado/mobile | Nova migration de ativação; retestar boundary/core/demo |
 | Merge/release do núcleo | Gates incompletos | PASS nos itens acima | Merge; fonte main; deployment final SUCCESS |
 | Prompts 2, 3 e 4 | Sua regra proíbe avançar antes de estabilizar o Prompt 1 | Núcleo aprovado | Retomar auditoria do que já existe e implementar apenas lacunas |
 
@@ -149,9 +153,10 @@ WhatsApp Cloud API, IA/chatbot, Stripe completo, ERP, automação multicanal, ap
 | Uso | ID | Commit/fonte | Estado confirmado |
 |---|---|---|---|
 | Teste temporário | f188cf1a-6f31-4d10-a5c8-52af5ff2c071 | 74568433127876192f09cb2900b820dc694f86d3 / core-execution-20260930 | SUCCESS; substituído pela restauração |
-| Restauração atual | e63fa615-39b2-48c1-9caf-89bf08a5127a | f08f9157fc0786afd2b0d20529f1e260d87f38a5 / main | SUCCESS |
+| QA adicional / Jarvis | 735191e1-3fa1-4e89-bb02-191c137206b3 | e37f6855e82edf43dd162e819b5370f688ee24a1 / core-execution-20260930 | SUCCESS; substituído pelo restore |
+| Restauração atual | 5c02f4be-f7fa-4305-af81-28dea223c9ad | f08f9157fc0786afd2b0d20529f1e260d87f38a5 / main | SUCCESS |
 
-Configuração de produção conferida independentemente: main, commit f08f915, healthcheck /login, timeout 30s; deployment e63fa615-39b2-48c1-9caf-89bf08a5127a SUCCESS às 16:03:31 UTC. Domínio, variáveis, réplicas e dados de clientes preservados. **Os novos recursos ainda não foram incorporados a main.**
+Configuração de produção conferida independentemente: main, commit f08f915, healthcheck /login, timeout 30s; deployment 5c02f4be-f7fa-4305-af81-28dea223c9ad SUCCESS às 16:32:07 UTC. Domínio, variáveis, réplicas e dados de clientes preservados. **Os novos recursos ainda não foram incorporados a main.**
 
 ## 15. Riscos antes de operar clientes reais
 
@@ -173,3 +178,12 @@ Configuração de produção conferida independentemente: main, commit f08f915, 
 - Commit de código validado: 74568433127876192f09cb2900b820dc694f86d3. Railway QA f188cf1a-6f31-4d10-a5c8-52af5ff2c071 SUCCESS, health /api/health HTTP 200.
 
 ![QA desktop — próxima ação e histórico](qa/aether-flow-qa-20260930-1601.jpg)
+
+## Atualização final: Jarvis e fronteira transacional
+
+- Jarvis local-heavy-v1/LORA, RC51, heartbeat saudável; kill switch mantido. desktop.chrome.status e duas auditorias públicas de login concluíram PASS. Não houve leitura de conversas ou envio de WhatsApp.
+- Último job d686308d-0416-4ca4-8c68-590bd735ae49 auditou a branch e37 em 360×800, 390×844, 412×915 e 768×1024: HTTP 200, sem overflow/page errors/console errors. Não substitui mobile autenticado.
+- RPC-only: matriz de ACL, execução RPC, 12 mutações diretas negadas sob authenticated e 4 leituras negadas sob anon PASS. Core 23 e demo 5 PASS sob essas permissões. Core 23 PASS novamente após restore legacy.
+- Migrations remotas e filenames sincronizados: boundary 20260930162312; restore 20260930163119. Estado atual é compatibility grants, não RPC-only definitivo.
+- Railway main/f08f915 restaurada, deployment 5c02f4be-f7fa-4305-af81-28dea223c9ad SUCCESS; inspeção independente e /login HTTP 200.
+- Prompt completo de continuidade: MASTER_IMPLEMENTATION_HANDOFF_20260930.md. Nenhum merge ou implementação do Prompt 2 nesta atualização.

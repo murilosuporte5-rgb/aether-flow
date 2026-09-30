@@ -1,80 +1,59 @@
-# Aether Flow — Core execution release
+# Aether Flow — publicação do núcleo
 
-Scope: Prompt 1. Prompts 2–4 remain gated until this layer passes authenticated runtime, mobile and production checks. No commercial outreach or WhatsApp message is sent by this implementation.
+Estado de referência: 30/09/2026. Scope: Prompt 1. Os Prompts 2–4 aguardam estabilização desta camada. Nenhuma mensagem comercial/WhatsApp foi enviada.
 
-## Baseline
+## Fontes e estado atual
 
-- Repository: murilosuporte5-rgb/aether-flow.
-- Baseline main: f08f9157fc0786afd2b0d20529f1e260d87f38a5.
+- GitHub: murilosuporte5-rgb/aether-flow; branch core-execution-20260930; PR #13 em rascunho, sem merge.
+- Main/runtime de produção: f08f9157fc0786afd2b0d20529f1e260d87f38a5.
 - Railway project: 0d6c6fca-ca81-4da4-a5af-ee91f0dfd3ee.
-- Production environment: 22f8e56e-2391-4480-9a6f-3d1f93f11f70.
-- Service: 160fec62-b04d-466b-9c52-4a3f0b40cd82.
-- Successful baseline deployment: d315ed30-94d2-4598-acee-f265e93adc6e.
-- Supabase: xffwvvcmeqzimnuqqtus.
-- Exact initial data: 2 companies, 3 profiles, 0 contacts/opportunities/activities/history.
+- Production environment: 22f8e56e-2391-4480-9a6f-3d1f93f11f70; service: 160fec62-b04d-466b-9c52-4a3f0b40cd82.
+- Restore atual: 5c02f4be-f7fa-4305-af81-28dea223c9ad SUCCESS, confirmado em 16:32:07 UTC; config main/SHA/healthcheck /login 30s; endpoint HTTP 200.
+- Supabase Flow: xffwvvcmeqzimnuqqtus. Dados preservados: 2 empresas, 3 perfis; zero linhas operacionais após limpeza de QA.
+- Documentação completa: IMPLEMENTATION_STATUS.md e MASTER_IMPLEMENTATION_HANDOFF_20260930.md.
 
-## Changes
+## Núcleo implementado na branch
 
-- One guarded PostgreSQL RPC executes creation/edit/schedule/reschedule/complete/stage/comment/WhatsApp events transactionally.
-- Completion requires a dated next step or won/lost outcome. Loss requires a controlled reason; Other requires explanation.
-- Normalized phone generated column and unique company/phone index. Explicit existing-contact reuse allows multiple opportunities.
-- Command receipts and transaction advisory locks make retries idempotent; a request ID cannot be reused with a different payload.
-- Quick form, optional secondary details, initial action, controlled closure modal, readable phone, mobile fixed create action and keyboard focus handling.
-- WhatsApp is opened through wa.me after recording whatsapp_opened. Opening does not assert a sent message or reset last_interaction_at.
-- Contact time changes only when completion explicitly records a confirmed contact and its result.
-- Stale thresholds: normal <3 days, attention 3–6, stale >=7. Missing timestamp remains unknown.
-- Priority: overdue timestamp, today, missing next step, stale, waiting action, future, closed.
-- Demo seeding is atomic/idempotent and uses no fabricated WhatsApp phone numbers.
-- Public /api/health for runtime liveness only; it does not claim a database health check.
+RPC apply_workspace_command tenant-scoped/transacional; próxima ação obrigatória ou ganho/perda; motivo controlado; telefone normalizado/unique por empresa; reutilização explícita; receipts idempotentes; formulário compacto; abertura oficial wa.me auditada sem falsa interação; indicadores 3/7 dias; prioridades determinísticas; demo atômica/idempotente; health de liveness.
 
-## Evidence collected
+## Evidências
 
-- npm test: 11 tests PASS (8 domain + 3 request-origin regressions).
-- npm run check: PASS.
-- npm run build: PASS.
-- tests/core-acceptance.sql: 23 PostgreSQL checks PASS, all fixtures rolled back.
-- tests/demo-acceptance.sql: 5 PostgreSQL checks PASS, all fixtures rolled back.
-- Local production-mode /api/health and /login: HTTP 200.
-- Repeated requests returned one contact/opportunity, and repeated identical IDs returned the same result. MCP SQL calls were serialized (timestamps did not overlap): these are NOT evidence of true simultaneous HTTP/session concurrency. Required simultaneous test remains pending.
-- Disposable concurrency fixture was removed; original counts restored (2 companies; no operational rows).
+- npm test 11 PASS; TypeScript e build PASS na revisão de código testada.
+- SQL core 23 PASS; demo 5 PASS, fixtures revertidos.
+- Desktop autenticado: criação/validação/duplicidade, conclusão+próxima ação, ganho/perda/Outro, histórico, persistência e agendamento Hoje PASS.
+- HTTP simultâneo: duas requisições sobrepostas 200/409; um contato/uma oportunidade. Não comprova overlap interno de transações PostgreSQL.
+- QA Railway f188cf1a-6f31-4d10-a5c8-52af5ff2c071 (7456843) SUCCESS. QA adicional 735191e1-3fa1-4e89-bb02-191c137206b3 (e37f685) SUCCESS, health HTTP 200.
+- Jarvis RC51 auditou login público 360/390/412/768 na branch e37: HTTP 200, sem overflow/erros. **Mobile autenticado continua NOT_TESTED.**
+- tests/core-mutation-boundary.sql PASS durante ativação RPC-only: ACL, execução RPC, 12 mutações diretas authenticated e 4 SELECTs anon negados. Core/demo também PASS sob RPC-only.
 
-## Release sequence
+## Migrations e grants
 
-1. Verify current main has not advanced; rebase/retest if it has.
-2. Confirm rollback of the recorded SUCCESS image remains available in Railway. Baseline restore 63e8783f-5832-4cb3-a5f1-1562dc7907d0 reached SUCCESS in this run.
-3. Apply additive migrations, sync their actual versions with migration files.
-4. Push the feature branch, switch ONLY this service's source branch temporarily, deploy it.
-5. Validate /api/health, login, authenticated core flow and mobile.
-6. Apply mutation-boundary permission migration only after the new runtime and atomic demo RPC work. Re-run SQL security tests.
-7. Run concurrent authenticated requests in two independent sessions; verify one contact and idempotent opportunities.
-8. Merge only after all required gates; return the source branch to main; confirm final SUCCESS and matching commit.
+Quinze migrations remotas sincronizadas, incluindo cinco novas: 20260930130958 core; 20260930132228 demo; 20260930134524 international; 20260930162312 boundary; 20260930163119 legacy restore.
+
+A última migration restaura compatibilidade com main: authenticated SELECT/INSERT/UPDATE em contacts/opportunities/activities; SELECT/INSERT em opportunity_history. DELETE/TRUNCATE/REFERENCES/TRIGGER permanecem revogados; anon sem acesso. RLS preservada. Portanto a fronteira RPC-only foi testada, mas não está definitivamente ativa.
+
+O template docs/pending/core_mutation_boundary.sql exige **nova migration** para ativação final. Não editar/reexecutar uma versão histórica como se ela não tivesse sido aplicada. Core 23 PASS novamente após restore de grants.
+
+## Próxima publicação
+
+1. Conferir HEAD/main, schema/grants e migrations reais; rebase/retestar se houver alterações.
+2. Confirmar rollback disponível para o SHA/imagem de produção e compatibilidade do banco.
+3. Testar a revisão exata da branch na Railway, preservando domínio/config/variáveis.
+4. Concluir mobile autenticado core; verificar callback de WhatsApp e medir captura.
+5. Com runtime transacional aprovado ativo, gerar/aplicar nova migration RPC-only, sincronizar versão; retestar boundary/core/demo e UI autenticada.
+6. Conferir TypeScript/build/runtime/health e revisão; merge somente após todos os gates.
+7. Devolver fonte Railway para main; confirmar deployment SUCCESS, commit correto, health e fluxo principal.
+
+Não iniciar Prompt 2 antes disso. Se gates bloquearem, restaurar permissões necessárias ao runtime antigo ANTES de restaurá-lo e terminar com main/SUCCESS confirmado.
 
 ## Rollback
 
-The additive columns, receipt table and RPCs can remain when rolling back application code; no existing data must be dropped. Do not attempt a destructive down migration.
+Colunas/tabelas/RPCs aditivos podem permanecer; não executar down migration destrutiva. Se RPC-only estiver ativo, usar nova migration rastreada que restaure somente os grants necessários ao runtime antigo. Não conceder ALL ou anon; preservar RLS e revogações não necessárias ao legacy.
 
-If mutation-boundary grants were tightened, restore legacy INSERT/UPDATE grants on contacts, opportunities and activities, and INSERT on opportunity_history via a tracked rollback migration BEFORE restoring the old image. Preserve SELECT and existing RLS; do not grant DELETE/TRUNCATE or expose service secrets.
+Selecionar imagem SUCCESS retida na Railway e confirmar rollback/SHA/status. Se não estiver disponível, publicar o commit de recuperação verificado. Reconferir /login e escritas com fixture isolado. Não assumir rollback concluído por uma mensagem do agente ainda INITIALIZING.
 
-Select the recorded successful deployment in Railway's deployment list and use its rollback action, if retained. Check status, /login and application writes with a disposable fixture. Restore GitHub source to main. If that retained image is unavailable, deploy the exact baseline commit from a recovery branch; never guess a successful rollback.
+## Pendências fora do núcleo
 
-## Existing issues outside Prompt 1
+Compensação administrativa não confere cleanup; onboarding real requer auditoria. Leaked-password protection desabilitada conforme advisor. RPC SECURITY DEFINER protegidas/intencionais precisam da revisão final. Performance/snapshot sem volume relevante, admin/trial/reset/CSV/export e RLS completa aguardam seus sprints.
 
-- create-access compensation is unchecked and currently claims no partial access even if compensation fails. Requires Prompt 4 correction and its acceptance tests.
-- Supabase leaked-password protection is disabled (security advisor WARN); availability/configuration must be verified before enabling or recording a justified limitation.
-- Existing multiple permissive INSERT policies need a semantics-preserving consolidation in hardening.
-- Temporary Railway branch deployment dbcd9a0abca7097326e00854348661c7b2a52c19 reached SUCCESS (4d08f1ab-594b-4ff0-8e3e-99fe6906fd32); public health returned HTTP 200.
-- The initial secure login attempt was rejected; the user subsequently supplied a working authenticated session. Desktop core and simultaneous HTTP requests now passed. Mobile remains NOT_TESTED due to unavailable viewport controls. No password was accessed or changed.
-- The permission activation SQL in docs/pending/core_mutation_boundary.sql is NOT_APPLIED; it is intentionally outside the migration directory until deployment gates pass. Legacy direct writes must remain available while the old runtime is restored. Core is not released into main.
-- Two new security-advisor WARN findings identify intentionally authenticated SECURITY DEFINER RPCs. They have empty search_path, verified auth.uid(), scoped membership/ownership checks, bounded inputs, revoked anon/PUBLIC execution and composite FKs. Tenant adversarial tests passed; final independent security review remains part of Prompt 4.
-
-## Production restored
-
-After the secure login was rejected, source was returned to main at f08f9157fc0786afd2b0d20529f1e260d87f38a5, healthcheck /login, deployment 63e8783f-5832-4cb3-a5f1-1562dc7907d0 SUCCESS. Later phone-storage/accessibility refinements remain on the feature branch and require another temporary production test. No merge was performed.
-
-## Authenticated QA update — 30 September 2026
-
-User supplied the authenticated browser session; no credentials were read or changed. Code commit 74568433127876192f09cb2900b820dc694f86d3 reached SUCCESS in Railway QA deployment f188cf1a-6f31-4d10-a5c8-52af5ff2c071. Main-origin proxy mismatch was fixed and verified by actual writes. Creation, mandatory-next-step completion, explicit phone reuse, won/lost/Other validation, persistence and Today scheduling passed. WhatsApp records only opening.
-
-Two POSTs overlapped in Railway HTTP logs at 15:57:33Z: durations 919/1264 ms, responses 200/409; one contact/opportunity remained. This supersedes the previous NOT_TESTED HTTP concurrency state, but does not prove internal database transaction overlap. Mobile viewport QA and mutation-boundary activation remain pending. No merge permitted yet.
-
-Disposable QA company was removed; baseline counts restored. Production restore to main f08f915 reached SUCCESS as deployment e63fa615-39b2-48c1-9caf-89bf08a5127a at 16:03:31 UTC; independent config inspection confirmed main, exact commit and /login healthcheck. See IMPLEMENTATION_STATUS.md for the current release state and evidence. Earlier rejected-login notes are historical and no longer describe the current access blocker.
+Login fornecido pelo usuário funcionou; nenhuma senha lida/trocada. Jarvis governado usado apenas para status/auditoria pública, sem effects/kill-switch alteração ou bypass de autenticação.
