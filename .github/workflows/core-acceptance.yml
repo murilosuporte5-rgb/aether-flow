@@ -74,6 +74,8 @@ jobs:
           LOCAL_QA_STATUS_FILE: ${{ runner.temp }}/local-supabase.json
           TESTED_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node tests/daily-acceptance.mjs
+      - name: Read-only production HTTP smoke
+        run: node tests/public-release-smoke.mjs
       - name: Generate final pipeline boundary migration
         run: |
           set -euo pipefail
