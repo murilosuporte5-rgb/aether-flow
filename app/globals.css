@@ -76,3 +76,49 @@
 .sidebar nav .admin-nav{display:flex;align-items:center;border-radius:8px}.sidebar nav .admin-nav:hover{background:#26374f;color:#fff}
 @media(max-width:900px){.admin-layout{grid-template-columns:1fr}.admin-help-card{order:-1}.auth-shell{grid-template-columns:1fr;max-width:540px;min-height:0}.auth-visual{display:none}.mobile-auth-brand{display:flex}.login-card-v2{padding:42px}}
 @media(max-width:620px){.admin-page-v2{padding:20px 14px 50px}.admin-topbar{margin-bottom:28px}.admin-badge{display:none}.admin-hero{gap:11px}.admin-hero-icon{width:42px;height:42px;border-radius:12px}.admin-hero h1{font-size:27px}.admin-layout{gap:12px}.admin-card,.admin-help-card{border-radius:14px}.admin-card-head{padding:18px}.admin-form-v2{padding:18px}.admin-fields-grid{grid-template-columns:1fr}.admin-fields-grid .field-wide{grid-column:auto}.admin-form-footer{align-items:stretch;flex-direction:column}.admin-create-button{width:100%}.admin-security-note{order:2}.login{padding:12px}.auth-shell{border-radius:18px}.login-card-v2{padding:34px 22px}.credential-row{grid-template-columns:1fr;gap:2px}.success-actions>*{width:100%;justify-content:center}}
+
+/* ===== WORKSPACE USABILITY POLISH ===== */
+.content{background:#f5f7fa}
+.topbar{border-bottom-color:#e9edf2}
+.page-body{padding-top:36px}
+.heading h1{color:#15253a}
+.metrics>*,.priority-panel,.insight-panel,.upcoming-panel,.table-wrap{box-shadow:0 5px 20px #1e324608}
+.signal-card{border-radius:14px}
+.focus-banner{border-radius:17px;background:linear-gradient(140deg,#14243d,#1d3f69)}
+.column{border-radius:12px}
+.kanban-card{border-radius:10px}
+.modal{border-radius:18px}
+.detail{box-shadow:-18px 0 50px #0d1d321c}
+
+@media(max-width:760px){
+ .sidebar{background:#fff;color:#33455c;border-bottom:1px solid #e7ebf0;padding:12px 14px 10px}
+ .brand{padding:0 0 10px}
+ .brand strong{color:#22344b}
+ .brand small{color:#8c99aa}
+ .company-sidebar-name{margin:0;padding:9px 11px;background:#f4f7fb;color:#4d6077;border-color:#e2e8ef}
+ .select-wrap{margin-bottom:0}
+ .select-wrap select{background:#f4f7fb;color:#3a4e67;border-color:#dfe6ed}
+ .sidebar nav{position:fixed;z-index:40;left:0;right:0;bottom:0;display:flex;justify-content:space-around;gap:5px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #dfe5ec;box-shadow:0 -8px 28px #14273b10;overflow:visible}
+ .sidebar nav button,.sidebar nav .admin-nav{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 4px;margin:0;border:0;border-radius:9px;background:transparent;color:#77879a;font-size:10px;font-weight:800;white-space:nowrap}
+ .sidebar nav button svg{width:17px;height:17px}
+ .sidebar nav button.active{background:#edf4fd;color:#245d9e}
+ .sidebar nav .admin-nav:hover{background:#edf4fd;color:#245d9e}
+ .topbar{display:none}
+ .page-body{padding:22px 14px calc(105px + env(safe-area-inset-bottom))}
+ .heading{margin-bottom:20px}
+ .heading h1{font-size:25px}
+ .heading p{font-size:12px;line-height:1.55}
+ .heading .primary{width:100%;margin-top:15px}
+ .dashboard-grid{grid-template-columns:1fr}
+ .focus-banner{padding:22px}
+ .focus-visual{display:none}
+ .priority-panel,.insight-panel,.upcoming-panel{border-radius:13px}
+ .filters,.pipeline-filters{gap:7px}
+ .filters label,.pipeline-filters label{width:100%;min-width:0!important}
+ .filters select,.pipeline-filters select{width:100%}
+ .detail{width:100%;padding:20px 17px 90px}
+ .detail-controls{flex-wrap:wrap}
+ .detail-controls>*{flex:1;justify-content:center}
+ .modal{border-radius:16px;padding:20px 17px}
+ .modal-footer{position:sticky;bottom:-1px;background:#fff;padding-bottom:3px}
+}
