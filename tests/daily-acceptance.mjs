@@ -359,6 +359,8 @@ try {
     await page
       .getByRole("button", { name: "Sair da fila", exact: true })
       .click();
+    const mobileMenu = page.getByRole("button", { name: "Abrir menu", exact: true });
+    if (await mobileMenu.isVisible()) await mobileMenu.click();
     await page.getByRole("link", { name: "Contatos", exact: true }).click();
     await page.waitForURL(base + "/contatos");
     await page
@@ -526,6 +528,8 @@ try {
         .getByRole("button", { name: "Nova oportunidade", exact: true })
         .isEnabled(),
     );
+    const pipelineMenu = page.getByRole("button", { name: "Abrir menu", exact: true });
+    if (await pipelineMenu.isVisible()) await pipelineMenu.click();
     await page.getByRole("button", { name: "Pipeline", exact: true }).click();
     await page
       .getByRole("button", { name: "Configurar pipeline", exact: true })
