@@ -5,11 +5,8 @@ import {
   Check,
   Clock3,
   MessageCircle,
-  MoveUpRight,
   PhoneCall,
-  Target,
   UserRound,
-  Workflow,
 } from "lucide-react";
 import type { Row, Data } from "./workspace";
 import WhatsAppAction from "./whatsapp-action";
@@ -70,8 +67,7 @@ export default function Dashboard({
     missing = active.filter((r) => !r.next_action_at),
     future = active.filter(
       (r) => r.next_action_at && dateKey(r.next_action_at) > today,
-    ),
-    waiting = active.filter((r) => r.next_action_type === "Aguardar cliente");
+    );
   const urgent = active
     .filter(
       (r) =>
@@ -99,40 +95,6 @@ export default function Dashboard({
     ).length,
     all: active.filter((r) => r.owner_id === o.id).length,
   }));
-  const cards = [
-    {
-      label: "Retornos vencidos",
-      count: overdue.length,
-      detail: "Precisam de atenção",
-      className: "danger",
-      icon: <Clock3 size={18} />,
-      filter: "overdue",
-    },
-    {
-      label: "Ações para hoje",
-      count: due.length,
-      detail: "Compromissos do dia",
-      className: "blue",
-      icon: <CalendarDays size={18} />,
-      filter: "today",
-    },
-    {
-      label: "Sem próximo passo",
-      count: missing.length,
-      detail: "Acompanhamento indefinido",
-      className: "amber",
-      icon: <Target size={18} />,
-      filter: "none",
-    },
-    {
-      label: "Aguardando cliente",
-      count: waiting.length,
-      detail: "Com revisão agendada",
-      className: "neutral",
-      icon: <Workflow size={18} />,
-      filter: "all",
-    },
-  ];
   return (
     <div className="dashboard-v2">
       <div className="focus-banner">
@@ -173,21 +135,6 @@ export default function Dashboard({
           <div className="radar-cash"><span>VALOR EM ABERTO</span><strong>{money(active.reduce((sum, row) => sum + (row.estimated_value || 0), 0))}</strong><small>{active.length} oportunidades acompanhadas</small></div>
         </div>
       </section>
-      <div className="signal-grid">
-        {cards.map((card) => (
-          <button
-            key={card.label}
-            className={`signal-card ${card.className}`}
-            onClick={() => viewList(card.filter)}
-          >
-            <span className="signal-icon">{card.icon}</span>
-            <span className="signal-label">{card.label}</span>
-            <strong>{card.count}</strong>
-            <small>{card.detail}</small>
-            <MoveUpRight size={16} className="signal-link" />
-          </button>
-        ))}
-      </div>
       <div className="dashboard-grid">
         <section className="priority-panel">
           <div className="panel-heading">
