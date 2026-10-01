@@ -60,6 +60,20 @@ export async function POST(request: Request) {
       if (error) return fail(error.code === "42501" ? "Gestor da empresa requerido." : "Não foi possível criar o produto.", error.code === "42501" ? 403 : 400);
       return Response.json({ ok: true, product: data });
     }
+    if (body.kind === "category") {
+      const name = text(body.name, 120);
+      if (name.length < 2) return fail("Nome da categoria inválido.");
+      const { data, error } = await ctx.s.from("operation_categories").insert({ company_id: companyId, name }).select("id,name").single();
+      if (error) return fail(error.code === "23505" ? "Essa categoria já existe." : "Não foi possível criar a categoria.", error.code === "23505" ? 409 : 400);
+      return Response.json({ ok: true, category: data });
+    }
+    if (body.kind === "supplier") {
+      const name = text(body.name, 160), contact = text(body.contact, 160) || null;
+      if (name.length < 2) return fail("Nome do fornecedor inválido.");
+      const { data, error } = await ctx.s.from("operation_suppliers").insert({ company_id: companyId, name, contact }).select("id,name,contact").single();
+      if (error) return fail(error.code === "23505" ? "Esse fornecedor já existe." : "Não foi possível criar o fornecedor.", error.code === "23505" ? 409 : 400);
+      return Response.json({ ok: true, supplier: data });
+    }
     return fail("Operação inválida.");
   } catch (error) {
     if (error instanceof SyntaxError) return fail("Dados inválidos.");
