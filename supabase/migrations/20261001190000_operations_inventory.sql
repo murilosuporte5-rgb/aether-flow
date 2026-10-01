@@ -80,6 +80,10 @@ create function private.stamp_operation_updated_at() returns trigger language pl
 begin new.updated_at:=statement_timestamp(); return new; end $$;
 revoke all on function private.stamp_operation_updated_at() from public,anon,authenticated;
 create trigger operation_products_updated before update on public.operation_products for each row execute function private.stamp_operation_updated_at();
+create trigger operation_categories_write_guard before insert or update on public.operation_categories for each row execute function private.guard_company_write();
+create trigger operation_suppliers_write_guard before insert or update on public.operation_suppliers for each row execute function private.guard_company_write();
+create trigger operation_products_write_guard before insert or update on public.operation_products for each row execute function private.guard_company_write();
+create trigger operation_movements_write_guard before insert on public.operation_movements for each row execute function private.guard_company_write();
 
 create function public.apply_operation_movement(p_company_id uuid,p_product_id uuid,p_type text,p_quantity integer,p_note text default null)
 returns jsonb language plpgsql security definer set search_path='' as $$

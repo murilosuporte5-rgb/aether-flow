@@ -4,7 +4,8 @@ const planItems = [
   "Radar de retornos, compromissos e oportunidades paradas",
   "Contatos, pipeline, mensagens e histórico no mesmo fluxo",
   "Importação e exportação em CSV",
-  "Até 3 integrantes no ambiente da empresa",
+  "Produtos, categorias e movimentações da operação sem limite de registros",
+  "Até 3 integrantes no ambiente da empresa, com responsável por atendimento",
   "Tutorial rápido para a primeira configuração",
 ];
 
@@ -15,7 +16,7 @@ export default function LandingCommercialSection() {
         <span className="landing-eyebrow">COMECE COM A OPERAÇÃO COMPLETA</span>
         <h2 id="plan-title">Um acesso simples para organizar a equipe desde o primeiro contato.</h2>
         <p>
-          O valor é apresentado na contratação, de acordo com o acesso liberado pela Aether Works. Você conhece as telas reais antes de decidir.
+          Um plano simples para colocar o radar comercial e a operação da empresa em um só lugar. Sem taxa de implantação e sem fidelidade.
         </p>
         <div className="landing-commercial-signals" aria-label="O que facilita a implantação">
           <span><FileSpreadsheet size={17} /> Traga sua base por CSV</span>
@@ -29,10 +30,10 @@ export default function LandingCommercialSection() {
           <div><span>PLANO AETHER FLOW</span><h3>Acesso Aether Flow</h3></div>
           <span className="landing-plan-badge"><Users size={15} /> até 3 pessoas</span>
         </div>
-        <p className="landing-plan-price"><strong>Condição personalizada</strong><span>valor informado durante a liberação do acesso</span></p>
+        <p className="landing-plan-price"><strong>R$ 67 <small>/mês</small></strong><span>por empresa · cancele quando quiser</span></p>
         <ul>{planItems.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul>
         <a className="landing-primary landing-plan-cta" href="#produto">Ver telas reais <ArrowRight size={17} /></a>
-        <small>Acesso já liberado? <a href="/login">Entrar no ambiente</a></small>
+        <small>Garantia de 7 dias · acesso já liberado? <a href="/login">Entrar no ambiente</a></small>
       </article>
     </section>
   );
