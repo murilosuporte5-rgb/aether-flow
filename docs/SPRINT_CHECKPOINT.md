@@ -37,3 +37,9 @@
 - Implementado na branch `saas-completion-20260930`: estados vazios compactos e responsivos; chip de atenção clicável para abrir a fila; modo rápido com os campos mínimos já validados; biblioteca de mensagens com modelos padrão, variáveis e seleção antes do WhatsApp; aba `/mensagens`.
 - Evidências: `npm test` 24/24 PASS; `npm run check` PASS; `npm run build` PASS; diff limpo e PR draft #21 publicado.
 - Persistência corrigida neste delta: tabela `message_templates` com RLS por membro da empresa e API autenticada de leitura/criação/exclusão. PR #21 mesclado em `main` (`cae66ea`), migration aplicada no Supabase (`20261001100411`), Railway deployment `9fef682f-7869-4354-bf5b-10f4d768f85e` SUCCESS em `main` (`ec4149e`); health 200, login 200 e APIs protegidas 401.
+
+## Delta de apresentação — 2026-10-01
+- Decisão: manter seis capacidades já entregues e dar a elas uma entrada visual única, sem alterar dados ou contratos.
+- Implementado: demonstração guiada em `/login` com seis etapas (oportunidade, conversa, feito, venda, perda e próxima prioridade), valor em movimento e respeito a redução de movimento; radar agora explica o motivo de cada prioridade; métricas exibem valor aberto, ganhos e taxa no resumo; seis recursos ficam visíveis na apresentação inicial.
+- Evidências: `npm test` 24/24 PASS; `npm run check` PASS; `npm run build` PASS; `git diff --check` PASS.
+- Pendências: publicar a branch, aguardar CI, mesclar e reconfirmar Railway/main e healthcheck.

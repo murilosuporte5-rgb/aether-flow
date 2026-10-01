@@ -203,6 +203,13 @@ export default function Dashboard({
                     : dateKey(r.next_action_at) === today
                       ? "Hoje"
                       : "Parado";
+                const reason = !r.next_action_at
+                  ? "Sem próximo passo definido"
+                  : Date.parse(r.next_action_at) < Date.now()
+                    ? "Retorno vencido"
+                    : dateKey(r.next_action_at) === today
+                      ? "Ação prevista para hoje"
+                      : "Sem interação recente";
                 return (
                   <article className="priority-row" key={r.id}>
                     <div
@@ -223,6 +230,7 @@ export default function Dashboard({
                       <p>
                         {r.title} <span>·</span> {r.stage_name}
                       </p>
+                      <span className="priority-reason">Por que está aqui: {reason}</span>
                       <div className="priority-sub">
                         <span>
                           {r.next_action_type || "Sem próxima ação"}{" "}
