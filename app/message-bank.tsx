@@ -16,7 +16,7 @@ export default function MessageBank({ companyId, opportunityId, phone, name, tit
   const current = useMemo(() => items.find((x) => x.id === selected) || items[0], [items, selected]);
   const save = async () => { const n = draftName.trim(), b = draftBody.trim(); if (!n || !b || b.length > 1000) return; const response = await fetch("/api/message-templates", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, name: n, body: b }) }); const result = await response.json(); if (!response.ok || !result.item) return; const next = [...items, result.item]; setItems(next); setSelected(result.item.id); setDraftName(""); setDraftBody(""); setOpen(false); };
   return <div className="message-tools">
-    <details open>
+    <details>
       <summary>Mensagem pronta</summary>
       <label className="message-picker">Escolha um modelo
         <select value={selected} onChange={(e) => setSelected(e.target.value)}>{items.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}</select>

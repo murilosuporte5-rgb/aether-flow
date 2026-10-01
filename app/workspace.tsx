@@ -31,6 +31,7 @@ import {
   comparePriority,
   priorityRank,
   formatPhone,
+  messageTemplate,
   staleLabel,
   whatsappUrl,
   STAGE_STALE_DAYS,
@@ -1163,6 +1164,16 @@ export default function Workspace({
                   }
                 />
               )}
+            </div>
+            <div className="message-tools">
+              <details>
+                <summary>Preparar mensagem</summary>
+                <p>{messageTemplate(row.contact_name, row.title)}</p>
+                <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(messageTemplate(row.contact_name, row.title)); setNotice("Mensagem copiada."); } catch { setError("Não foi possível copiar. Selecione o texto acima."); } }}>
+                  Copiar mensagem
+                </button>
+                <WhatsAppAction companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} message={messageTemplate(row.contact_name, row.title)} onRecorded={() => void fetchData(template, data.company!.id, true)} />
+              </details>
             </div>
             <MessageBank companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} title={row.title} />
             <div className="detail-grid">
