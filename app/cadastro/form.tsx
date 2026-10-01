@@ -11,7 +11,7 @@ export default function SignupForm(){
   e.preventDefault();setError('');setNotice('');
   const clean=email.trim().toLowerCase();
   if(!/^\S+@\S+\.\S+$/.test(clean)){setError('Informe um e-mail válido.');return}
-  if(password.length<8){setError('Use uma senha com pelo menos 8 caracteres.');return}
+  if(password.length<12){setError('Use uma senha com pelo menos 12 caracteres.');return}
   if(password!==confirm){setError('As senhas não coincidem.');return}
   setBusy(true);
   try{
@@ -31,8 +31,8 @@ export default function SignupForm(){
 
  return <form className="login-form" onSubmit={submit}>
   <label>E-mail<input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="email" required/></label>
-  <label>Senha<input type="password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="new-password" minLength={8} required/></label>
-  <label>Confirmar senha<input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} autoComplete="new-password" minLength={8} required/></label>
+  <label>Senha<input type="password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="new-password" minLength={12} required/></label>
+  <label>Confirmar senha<input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} autoComplete="new-password" minLength={12} required/></label>
   {error&&<p role="alert" className="form-error">{error}</p>}
   {notice&&<p role="status" className="admin-success">{notice}</p>}
   <button className="primary login-action" disabled={busy}>{busy?'Criando conta…':'Criar conta'}</button>
