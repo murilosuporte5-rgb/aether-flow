@@ -36,6 +36,7 @@ export default async function LoginPage({searchParams}:{searchParams?:Promise<{r
     {params.reset==='success'&&<p className="login-notice" role="status">Senha atualizada. Entre novamente para continuar.</p>}
     <LoginForm/>
     <div className="login-help"><ShieldCheck size={15}/><span>Seu acesso é individual e protegido.</span></div>
+    <a className="login-landing-link" href="/landing#produto">Conheça o Aether Flow <ArrowUpRight size={15}/></a>
    </section>
   </div>
  </main>;
