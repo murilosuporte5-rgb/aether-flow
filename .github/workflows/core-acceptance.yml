@@ -49,6 +49,7 @@ jobs:
           psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/core-mutation-boundary.sql
           psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -f docs/pending/daily_mutation_boundary.sql
           psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/daily-mutation-boundary.sql
+          psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -f tests/business-mutation-boundary.sql
       - name: Configure isolated runtime
         run: |
           set -euo pipefail
