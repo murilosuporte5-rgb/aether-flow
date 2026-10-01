@@ -1,4 +1,3 @@
-import {redirect} from 'next/navigation';
 import {CalendarDays,Clock3,Target,Workflow} from 'lucide-react';
 
 export const dynamic='force-dynamic';
@@ -11,10 +10,11 @@ const opportunities=[
  {name:'Fernanda Lima',title:'Consulta inicial',stage:'Novo',owner:'Equipe Comercial',next:'03/10 · 09:00',value:'R$ 1.700',state:'Programado'},
 ];
 
-export default async function DemoPage({searchParams}:{searchParams:Promise<{access?:string}>}){
- const params=await searchParams;
- if(!process.env.DEMO_ACCESS_KEY||params.access!==process.env.DEMO_ACCESS_KEY)redirect('/login');
- return <div className="app">
+export default async function DemoPage({searchParams}:{searchParams?:Promise<{view?:string}>}){
+ const params=searchParams?await searchParams:{};
+ const view=['panel','alerts','contacts','pipeline','team'].includes(params.view||'')?params.view as string:'panel';
+ const copy=view==='alerts'?['Alertas que pedem ação','Vencimentos, compromissos e oportunidades sem próximo passo, em uma fila só.']:view==='contacts'?['Cada contato com contexto','Veja quem está ligado a cada oportunidade e qual é o próximo passo.']:view==='pipeline'?['O caminho até o fechamento','Acompanhe cada oportunidade por etapa, valor e responsável.']:view==='team'?['Uma equipe sem desencontro','Cada atendimento tem um responsável e um histórico visível.']:['O que precisa de atenção hoje','Veja como a operação prioriza retornos, propostas e próximos passos.'];
+ return <div className="app demo-readonly" id="demo-screen" data-demo-view={view}>
   <aside className="sidebar">
    <div className="brand"><span className="brand-mark">A</span><div><strong>Aether Works</strong><small>DEMONSTRAÇÃO</small></div></div>
    <div className="workspace-label">MODO DEMONSTRAÇÃO</div>
@@ -22,9 +22,9 @@ export default async function DemoPage({searchParams}:{searchParams:Promise<{acc
    <div className="sidebar-bottom"><div className="demo-note"><span className="demo-dot"/> SOMENTE LEITURA<p>Ambiente fictício para conhecer o fluxo sem alterar dados reais.</p></div></div>
   </aside>
   <main className="content">
-   <header className="topbar"><div className="crumb">Empresa Demonstração <span>/</span> Geral</div><div className="topright"><span className="demo-pill">DEMONSTRAÇÃO</span></div></header>
+   <header className="topbar"><div className="crumb">Empresa Demonstração <span>/</span> {view==='panel'?'Radar':view[0].toUpperCase()+view.slice(1)}</div><div className="topright"><span className="demo-pill">DEMONSTRAÇÃO · SOMENTE LEITURA</span></div></header>
    <div className="page-body">
-    <div className="heading"><div><div className="eyebrow">CENTRAL DE AÇÕES · SOMENTE LEITURA</div><h1>O que precisa de atenção hoje</h1><p>Veja como a operação prioriza retornos, propostas e próximos passos.</p></div></div>
+    <div className="heading"><div><div className="eyebrow">AETHER FLOW · AMBIENTE DE DEMONSTRAÇÃO</div><h1>{copy[0]}</h1><p>{copy[1]}</p></div></div>
     <div className="signal-grid">
      <div className="signal-card danger"><span className="signal-icon"><Clock3 size={18}/></span><span className="signal-label">Retornos vencidos</span><strong>1</strong><small>Precisam de atenção</small></div>
      <div className="signal-card blue"><span className="signal-icon"><CalendarDays size={18}/></span><span className="signal-label">Ações para hoje</span><strong>1</strong><small>Compromissos do dia</small></div>

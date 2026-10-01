@@ -1,20 +1,15 @@
 import {
   ArrowRight,
   BarChart3,
-  Bell,
   Check,
   ChevronDown,
   CircleCheck,
-  Clock3,
   MessageCircle,
-  Search,
   ShieldCheck,
   Sparkles,
   Target,
   Users,
-  Workflow,
 } from "lucide-react";
-import DemoShowcase from "./demo-showcase";
 import LandingProductGallery from "./landing-product-gallery";
 
 const featureCards = [
@@ -88,12 +83,13 @@ export default function LandingPage() {
         <nav className="landing-links" aria-label="Navegação principal">
           <a href="#como-funciona">Como funciona</a>
           <a href="#recursos">Recursos</a>
+          <a href="#para-quem">Para quem é</a>
           <a href="#equipe">Equipe</a>
           <a href="#duvidas">Dúvidas</a>
         </nav>
         <div className="landing-nav-actions">
           <a className="landing-login" href="/login">Entrar</a>
-          <a className="landing-nav-cta" href="/login">Entrar e começar</a>
+          <a className="landing-nav-cta" href="#produto">Ver telas reais</a>
         </div>
       </header>
 
@@ -103,26 +99,17 @@ export default function LandingPage() {
           <h1>Saiba quem precisa de retorno antes que a venda esfrie.</h1>
           <p className="landing-lede">O Aether Flow organiza urgência, compromissos e oportunidades paradas em uma fila clara para sua equipe agir.</p>
           <div className="landing-actions">
-            <a className="landing-primary" href="#produto">Ver o sistema em ação <ArrowRight size={17} /></a>
+            <a className="landing-primary" href="#produto">Ver telas reais <ArrowRight size={17} /></a>
             <a className="landing-secondary" href="/login">Entrar no meu ambiente</a>
           </div>
           <div className="landing-proof"><CircleCheck size={17} /> Sem planilha perdida <span /> <ShieldCheck size={17} /> Dados separados por empresa</div>
         </div>
 
-        <div className="landing-hero-product" aria-label="Prévia do painel Aether Flow">
-          <div className="landing-product-window">
-            <div className="landing-window-top"><span className="window-dot red" /><span className="window-dot yellow" /><span className="window-dot green" /><span className="window-title">Aether Flow · Hoje</span><Bell size={13} className="window-bell" /><span className="window-user">MS</span></div>
-            <div className="landing-window-body">
-              <aside><strong>Aether Flow</strong><small>MEU AMBIENTE</small><span className="window-nav-active"><Target size={13} /> Radar</span><span><Users size={13} /> Contatos</span><span><Workflow size={13} /> Pipeline</span><span><MessageCircle size={13} /> Mensagens</span></aside>
-              <div className="landing-window-main">
-                <div className="window-heading"><div><small>RADAR DE ATENÇÃO · HOJE</small><h2>Veja onde agir primeiro</h2></div><span className="window-date">01 OUT 2026</span></div>
-                <div className="window-metrics"><div><small>Em aberto</small><strong>R$ 18.430</strong><span>4 oportunidades</span></div><div><small>Ganhos no período</small><strong className="green-text">R$ 9.600</strong><span>1 venda registrada</span></div><div><small>Taxa de ganho</small><strong>42%</strong><span>+8% no mês</span></div></div>
-                <div className="window-focus-card"><div className="window-focus-head"><span>PRÓXIMAS AÇÕES</span><b>3 itens</b></div><div className="window-row"><span className="window-row-icon late"><Clock3 size={14} /></span><div><strong>Retorno vencido</strong><small>Mariana Souza · Proposta comercial</small></div><button>Agir agora</button></div><div className="window-row"><span className="window-row-icon today"><Target size={14} /></span><div><strong>Ação para hoje</strong><small>Empresa Horizonte · Ligação de acompanhamento</small></div><button>Hoje</button></div><div className="window-row"><span className="window-row-icon open"><Search size={14} /></span><div><strong>Sem próximo passo</strong><small>Lucas Oliveira · Defina o que acontece depois</small></div><button>Revisar</button></div></div>
-              </div>
-            </div>
+        <div className="landing-hero-product" aria-label="Captura real do painel Aether Flow">
+          <div className="landing-static-frame">
+            <div className="landing-live-frame-head"><span><i className="live-dot" /> AETHER FLOW · CAPTURA REAL DO PAINEL</span><small>Dados fictícios para demonstração</small></div>
+            <img src="/demo/panel.png" alt="Painel real do Aether Flow com alertas e oportunidades fictícias" />
           </div>
-          <div className="landing-float-card float-value"><span>VALOR EM MOVIMENTO</span><strong>R$ 9.600</strong><small>resultado no período</small></div>
-          <div className="landing-float-card float-status"><CircleCheck size={16} /><span>Equipe em dia</span><small>2 ações concluídas hoje</small></div>
         </div>
       </section>
 
@@ -140,9 +127,13 @@ export default function LandingPage() {
         <div className="landing-step-grid">{steps.map(([number, title, text]) => <article key={number}><span className="step-number">{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
       </section>
 
+      <section className="landing-section landing-audience" id="para-quem">
+        <div className="landing-section-heading"><span className="landing-eyebrow">PARA QUEM É</span><h2>Serve para a sua empresa. Seja qual for o ramo.</h2><p>Cada equipe perde uma oportunidade de um jeito. O Aether Flow deixa o próximo passo visível para todos.</p></div>
+        <div className="landing-audience-grid"><article><span>01</span><h3>Salão e barbearia</h3><p>Retornos, orçamentos e clientes que pediram para pensar não ficam esquecidos.</p></article><article><span>02</span><h3>Oficina e serviços</h3><p>Cada orçamento tem responsável, prazo e histórico até virar serviço fechado.</p></article><article><span>03</span><h3>Clínicas e consultórios</h3><p>A equipe acompanha o próximo contato sem depender de uma planilha compartilhada.</p></article><article><span>04</span><h3>Times comerciais</h3><p>Gestores enxergam o que está parado e quem precisa agir agora.</p></article></div>
+      </section>
+
       <section className="landing-product-section" id="produto">
         <div className="landing-section-heading light"><span className="landing-eyebrow">O SISTEMA POR DENTRO</span><h2>Não é maquete. É a operação rodando.</h2><p>Veja como o radar transforma cada conversa em uma ação que alguém consegue concluir.</p></div>
-        <DemoShowcase />
         <LandingProductGallery />
       </section>
 
@@ -161,7 +152,7 @@ export default function LandingPage() {
         <div className="landing-faq-list"><details><summary>Minha equipe vai conseguir usar? <ChevronDown size={17} /></summary><p>Sim. O fluxo começa com poucos campos, mostra o próximo passo e permite abrir uma mensagem pronta sem procurar em outra ferramenta.</p></details><details><summary>O que acontece quando eu entro pela primeira vez? <ChevronDown size={17} /></summary><p>Você cria o ambiente da empresa, cadastra a primeira oportunidade e pode seguir pelo tutorial rápido dentro do painel.</p></details><details><summary>Os dados de outras empresas aparecem para mim? <ChevronDown size={17} /></summary><p>Não. Cada usuário acessa apenas as empresas das quais participa, com permissões definidas pelo administrador.</p></details><details><summary>Posso começar com poucos contatos? <ChevronDown size={17} /></summary><p>Sim. O Aether Flow funciona desde o primeiro contato e cresce junto com o seu processo comercial.</p></details></div>
       </section>
 
-      <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Transforme a próxima conversa em uma oportunidade de verdade.</h2><p>Entre no seu ambiente para ver o fluxo completo com os acessos liberados pela Aether Works.</p></div><div className="landing-actions"><a className="landing-primary" href="/login">Entrar e começar <ArrowRight size={17} /></a><a className="landing-secondary" href="/login">Já tenho acesso</a></div></section>
+      <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Veja o fluxo completo antes de decidir.</h2><p>Confira as telas reais do produto ou entre no ambiente liberado pela Aether Works.</p></div><div className="landing-actions"><a className="landing-primary" href="#produto">Ver telas reais <ArrowRight size={17} /></a><a className="landing-secondary" href="/login">Já tenho acesso</a></div></section>
 
       <footer className="landing-footer"><a className="landing-brand" href="#topo"><span className="brand-mark">A</span><span><strong>Aether Flow</strong><small>AETHER WORKS</small></span></a><span>Radar de oportunidades para equipes que precisam agir no momento certo.</span><a href="/login">Entrar</a></footer>
     </main>
