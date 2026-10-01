@@ -42,4 +42,4 @@
 - Decisão: manter seis capacidades já entregues e dar a elas uma entrada visual única, sem alterar dados ou contratos.
 - Implementado: demonstração guiada em `/login` com seis etapas (oportunidade, conversa, feito, venda, perda e próxima prioridade), valor em movimento e respeito a redução de movimento; radar agora explica o motivo de cada prioridade; métricas exibem valor aberto, ganhos e taxa no resumo; seis recursos ficam visíveis na apresentação inicial.
 - Evidências: `npm test` 24/24 PASS; `npm run check` PASS; `npm run build` PASS; `git diff --check` PASS.
-- Pendências: publicar a branch, aguardar CI, mesclar e reconfirmar Railway/main e healthcheck.
+- Fechamento: PR #22 passou no CI isolado, foi mesclado em `main` (`84e4da1`); Railway deployment `f02c7902-d075-42e7-860f-5cf738f20363` SUCCESS com o mesmo commit; health 200, login 200 e API protegida 401.
