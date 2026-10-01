@@ -22,7 +22,7 @@ export default function LandingProductGallery() {
       </div>
       <div className={`landing-gallery-screen ${screen.tone}`}>
         <div className="gallery-screen-head"><div><span>Aether Flow · visão real</span><h3>{screen.title}</h3></div><span className="gallery-screen-icon"><Icon size={18} /></span></div>
-        <iframe className="gallery-real-frame" src={`/demo?view=${screen.view}#demo-screen`} title={`Tela real do Aether Flow: ${screen.label}`} loading="eager" />
+        <img className="gallery-real-shot" src={`/demo/${screen.view}.png`} alt={`Captura real do Aether Flow: ${screen.label}`} />
         <div className="gallery-screen-footer"><Check size={14} /> Dados da sua empresa, separados e com histórico</div>
       </div>
     </div>

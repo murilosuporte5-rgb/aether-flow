@@ -89,7 +89,7 @@ export default function LandingPage() {
         </nav>
         <div className="landing-nav-actions">
           <a className="landing-login" href="/login">Entrar</a>
-          <a className="landing-nav-cta" href="/demo?view=panel#demo-screen">Abrir demonstração</a>
+          <a className="landing-nav-cta" href="#produto">Ver telas reais</a>
         </div>
       </header>
 
@@ -99,16 +99,16 @@ export default function LandingPage() {
           <h1>Saiba quem precisa de retorno antes que a venda esfrie.</h1>
           <p className="landing-lede">O Aether Flow organiza urgência, compromissos e oportunidades paradas em uma fila clara para sua equipe agir.</p>
           <div className="landing-actions">
-            <a className="landing-primary" href="/demo?view=panel#demo-screen">Ver o sistema real <ArrowRight size={17} /></a>
+            <a className="landing-primary" href="#produto">Ver telas reais <ArrowRight size={17} /></a>
             <a className="landing-secondary" href="/login">Entrar no meu ambiente</a>
           </div>
           <div className="landing-proof"><CircleCheck size={17} /> Sem planilha perdida <span /> <ShieldCheck size={17} /> Dados separados por empresa</div>
         </div>
 
-        <div className="landing-hero-product" aria-label="Tela real do Aether Flow em demonstração">
-          <div className="landing-live-frame">
-            <div className="landing-live-frame-head"><span><i className="live-dot" /> AETHER FLOW · DEMONSTRAÇÃO REAL</span><a href="/demo?view=panel#demo-screen">Abrir tela inteira <ArrowRight size={13} /></a></div>
-            <iframe src="/demo?view=panel#demo-screen" title="Painel real do Aether Flow em modo demonstração" loading="eager" />
+        <div className="landing-hero-product" aria-label="Captura real do painel Aether Flow">
+          <div className="landing-static-frame">
+            <div className="landing-live-frame-head"><span><i className="live-dot" /> AETHER FLOW · CAPTURA REAL DO PAINEL</span><small>Dados fictícios para demonstração</small></div>
+            <img src="/demo/panel.png" alt="Painel real do Aether Flow com alertas e oportunidades fictícias" />
           </div>
         </div>
       </section>
@@ -152,7 +152,7 @@ export default function LandingPage() {
         <div className="landing-faq-list"><details><summary>Minha equipe vai conseguir usar? <ChevronDown size={17} /></summary><p>Sim. O fluxo começa com poucos campos, mostra o próximo passo e permite abrir uma mensagem pronta sem procurar em outra ferramenta.</p></details><details><summary>O que acontece quando eu entro pela primeira vez? <ChevronDown size={17} /></summary><p>Você cria o ambiente da empresa, cadastra a primeira oportunidade e pode seguir pelo tutorial rápido dentro do painel.</p></details><details><summary>Os dados de outras empresas aparecem para mim? <ChevronDown size={17} /></summary><p>Não. Cada usuário acessa apenas as empresas das quais participa, com permissões definidas pelo administrador.</p></details><details><summary>Posso começar com poucos contatos? <ChevronDown size={17} /></summary><p>Sim. O Aether Flow funciona desde o primeiro contato e cresce junto com o seu processo comercial.</p></details></div>
       </section>
 
-      <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Veja o fluxo completo antes de decidir.</h2><p>Abra a demonstração com dados fictícios ou entre no ambiente liberado pela Aether Works.</p></div><div className="landing-actions"><a className="landing-primary" href="/demo?view=panel#demo-screen">Abrir demonstração <ArrowRight size={17} /></a><a className="landing-secondary" href="/login">Já tenho acesso</a></div></section>
+      <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Veja o fluxo completo antes de decidir.</h2><p>Confira as telas reais do produto ou entre no ambiente liberado pela Aether Works.</p></div><div className="landing-actions"><a className="landing-primary" href="#produto">Ver telas reais <ArrowRight size={17} /></a><a className="landing-secondary" href="/login">Já tenho acesso</a></div></section>
 
       <footer className="landing-footer"><a className="landing-brand" href="#topo"><span className="brand-mark">A</span><span><strong>Aether Flow</strong><small>AETHER WORKS</small></span></a><span>Radar de oportunidades para equipes que precisam agir no momento certo.</span><a href="/login">Entrar</a></footer>
     </main>
