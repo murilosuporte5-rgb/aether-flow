@@ -472,6 +472,17 @@ export default function Workspace({
             <CalendarDays size={18} /> Hoje
           </button>
           <button
+            className="alert-nav"
+            onClick={() => {
+              setTab("today");
+              setSelected(null);
+              window.setTimeout(() => document.getElementById("radar-de-atencao")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+            }}
+            title="Abrir alertas de atenção"
+          >
+            <Bell size={18} /> Alertas <span className="sidebar-alert-count">{attentionCount}</span>
+          </button>
+          <button
             className={tab === "list" ? "active" : ""}
             onClick={() => {
               setTab("list");

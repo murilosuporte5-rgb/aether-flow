@@ -250,3 +250,18 @@
 @media(max-width:900px){.login-v2{display:block;min-height:100dvh;padding:12px}.login-v2 .auth-shell{display:block;width:min(540px,100%);height:auto;min-height:0;max-height:none;overflow:visible;margin:0 auto}.login-v2 .auth-visual{display:none!important}.login-v2 .login-card-v2{display:block;min-height:0;padding:32px 24px;border-radius:18px}.login-v2 .mobile-auth-brand{display:flex;margin-bottom:25px}}
 @media(max-width:520px){.login-v2{padding:8px}.login-v2 .login-card-v2{padding:28px 19px}.login-v2 .login-card-v2 h2{font-size:25px}.login-v2 .login-card-v2>p{font-size:13px}.login-v2 .login-form-v2{margin-top:18px}}
 .contact-email-action{display:grid;gap:8px;margin:14px 0}.contact-email-capture{display:grid;gap:8px}.contact-email-capture label,.email-compose label{display:grid;gap:5px;color:#61738b;font-size:12px;font-weight:800}.contact-email-capture input,.email-compose input,.email-compose textarea{width:100%;border:1px solid #d7e1ed;border-radius:10px;background:#fff;color:#17385f;padding:10px 11px;font:inherit;font-size:13px}.contact-email-buttons,.contact-email-toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.contact-email-toolbar{padding:9px 10px;border:1px solid #dce6f0;border-radius:10px;background:#f7faff}.contact-email-toolbar>span{display:flex;align-items:center;gap:6px;min-width:0;flex:1;color:#2b68a7;font-size:12px;word-break:break-word}.email-open-button{justify-self:start}.email-compose{display:grid;gap:10px;padding:12px;border:1px solid #dce6f0;border-radius:12px;background:#f7faff}.email-compose textarea{resize:vertical;line-height:1.45}.contact-email-line{font-size:13px;color:#2b68a7;word-break:break-word}.contact-email-action .login-notice,.contact-email-action .form-error{margin:0!important}.contact-email-action .loading-spinner{color:#2b68a7}
+/* Landing captures use the same app screenshots with a compact frame. */
+.landing-static-frame>img{width:min(94%,760px);max-height:360px;object-fit:cover;object-position:top;margin:0 auto;border-radius:0 0 10px 10px}
+.gallery-real-shot{width:min(94%,760px);max-height:340px;object-fit:cover;object-position:top;margin:17px auto 0}
+.demo-readonly .global-search label{display:flex;align-items:center;gap:7px;width:100%;border:1px solid #d7dfe9;border-radius:8px;background:#fff;padding:0 11px;color:#7790aa}
+.demo-readonly .global-search input{border:0;padding:11px 0;min-width:0;outline:0}
+.demo-readonly .global-search input:focus{box-shadow:none}
+.demo-readonly .welcome-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:12px;color:#8a98a9;font-size:11px}
+.demo-readonly .welcome-meta i{width:4px;height:4px;border-radius:50%;background:#b5c1cf}
+.demo-readonly .attention-link{border:0;background:none;color:#246bb0;font-size:11px;font-weight:800;padding:0}
+.demo-readonly .company-sidebar-name{margin:0 4px 28px;padding:11px 12px;border:1px solid #3a4860;border-radius:9px;background:#1d2a3d;color:#f2f6fc;font-size:13px;font-weight:600}
+.demo-readonly .demo-team-form input[readonly]{color:#8c9caf;background:#fff}
+@media(max-width:700px){.landing-static-frame>img,.gallery-real-shot{width:100%;max-height:265px}.demo-readonly .global-search{display:none}}
+.sidebar nav button.alert-nav{position:relative}
+.sidebar-alert-count{margin-left:auto;min-width:18px;height:18px;padding:0 5px;display:inline-grid;place-items:center;border-radius:999px;background:#e7865f;color:#fff;font-size:10px;font-weight:900}
+.sidebar nav button.alert-nav:hover .sidebar-alert-count,.sidebar nav button.alert-nav.active .sidebar-alert-count{background:#f29a70}

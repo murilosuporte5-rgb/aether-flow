@@ -127,7 +127,7 @@ export default function Dashboard({
           <small>{plannedWeek.length} com retorno nos próximos 7 dias</small>
         </div>
       </div>
-      <section className="radar-strip" aria-label="Radar de atenção">
+      <section id="radar-de-atencao" className="radar-strip" aria-label="Radar de atenção">
         <div className="radar-strip-head"><div><span className="eyebrow">RADAR DE ATENÇÃO</span><h3>Veja onde agir primeiro</h3></div><button onClick={() => viewList("all")}>Abrir oportunidades <ArrowRight size={15} /></button></div>
         <div className="radar-strip-grid">
           <button onClick={() => viewList("overdue")}><span>Retornos vencidos</span><strong>{overdue.length}</strong><small>Prioridade imediata</small></button>
