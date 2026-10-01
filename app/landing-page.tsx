@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   ArrowRight,
   BarChart3,
@@ -5,10 +8,12 @@ import {
   ChevronDown,
   CircleCheck,
   MessageCircle,
+  Menu,
   ShieldCheck,
   Sparkles,
   Target,
   Users,
+  X,
 } from "lucide-react";
 import LandingProductGallery from "./landing-product-gallery";
 
@@ -73,6 +78,9 @@ const steps = [
 ];
 
 export default function LandingPage() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <main className="landing-page">
       <header className="landing-nav">
@@ -80,17 +88,22 @@ export default function LandingPage() {
           <span className="brand-mark">A</span>
           <span><strong>Aether Flow</strong><small>RADAR DE OPORTUNIDADES</small></span>
         </a>
-        <nav className="landing-links" aria-label="Navegação principal">
-          <a href="#como-funciona">Como funciona</a>
-          <a href="#recursos">Recursos</a>
-          <a href="#para-quem">Para quem é</a>
-          <a href="#equipe">Equipe</a>
-          <a href="#duvidas">Dúvidas</a>
+        <nav className={`landing-links${menuOpen ? " is-open" : ""}`} id="landing-navigation" aria-label="Navegação principal">
+          <a href="#como-funciona" onClick={closeMenu}>Como funciona</a>
+          <a href="#recursos" onClick={closeMenu}>Recursos</a>
+          <a href="#para-quem" onClick={closeMenu}>Para quem é</a>
+          <a href="#equipe" onClick={closeMenu}>Equipe</a>
+          <a href="#duvidas" onClick={closeMenu}>Dúvidas</a>
+          <a className="landing-mobile-action" href="/login" onClick={closeMenu}>Entrar</a>
+          <a className="landing-mobile-action landing-mobile-cta" href="#produto" onClick={closeMenu}>Ver telas reais</a>
         </nav>
         <div className="landing-nav-actions">
-          <a className="landing-login" href="/login">Entrar</a>
-          <a className="landing-nav-cta" href="#produto">Ver telas reais</a>
+          <a className="landing-login" href="/login" onClick={closeMenu}>Entrar</a>
+          <a className="landing-nav-cta" href="#produto" onClick={closeMenu}>Ver telas reais</a>
         </div>
+        <button className="landing-menu-toggle" type="button" aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="landing-navigation" onClick={() => setMenuOpen((open) => !open)}>
+          {menuOpen ? <X size={21} /> : <Menu size={21} />}
+        </button>
       </header>
 
       <section className="landing-hero" id="topo">
