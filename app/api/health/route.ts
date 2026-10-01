@@ -1,4 +1,16 @@
 export const dynamic = 'force-dynamic';
-export function GET() {
-  return Response.json({status:'ok',product:'Aether Flow'}, {headers:{'Cache-Control':'no-store'}});
+import { createClient } from '@/lib/supabase/server';
+
+export async function GET() {
+  let database: 'ok' | 'degraded' = 'degraded';
+  try {
+    const supabase = await createClient();
+    const check = supabase.from('companies').select('id').limit(1);
+    const result = await Promise.race([
+      check,
+      new Promise<{error:Error}>((resolve) => setTimeout(() => resolve({error:new Error('timeout')}), 1200)),
+    ]);
+    if (!result.error) database = 'ok';
+  } catch { /* liveness remains available while readiness is reported below */ }
+  return Response.json({status:'ok',product:'Aether Flow',checks:{database}}, {headers:{'Cache-Control':'no-store'}});
 }
