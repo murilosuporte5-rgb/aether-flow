@@ -54,3 +54,8 @@
 - Implementado na branch `visual-radar-contacts-20261001`: radar explícito no dashboard com valor em aberto; linha inteira de contato clicável e acessível por teclado; resumo aberto com valor em aberto, valor ganho, ganhos do período e taxa; seletor CSV com aparência de botão; login com demonstração guiada e painel fosco com valor verde também em viewport estreita.
 - Evidências locais: `npm test` 24/24 PASS; `npm run check` PASS; `npm run build` PASS; `git diff --check` PASS; `/login` local mostra radar/demonstração guiada no accessibility tree.
 - Pendências: CI, merge, Railway `main` SUCCESS e healthcheck final.
+
+## Ajuste final de apresentação — 2026-10-01
+- Feedback visual recebido: o mockup fosco parecia genérico e competia com a etapa.
+- Decisão: reproduzir a linguagem do produto no fundo da demonstração: marca Aether Flow, navegação Radar/Contatos/Oportunidades/Mensagens, KPIs, prioridades e contatos; manter a camada fosca discreta.
+- Evidências: `npm run check`, `npm test` 24/24, `npm run build`, Railway `ce71cc3e-848c-42d4-84f7-ca813fa85f3f` SUCCESS em `main` (`efbb8c3`); health 200, login 200 e API protegida 401.
