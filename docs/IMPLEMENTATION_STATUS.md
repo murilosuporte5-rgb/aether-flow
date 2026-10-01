@@ -191,3 +191,6 @@ Configuração de produção conferida independentemente: main, commit f08f915, 
 - Migrations remotas e filenames sincronizados: boundary 20260930162312; restore 20260930163119. Estado atual é compatibility grants, não RPC-only definitivo.
 - Railway main/f08f915 restaurada, deployment 5c02f4be-f7fa-4305-af81-28dea223c9ad SUCCESS; inspeção independente e /login HTTP 200.
 - Prompt completo de continuidade: MASTER_IMPLEMENTATION_HANDOFF_20260930.md. Nenhum merge ou implementação do Prompt 2 nesta atualização.
+
+## Atualização posterior — 2026-10-01
+A compensação atual de `create-access` confere limpeza de empresa, usuário Auth e auditoria final; falhas ficam marcadas como `recovery_required` com referência. A cobertura de falhas injetadas e E2E produtivo permanece pendente.

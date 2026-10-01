@@ -39,3 +39,6 @@ Main anterior f08f9157fc0786afd2b0d20529f1e260d87f38a5, deployment retido 5c02f4
 - SECURITY DEFINER de RPC operacional/demo intencional: auth.uid obrigatório, membership/dono por empresa, parâmetros limitados, search_path vazio, PUBLIC/anon revogados; aceito para fronteira transacional, com testes adversariais. Não significa auditoria completa Prompt 4.
 - Performance advisors: FK actor de receipts sem índice e políticas permissivas de onboarding exigem análise posterior; índices sem uso em base sem dados não foram removidos.
 - Prompts 2–4: fila Resolver Pendências/pipeline/Contatos/busca/feedback; métricas/CSV/admin/trial/export; hardening/recovery/E2E final. Não contabilizados como concluídos.
+
+## Atualização posterior — 2026-10-01
+A versão atual de `supabase/functions/create-access/index.ts` verifica o resultado de cada limpeza de empresa/usuário, preserva o dono Auth quando a remoção da empresa falha e grava `recovery_required` com referência de recuperação. Os parágrafos históricos acima descrevem a versão anterior e não representam o código publicado atual. Ainda faltam testes de falha injetada em cada etapa e um E2E produtivo com credencial administrativa.
