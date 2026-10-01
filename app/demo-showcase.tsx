@@ -25,7 +25,9 @@ export default function DemoShowcase() {
         <div><span className="eyebrow">DEMONSTRAÇÃO GUIADA</span><strong>Do primeiro contato ao caixa</strong></div>
         <span className="demo-showcase-count">{index + 1}/{steps.length}</span>
       </div>
-      <div className="demo-frosted-app" aria-hidden="true"><span>HOJE</span><b>Radar de oportunidades</b><i>Mariana Souza · Proposta</i><i>Empresa Horizonte · Retorno vencido</i><em>+ R$ 9.600 em vendas</em></div>
+      <div className="demo-frosted-app" aria-hidden="true">
+        <div className="demo-app-shell"><div className="demo-app-top"><b>AETHER FLOW</b><span>Hoje · Radar</span><i>MS</i></div><div className="demo-app-body"><nav><span className="active">Radar</span><span>Contatos</span><span>Oportunidades</span><span>Mensagens</span></nav><main><div className="demo-app-kpis"><span><small>Em aberto</small><b>R$ 18.430</b></span><span><small>Ganhos</small><b>R$ 9.600</b></span><span><small>Taxa</small><b>42%</b></span></div><div className="demo-app-panel"><strong>Prioridades de hoje</strong><i><em>●</em> Mariana Souza <small>Proposta · R$ 4.800</small></i><i><em>●</em> Empresa Horizonte <small>Retorno vencido</small></i><i><em>●</em> Lucas Oliveira <small>Mensagem pronta</small></i></div></main></div></div>
+      </div>
       <div className="demo-showcase-stage">
         <div className="demo-showcase-copy" aria-live="polite">
           <span className="demo-step-kicker">AGORA NO RADAR</span>
