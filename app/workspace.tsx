@@ -24,6 +24,7 @@ import OperationalTimeline from "./operational-timeline";
 import ProductFeedback from "./product-feedback";
 import PipelineSettings from "./pipeline-settings";
 import Contacts from "./contacts";
+import BusinessOperations from "./business-operations";
 import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
 import {
   comparePriority,
@@ -57,6 +58,7 @@ export type Row = {
   created_at: string;
   stage_entered_at: string | null;
   waiting_started_at: string | null;
+  closed_at?: string | null;
 };
 export type Stage = {
   id: string;
@@ -677,6 +679,7 @@ export default function Workspace({
               <Plus size={17} /> Nova oportunidade
             </button>
           </div>
+          {snapshotReady && !loading && <BusinessOperations data={data} reload={()=>void fetchData(template,companyId)}/>}
           {tab === "today" && snapshotReady && !loading && (
             <button
               className="primary resolve-queue"
