@@ -59,3 +59,9 @@
 - Feedback visual recebido: o mockup fosco parecia genérico e competia com a etapa.
 - Decisão: reproduzir a linguagem do produto no fundo da demonstração: marca Aether Flow, navegação Radar/Contatos/Oportunidades/Mensagens, KPIs, prioridades e contatos; manter a camada fosca discreta.
 - Evidências: `npm run check`, `npm test` 24/24, `npm run build`, Railway `ce71cc3e-848c-42d4-84f7-ca813fa85f3f` SUCCESS em `main` (`efbb8c3`); health 200, login 200 e API protegida 401.
+
+## Auditoria de continuidade — 2026-10-01
+- PR #25 mesclado em `main` (`f624a1f`): login mobile com camada legível, radar sem cartões duplicados, vazio da fila preenchido, feedback libera loading em erro e healthcheck com consulta limitada.
+- PR #26 mesclado em `main` (`99bb925`): ACL anônima do banco classificada como `protected`, mantendo liveness `200/status:ok` sem abrir leitura pública.
+- Evidências: CI `36856577757` e `36857345850` PASS; Railway `d25c6fd3-a0f3-4299-b19b-36ac196c5d52` SUCCESS; health 200 (`database: protected`), login 200, API 401.
+- Pendências reais: restore/RPO-RTO não demonstrado; E2E produtivo de criação/reset/compensação ainda depende de credencial administrativa Supabase; leaked-password protection segue indisponível no plano atual e estacionado por orientação do usuário.
