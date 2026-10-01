@@ -1,7 +1,8 @@
 import {ArrowUpRight,CheckCircle2,Clock3,ShieldCheck,Target} from 'lucide-react';
 import LoginForm from './form';
 
-export default function LoginPage(){
+export default async function LoginPage({searchParams}:{searchParams?:Promise<{reset?:string}>}){
+ const params=searchParams?await searchParams:{};
  return <main className="login login-v2">
   <div className="auth-shell">
    <section className="auth-visual">
@@ -32,6 +33,7 @@ export default function LoginPage(){
     <div className="eyebrow">BEM-VINDO</div>
     <h2>Entre no seu ambiente</h2>
     <p>Use o e-mail e a senha liberados pela Aether Works.</p>
+    {params.reset==='success'&&<p className="login-notice" role="status">Senha atualizada. Entre novamente para continuar.</p>}
     <LoginForm/>
     <div className="login-help"><ShieldCheck size={15}/><span>Seu acesso é individual e protegido.</span></div>
    </section>
