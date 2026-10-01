@@ -215,3 +215,6 @@
 .feature-guide{border-color:#bfdbfe;background:linear-gradient(135deg,#ffffff 0%,#f3f8ff 100%);box-shadow:0 8px 22px #1d55a014}.feature-guide-trigger{color:#1d5cb5}.feature-guide-progress span.active,.feature-guide-progress span.done{background:linear-gradient(90deg,#2563eb,#06b6d4)}.feature-guide-icon{background:#dbeafe;color:#155fc1}.feature-guide-step strong{color:#173f78}.feature-guide-actions .primary{background:linear-gradient(135deg,#2563eb,#0ea5e9)}
 .global-search input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #bfdbfe}
 .stage-track span{background:linear-gradient(90deg,#2563eb,#38bdf8)}
+.dashboard-grid{align-items:stretch}
+.priority-panel{height:100%;overflow:hidden}
+.priority-panel>.dashboard-empty{flex:1;display:flex;align-items:center;justify-content:center;min-height:180px;padding:34px 28px;text-align:center;line-height:1.6;color:#52749a;background:radial-gradient(circle at 22% 18%,#dbeafe 0,transparent 34%),linear-gradient(145deg,#f5f9ff 0%,#eef7ff 52%,#ecfdf5 100%);border-top:1px solid #d8e9fb}
