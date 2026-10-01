@@ -27,6 +27,7 @@ import Contacts from "./contacts";
 import BusinessOperations from "./business-operations";
 import MessageBank from "./message-bank";
 import Team from "./team";
+import FeatureGuide from "./feature-guide";
 import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
 import {
   comparePriority,
@@ -714,6 +715,15 @@ export default function Workspace({
               <ArrowUpRight size={16} /> Modo rápido
             </button>}
           </div>
+          {tab === "today" && snapshotReady && !loading && (
+            <FeatureGuide
+              canManageTeam={data.companies?.some((company) => company.id === data.company?.id && company.role === "owner") === true}
+              onSelectTab={(nextTab) => {
+                setTab(nextTab);
+                setSelected(null);
+              }}
+            />
+          )}
           {snapshotReady && !loading && tab !== "team" && <BusinessOperations data={data} reload={()=>void fetchData(template,companyId)}/>}
           {tab === "today" && snapshotReady && !loading && (
             <button
