@@ -21,3 +21,9 @@
 - Railway permaneceu main 19c868b / SUCCESS na inspeção inicial. Não houve troca de deployment ou alteração de dados.
 - Final local: 24/24 testes PASS, TypeScript PASS, build PASS. Runtime Next Ready; health/login 200. Railway reconfirmada SUCCESS, deployment 5ac916c7, sem staged work.
 - Push inicial rejeitado por auto-review (publicação pública). Usuário autorizou explicitamente push e PR draft; nova tentativa permitida. Sem merge/release antes dos gates.
+
+## Fechamento da entrega publicada — 2026-10-01
+- PR #15 liberado e mesclado em `main` no commit `db231646b9fad7b8aa8333ff8aba6802d059fddb`.
+- Migration `business_operations` aplicada no Supabase; Edge `create-access` v3 ativa; Railway `main` em SUCCESS no deploy `cab0d9db-8748-407b-804d-c86dd179834e`.
+- CI `36788189713` PASS; 24 testes locais, TypeScript e build PASS; `/api/health` e `/login` HTTP 200; `/api/data` sem autenticação HTTP 401.
+- Limite externo real: `leaked password protection` do Supabase Auth permanece desativado. A documentação oficial exige configuração no Auth settings ou PATCH da Management API com token nos escopos `auth:write`, `auth_config_write` e `project_admin_write`. O dashboard redireciona para sign-in e não há token/credencial administrativa disponível nesta sessão. Não foi feita alteração especulativa nem E2E com credencial real de administrador.
