@@ -26,6 +26,7 @@ import PipelineSettings from "./pipeline-settings";
 import Contacts from "./contacts";
 import BusinessOperations from "./business-operations";
 import MessageBank from "./message-bank";
+import Team from "./team";
 import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
 import {
   comparePriority,
@@ -188,7 +189,7 @@ export default function Workspace({
 }) {
   const [companyId, setCompanyId] = useState<string | null>(null),
     [template, setTemplate] = useState<TemplateKey>("events"),
-    [tab, setTab] = useState<"today" | "list" | "pipeline" | "contacts">(
+    [tab, setTab] = useState<"today" | "list" | "pipeline" | "contacts" | "team">(
       initialTab,
     ),
     [data, setData] = useState<Data>(initial),
@@ -482,6 +483,11 @@ export default function Workspace({
           <a className={tab === "contacts" ? "active" : ""} href="/contatos">
             <Users size={18} /> Contatos
           </a>
+          {data.companies?.find((c) => c.id === data.company?.id)?.role === "owner" && (
+            <button className={tab === "team" ? "active" : ""} onClick={() => { setTab("team"); setSelected(null); }}>
+              <Users size={18} /> Equipe
+            </button>
+          )}
           <a href="/mensagens">
             <MessageCircle size={18} /> Mensagens
           </a>
@@ -657,17 +663,21 @@ export default function Workspace({
               ) : (
                 <>
                   <div className="eyebrow">
-                    {tab === "list" ? "ACOMPANHAMENTO" : "VISÃO DO PROCESSO"}
+                    {tab === "list" ? "ACOMPANHAMENTO" : tab === "team" ? "ADMINISTRAÇÃO" : "VISÃO DO PROCESSO"}
                   </div>
                   <h1>
                     {tab === "list"
                       ? "Oportunidades"
                       : tab === "contacts"
                         ? "Contatos"
+                        : tab === "team"
+                          ? "Equipe"
                         : "Pipeline"}
                   </h1>
                   <p>
-                    {tab === "contacts"
+                    {tab === "team"
+                      ? "Adicione funcionários e defina quem pode gerir o atendimento."
+                      : tab === "contacts"
                       ? "Clientes e suas oportunidades em um só lugar."
                       : tab === "list"
                         ? `Acompanhe cada ${conf.noun.toLocaleLowerCase("pt-BR")} da primeira conversa à decisão.`
@@ -676,7 +686,7 @@ export default function Workspace({
                 </>
               )}
             </div>
-            <button
+            {tab !== "team" && <button
               className="primary"
               disabled={
                 loading ||
@@ -690,8 +700,8 @@ export default function Workspace({
               }}
             >
               <Plus size={17} /> Nova oportunidade
-            </button>
-            <button
+            </button>}
+            {tab !== "team" && <button
               className="quick-entry-button"
               type="button"
               disabled={loading || !snapshotReady}
@@ -702,9 +712,9 @@ export default function Workspace({
               }}
             >
               <ArrowUpRight size={16} /> Modo rápido
-            </button>
+            </button>}
           </div>
-          {snapshotReady && !loading && <BusinessOperations data={data} reload={()=>void fetchData(template,companyId)}/>}
+          {snapshotReady && !loading && tab !== "team" && <BusinessOperations data={data} reload={()=>void fetchData(template,companyId)}/>}
           {tab === "today" && snapshotReady && !loading && (
             <button
               className="primary resolve-queue"
@@ -757,6 +767,8 @@ export default function Workspace({
                 Tentar novamente
               </button>
             </div>
+          ) : tab === "team" ? (
+            <Team companyId={data.company!.id} canManage={data.companies?.find((c) => c.id === data.company!.id)?.role === "owner"} />
           ) : tab === "contacts" ? (
             <Contacts
               data={data}
