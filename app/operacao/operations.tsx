@@ -1,36 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Boxes, FileBarChart, Filter, Package, RefreshCw, Search, Truck, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Boxes, FileBarChart, Filter, Package, Plus, RefreshCw, Search, Truck, X } from "lucide-react";
 
-const sections = [
-  { label: "Produtos", icon: Package, count: "14" },
-  { label: "Categorias", icon: Boxes, count: "6" },
-  { label: "Fornecedores", icon: Truck, count: "4" },
-  { label: "Entradas", icon: ArrowDownToLine, count: "172" },
-  { label: "Saídas", icon: ArrowUpFromLine, count: "20" },
-  { label: "Relatórios", icon: FileBarChart, count: "3" },
-];
+type Product = { id: string; name: string; sku: string | null; status: "active" | "attention" | "inactive"; value: number; quantity: number; category_id: string | null; owner_id: string };
+type OperationData = { products: Product[]; categories: { id: string; name: string }[]; suppliers: { id: string; name: string }[]; movements: { type: string; quantity: number }[]; canManage: boolean };
 
-const products = [
-  ["Plano acompanhamento", "Serviços", "Ativo", "R$ 311,00", "Marina Alves"],
-  ["Consultoria comercial", "Serviços", "Ativo", "R$ 480,00", "João Oliveira"],
-  ["Pacote retorno mensal", "Recorrência", "Atenção", "R$ 199,00", "Ana Costa"],
+const labels = [
+  { label: "Produtos", icon: Package }, { label: "Categorias", icon: Boxes }, { label: "Fornecedores", icon: Truck },
+  { label: "Entradas", icon: ArrowDownToLine }, { label: "Saídas", icon: ArrowUpFromLine }, { label: "Relatórios", icon: FileBarChart },
 ];
+const money = (value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
 export default function Operations({ userName }: { userName: string }) {
-  const [active, setActive] = useState("Produtos");
-  const [query, setQuery] = useState("");
-  const [notice, setNotice] = useState("");
-  const shown = products.filter((row) => row.join(" ").toLowerCase().includes(query.toLowerCase()));
+  const [active, setActive] = useState("Produtos"), [query, setQuery] = useState(""), [notice, setNotice] = useState(""), [error, setError] = useState(""), [companyId, setCompanyId] = useState(""), [showProductForm, setShowProductForm] = useState(false), [busy, setBusy] = useState(false);
+  const [data, setData] = useState<OperationData>({ products: [], categories: [], suppliers: [], movements: [], canManage: false });
+  const [productName, setProductName] = useState(""), [productValue, setProductValue] = useState(""), [productQuantity, setProductQuantity] = useState("0");
+  const load = useCallback(async () => {
+    setError("");
+    try {
+      const workspace = await fetch("/api/workspace", { cache: "no-store" }); const snapshot = await workspace.json();
+      if (!workspace.ok || !snapshot.company?.id) throw new Error("Empresa não vinculada à conta.");
+      setCompanyId(snapshot.company.id);
+      const response = await fetch(`/api/operations?companyId=${encodeURIComponent(snapshot.company.id)}`, { cache: "no-store" }); const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Não foi possível carregar a operação.");
+      setData(payload);
+    } catch (e) { setError(e instanceof Error ? e.message : "Não foi possível carregar a operação."); }
+  }, []);
+  useEffect(() => { void load(); }, [load]);
   const flash = (message: string) => { setNotice(message); window.setTimeout(() => setNotice(""), 2400); };
+  const shown = useMemo(() => data.products.filter((item) => `${item.name} ${item.sku || ""}`.toLowerCase().includes(query.toLowerCase())), [data.products, query]);
+  const entryCount = data.movements.filter((item) => item.type === "entry").reduce((total, item) => total + item.quantity, 0);
+  const exitCount = data.movements.filter((item) => item.type === "exit").reduce((total, item) => total + item.quantity, 0);
+  async function createProduct(event: React.FormEvent) { event.preventDefault(); if (!companyId) return; setBusy(true); setError(""); try { const response = await fetch("/api/operations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: "product", companyId, name: productName, value: Number(productValue.replace(",", ".")), quantity: Number(productQuantity) }) }); const payload = await response.json(); if (!response.ok) throw new Error(payload.error || "Não foi possível criar o produto."); setProductName(""); setProductValue(""); setProductQuantity("0"); setShowProductForm(false); flash("Produto adicionado à operação"); await load(); } catch (e) { setError(e instanceof Error ? e.message : "Não foi possível criar o produto."); } finally { setBusy(false); } }
 
   return <main className="page-body operations-page">
-    <div className="heading"><div><span className="eyebrow">OPERAÇÃO</span><h1>Catálogo e movimentações</h1><p>Uma visão operacional conectada ao CRM: itens, entradas, saídas e alertas no mesmo lugar.</p></div><button className="primary" onClick={() => flash("Dados atualizados agora") }><RefreshCw size={16} /> Atualizar dados</button></div>
-    {notice && <p className="operations-notice" role="status">✓ {notice}</p>}
-    <div className="operations-layout">
-      <aside className="operations-sidebar" aria-label="Seções da operação"><div className="operations-sidebar-title"><Boxes size={16}/> OPERAÇÃO</div>{sections.map(({ label, icon: Icon, count }) => <button type="button" key={label} className={active === label ? "active" : ""} onClick={() => setActive(label)}><Icon size={16}/><span>{label}</span><small>{count}</small></button>)}<div className="operations-sidebar-note"><AlertTriangle size={15}/><span>1 item pede atenção</span></div></aside>
-      <section className="operations-main"><div className="operations-kpis"><article><span>Itens ativos</span><strong>14</strong><small>+2 nesta semana</small></article><article><span>Entradas no período</span><strong>172</strong><small>Últimos 30 dias</small></article><article><span>Saídas no período</span><strong>20</strong><small>5 aguardam retorno</small></article><article className="attention"><span>Alertas de atenção</span><strong>1</strong><small>Revisar hoje</small></article></div><div className="operations-toolbar"><label><Search size={15}/><span className="sr-only">Buscar item</span><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar produto, categoria ou responsável..." /></label><button className="secondary" type="button" onClick={() => flash("Filtros prontos para sua próxima ação")}><Filter size={15}/> Filtros</button></div><div className="operations-section-heading"><div><span className="eyebrow">{active.toUpperCase()}</span><h2>{active === "Produtos" ? "Itens que sua equipe acompanha" : `${active} da empresa`}</h2></div><span className="operations-context">Atualizado há poucos segundos</span></div>{active === "Produtos" ? <div className="operations-table-wrap"><table><thead><tr><th>Item</th><th>Categoria</th><th>Status</th><th>Valor</th><th>Responsável</th></tr></thead><tbody>{shown.map(row => <tr key={row[0]}><td><strong>{row[0]}</strong><small>Próximo passo registrado</small></td><td>{row[1]}</td><td><span className={`operations-status ${row[2] === "Atenção" ? "warn" : "ok"}`}>{row[2]}</span></td><td>{row[3]}</td><td>{row[4]}</td></tr>)}</tbody></table>{!shown.length && <p className="empty-table">Nenhum item encontrado.</p>}</div> : <div className="operations-empty"><Boxes size={28}/><h3>{active} prontos para integrar</h3><p>A estrutura visual está preparada para receber os registros da operação sem perder o histórico de contatos e oportunidades.</p><button className="secondary" type="button" onClick={() => setActive("Produtos")}><X size={14}/> Voltar para produtos</button></div>}</section>
-    </div>
+    <div className="heading"><div><span className="eyebrow">OPERAÇÃO</span><h1>Catálogo e movimentações</h1><p>Olá, {userName.split(" ")[0]}. Itens, entradas, saídas e alertas no mesmo fluxo do CRM.</p></div><div className="heading-actions"><button className="secondary" onClick={() => { void load(); flash("Dados atualizados agora"); }}><RefreshCw size={16} /> Atualizar dados</button>{data.canManage && <button className="primary" onClick={() => setShowProductForm((open) => !open)}><Plus size={16} /> Novo produto</button>}</div></div>
+    {notice && <p className="operations-notice" role="status">✓ {notice}</p>}{error && <p className="alert error" role="alert">{error}</p>}
+    {showProductForm && <form className="operations-product-form" onSubmit={createProduct}><label>Nome<input required value={productName} onChange={e => setProductName(e.target.value)} placeholder="Ex.: Pacote acompanhamento" /></label><label>Valor<input required inputMode="decimal" value={productValue} onChange={e => setProductValue(e.target.value)} placeholder="311,00" /></label><label>Quantidade<input required type="number" min="0" value={productQuantity} onChange={e => setProductQuantity(e.target.value)} /></label><button className="primary" disabled={busy}>{busy ? "Salvando…" : "Salvar produto"}</button></form>}
+    <div className="operations-layout"><aside className="operations-sidebar" aria-label="Seções da operação"><div className="operations-sidebar-title"><Boxes size={16}/> OPERAÇÃO</div>{labels.map(({ label, icon: Icon }) => <button type="button" key={label} className={active === label ? "active" : ""} onClick={() => setActive(label)}><Icon size={16}/><span>{label}</span><small>{label === "Produtos" ? data.products.length : label === "Categorias" ? data.categories.length : label === "Fornecedores" ? data.suppliers.length : label === "Entradas" ? entryCount : label === "Saídas" ? exitCount : "—"}</small></button>)}<div className="operations-sidebar-note"><AlertTriangle size={15}/><span>{data.products.filter((item) => item.status === "attention").length} item(ns) pedem atenção</span></div></aside>
+      <section className="operations-main"><div className="operations-kpis"><article><span>Itens ativos</span><strong>{data.products.filter((item) => item.status === "active").length}</strong><small>Na empresa atual</small></article><article><span>Entradas no período</span><strong>{entryCount}</strong><small>Movimentações registradas</small></article><article><span>Saídas no período</span><strong>{exitCount}</strong><small>Movimentações registradas</small></article><article className="attention"><span>Alertas de atenção</span><strong>{data.products.filter((item) => item.status === "attention").length}</strong><small>Revisar hoje</small></article></div><div className="operations-toolbar"><label><Search size={15}/><span className="sr-only">Buscar item</span><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar produto, categoria ou responsável..." /></label><button className="secondary" type="button" onClick={() => flash("Filtros prontos para sua próxima ação")}><Filter size={15}/> Filtros</button></div><div className="operations-section-heading"><div><span className="eyebrow">{active.toUpperCase()}</span><h2>{active === "Produtos" ? "Itens que sua equipe acompanha" : `${active} da empresa`}</h2></div><span className="operations-context">Sincronizado com a empresa atual</span></div>{active === "Produtos" ? <div className="operations-table-wrap"><table><thead><tr><th>Item</th><th>Categoria</th><th>Status</th><th>Valor</th><th>Saldo</th></tr></thead><tbody>{shown.map(item => <tr key={item.id}><td><strong>{item.name}</strong><small>{item.sku || "Sem código"}</small></td><td>{data.categories.find(category => category.id === item.category_id)?.name || "Sem categoria"}</td><td><span className={`operations-status ${item.status === "attention" ? "warn" : item.status === "active" ? "ok" : "muted"}`}>{item.status === "attention" ? "Atenção" : item.status === "active" ? "Ativo" : "Inativo"}</span></td><td>{money(item.value)}</td><td>{item.quantity}</td></tr>)}</tbody></table>{!shown.length && <p className="empty-table">Nenhum item cadastrado ainda. Use “Novo produto” para começar.</p>}</div> : <div className="operations-empty"><Boxes size={28}/><h3>{active} prontos para integrar</h3><p>A estrutura está ligada ao ambiente da empresa e pronta para receber os registros sem perder o histórico do CRM.</p><button className="secondary" type="button" onClick={() => setActive("Produtos")}><X size={14}/> Voltar para produtos</button></div>}</section></div>
   </main>;
 }
