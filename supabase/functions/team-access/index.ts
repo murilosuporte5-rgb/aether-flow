@@ -13,6 +13,11 @@ Deno.serve(async req=>{
   let body:any; try{body=await req.json()}catch{return json({error:'Dados inválidos.'},400)}
   const companyId=String(body.companyId||''), email=String(body.email||'').trim().toLowerCase(), name=String(body.displayName||'').trim().slice(0,100), role=body.role==='manager'?'manager':'member';
   if(!/^[0-9a-f-]{36}$/i.test(companyId)||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||name.length<2)return json({error:'Informe empresa, nome e e-mail válidos.'},400);
+  const {data:membership,error:membershipError}=await userClient.from('memberships').select('role').eq('company_id',companyId).eq('user_id',user.id).maybeSingle();
+  if(membershipError||membership?.role!=='owner')return json({error:'Somente o administrador da empresa pode gerir a equipe.'},403);
+  const {count:memberCount,error:countError}=await userClient.from('memberships').select('user_id',{count:'exact',head:true}).eq('company_id',companyId);
+  if(countError)return json({error:'Não foi possível validar a capacidade da equipe.'},500);
+  if((memberCount||0)>=4)return json({error:'O plano atual permite até 3 funcionários além do administrador.'},409);
   let created=false, targetId='';
   const existing=await admin.auth.admin.listUsers({page:1,perPage:1000});
   const match=existing.data.users.find(candidate=>candidate.email?.toLowerCase()===email);
