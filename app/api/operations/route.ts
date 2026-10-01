@@ -20,14 +20,15 @@ export async function GET(request: Request) {
     if (!/^[0-9a-f-]{36}$/i.test(companyId)) return fail("Empresa inválida.");
     const ctx = await context(companyId);
     if (!ctx) return fail("Empresa não autorizada.", 403);
-    const [categories, suppliers, products, movements] = await Promise.all([
+    const [categories, suppliers, products, movements, requests] = await Promise.all([
       ctx.s.from("operation_categories").select("id,name").eq("company_id", companyId).order("name"),
       ctx.s.from("operation_suppliers").select("id,name,contact").eq("company_id", companyId).order("name"),
       ctx.s.from("operation_products").select("id,name,sku,status,value,quantity,minimum_quantity,lot_code,expires_at,category_id,supplier_id,owner_id,created_at,updated_at").eq("company_id", companyId).order("updated_at", { ascending: false }),
       ctx.s.from("operation_movements").select("id,product_id,type,quantity,note,actor_id,created_at").eq("company_id", companyId).order("created_at", { ascending: false }).limit(100),
+      ctx.s.from("operation_requests").select("id,product_id,quantity,note,status,requested_by,created_at").eq("company_id", companyId).order("created_at", { ascending: false }).limit(100),
     ]);
-    for (const result of [categories, suppliers, products, movements]) if (result.error) throw result.error;
-    return Response.json({ categories: categories.data || [], suppliers: suppliers.data || [], products: products.data || [], movements: movements.data || [], canManage: ctx.role === "owner" || ctx.role === "manager" });
+    for (const result of [categories, suppliers, products, movements, requests]) if (result.error) throw result.error;
+    return Response.json({ categories: categories.data || [], suppliers: suppliers.data || [], products: products.data || [], movements: movements.data || [], requests: requests.data || [], canManage: ctx.role === "owner" || ctx.role === "manager" });
   } catch (error) {
     console.error("operations GET", { type: error instanceof Error ? error.name : "unknown" });
     return fail("Não foi possível carregar a operação.", 500);
@@ -46,10 +47,17 @@ export async function POST(request: Request) {
     if (body.kind === "movement") {
       const productId = text(body.productId, 80), type = text(body.type, 10);
       const quantity = Number(body.quantity);
-      if (!/^[0-9a-f-]{36}$/i.test(productId) || !['entry', 'exit'].includes(type) || !Number.isInteger(quantity) || quantity < 1 || quantity > 100000) return fail("Movimentação inválida.");
+      if (!/^[0-9a-f-]{36}$/i.test(productId) || !['entry', 'exit', 'damage'].includes(type) || !Number.isInteger(quantity) || quantity < 1 || quantity > 100000) return fail("Movimentação inválida.");
       const { data, error } = await ctx.s.rpc("apply_operation_movement", { p_company_id: companyId, p_product_id: productId, p_type: type, p_quantity: quantity, p_note: text(body.note, 500) || null });
       if (error) return fail(error.code === "42501" ? error.message : error.code === "P0001" ? error.message : "Não foi possível registrar a movimentação.", error.code === "42501" ? 403 : 400);
       return Response.json(data);
+    }
+    if (body.kind === "request") {
+      const productId = text(body.productId, 80), quantity = Number(body.quantity), note = text(body.note, 500) || null;
+      if (!/^[0-9a-f-]{36}$/i.test(productId) || !Number.isInteger(quantity) || quantity < 1 || quantity > 100000) return fail("Pedido inválido.");
+      const { data, error } = await ctx.s.from("operation_requests").insert({ company_id: companyId, product_id: productId, requested_by: ctx.user.id, quantity, note }).select("*").single();
+      if (error) return fail("Não foi possível criar o pedido.", error.code === "42501" ? 403 : 400);
+      return Response.json({ ok: true, request: data });
     }
     if (body.kind === "product") {
       const name = text(body.name, 160), sku = text(body.sku, 80) || null, lotCode = text(body.lotCode, 80) || null, expiresAt = text(body.expiresAt, 10) || null;
