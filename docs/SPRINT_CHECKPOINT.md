@@ -47,4 +47,4 @@
 ## Delta de segurança — 2026-10-01
 - Corrigida a inconsistência do cadastro público: senha mínima passou de 8 para 12 caracteres, alinhada a criação e reset administrativos.
 - Evidências: PR #23, CI isolado PASS (inclui 24 testes, TypeScript, build, mobile, isolamento e aceitação empresarial); Railway `b3631acf-959e-4abf-93fa-a3232d543474` SUCCESS em `main` (`6b53cb9`); health 200, login 200 e API 401.
-- Pendências externas reais: proteção contra senhas vazadas do Supabase Auth requer configuração administrativa; não há prova de restauração/RPO-RTO no plano Free. Advisors continuam sinalizando funções SECURITY DEFINER intencionais, com guards e isolamento verificados.
+- Pendências externas reais: o painel Supabase confirma que proteção contra senhas vazadas está disponível apenas no plano Pro; não há prova de restauração/RPO-RTO no plano Free. A política mínima de senha foi ajustada para 12 caracteres. Advisors continuam sinalizando funções SECURITY DEFINER intencionais, com guards e isolamento verificados.
