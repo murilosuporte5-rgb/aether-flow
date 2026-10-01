@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
+  Bell,
   CalendarDays,
   Check,
   ChevronDown,
@@ -361,6 +362,7 @@ export default function Workspace({
     : user.name;
   const firstName = rawDisplayName.trim().split(/\s+/)[0] || "cliente";
   const attentionCount = open.filter((r) => priorityRank(r) <= 3).length;
+  const currentRole = data.companies?.find((company) => company.id === data.company?.id)?.role;
   const greeting = greetingForNow(),
     todayLabel = longToday();
   const filtered = useMemo(
@@ -587,6 +589,10 @@ export default function Workspace({
             </div>
           )}
           <div className="topright">
+            <button className="notification-button" type="button" aria-label={`${attentionCount} alertas de atenção`} title="Abrir radar de atenção" onClick={() => { setTab("today"); setSelected(null); }}>
+              <Bell size={17} /><span>{attentionCount}</span>
+            </button>
+            <div className="topbar-user"><span className="topbar-user-avatar">{user.name.slice(0, 1).toUpperCase()}</span><span><strong>{firstName}</strong><small>{currentRole === "owner" ? "Administrador" : "Equipe"}</small></span></div>
             {data.company?.demo && (
               <span className="demo-pill">DEMONSTRAÇÃO</span>
             )}

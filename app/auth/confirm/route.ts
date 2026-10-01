@@ -12,7 +12,7 @@ export async function GET(request:Request){
  if(hash&&type&&otpTypes.has(type as EmailOtpType)){
   const {error}=await s.auth.verifyOtp({token_hash:hash,type:type as EmailOtpType});
   if(!error){
-   const target=type==='invite'||type==='recovery'?'/activate':next;
+   const target=type==='invite'?'/activate':type==='recovery'?'/activate?mode=recovery':next;
    return NextResponse.redirect(new URL(target,url.origin));
   }
  }
