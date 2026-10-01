@@ -32,7 +32,7 @@ try {
     { company_id: company.id, name: "Perdido", position: 2, kind: "lost" },
   ]).select("id,kind"));
   const open = stages.find((s) => s.kind === "open").id;
-  await checked(admin.from("product_feedback").insert({ company_id: company.id, user_id: customer.id, context: "qa", message: "business acceptance" }));
+  await checked(admin.from("product_feedback").insert({ company_id: company.id, user_id: customer.id, request_id: randomUUID(), context: "qa", message: "business acceptance" }));
 
   const operatorClient = createClient(api, anon, options);
   assert.ok((await operatorClient.auth.signInWithPassword({ email: operator.email, password: operator.password })).data.session);
