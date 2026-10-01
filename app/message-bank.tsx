@@ -8,14 +8,13 @@ const defaults: Saved[] = [
   { id: "follow-up", name: "Acompanhamento", body: "Olá, {nome}. Estou entrando em contato para dar continuidade à nossa conversa sobre {oportunidade}." },
   { id: "proposal", name: "Proposta", body: "Olá, {nome}. Podemos conversar sobre a proposta de {oportunidade}?" },
 ];
-const key = (companyId: string) => `aether-message-bank:${companyId}`;
 const fill = (body: string, name: string, title: string) => body.replaceAll("{nome}", name.split(" ")[0]).replaceAll("{oportunidade}", title);
 
 export default function MessageBank({ companyId, opportunityId, phone, name, title }: { companyId: string; opportunityId: string; phone: string | null; name: string; title: string }) {
   const [items, setItems] = useState<Saved[]>(defaults), [selected, setSelected] = useState("follow-up"), [draftName, setDraftName] = useState(""), [draftBody, setDraftBody] = useState(""), [open, setOpen] = useState(false);
-  useEffect(() => { try { const raw = localStorage.getItem(key(companyId)); if (raw) setItems(JSON.parse(raw)); } catch {} }, [companyId]);
+  useEffect(() => { fetch(`/api/message-templates?companyId=${encodeURIComponent(companyId)}`).then((r) => r.ok ? r.json() : null).then((result) => { if (result?.items?.length) { setItems(result.items); setSelected(result.items[0].id); } }).catch(() => {}); }, [companyId]);
   const current = useMemo(() => items.find((x) => x.id === selected) || items[0], [items, selected]);
-  const save = () => { const n = draftName.trim(), b = draftBody.trim(); if (!n || !b || b.length > 1000) return; const next = [...items, { id: crypto.randomUUID(), name: n.slice(0, 80), body: b }]; setItems(next); localStorage.setItem(key(companyId), JSON.stringify(next)); setSelected(next.at(-1)!.id); setDraftName(""); setDraftBody(""); setOpen(false); };
+  const save = async () => { const n = draftName.trim(), b = draftBody.trim(); if (!n || !b || b.length > 1000) return; const response = await fetch("/api/message-templates", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, name: n, body: b }) }); const result = await response.json(); if (!response.ok || !result.item) return; const next = [...items, result.item]; setItems(next); setSelected(result.item.id); setDraftName(""); setDraftBody(""); setOpen(false); };
   return <div className="message-tools">
     <details open>
       <summary>Mensagem pronta</summary>
