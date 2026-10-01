@@ -1,6 +1,4 @@
-"use client";
-
-import { useState } from "react";
+import Image from "next/image";
 import {
   ArrowRight,
   BarChart3,
@@ -8,13 +6,14 @@ import {
   ChevronDown,
   CircleCheck,
   MessageCircle,
-  Menu,
   ShieldCheck,
   Sparkles,
   Target,
   Users,
-  X,
 } from "lucide-react";
+import LandingCommercialSection from "./landing-commercial-section";
+import LandingFooter from "./landing-footer";
+import LandingHeader from "./landing-header";
 import LandingProductGallery from "./landing-product-gallery";
 
 const featureCards = [
@@ -78,33 +77,9 @@ const steps = [
 ];
 
 export default function LandingPage() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const closeMenu = () => setMenuOpen(false);
-
   return (
     <main className="landing-page">
-      <header className="landing-nav">
-        <a className="landing-brand" href="#topo" aria-label="Aether Flow, início">
-          <span className="brand-mark">A</span>
-          <span><strong>Aether Flow</strong><small>RADAR DE OPORTUNIDADES</small></span>
-        </a>
-        <nav className={`landing-links${menuOpen ? " is-open" : ""}`} id="landing-navigation" aria-label="Navegação principal">
-          <a href="#como-funciona" onClick={closeMenu}>Como funciona</a>
-          <a href="#recursos" onClick={closeMenu}>Recursos</a>
-          <a href="#para-quem" onClick={closeMenu}>Para quem é</a>
-          <a href="#equipe" onClick={closeMenu}>Equipe</a>
-          <a href="#duvidas" onClick={closeMenu}>Dúvidas</a>
-          <a className="landing-mobile-action" href="/login" onClick={closeMenu}>Entrar</a>
-          <a className="landing-mobile-action landing-mobile-cta" href="#produto" onClick={closeMenu}>Ver telas reais</a>
-        </nav>
-        <div className="landing-nav-actions">
-          <a className="landing-login" href="/login" onClick={closeMenu}>Entrar</a>
-          <a className="landing-nav-cta" href="#produto" onClick={closeMenu}>Ver telas reais</a>
-        </div>
-        <button className="landing-menu-toggle" type="button" aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="landing-navigation" onClick={() => setMenuOpen((open) => !open)}>
-          {menuOpen ? <X size={21} /> : <Menu size={21} />}
-        </button>
-      </header>
+      <LandingHeader />
 
       <section className="landing-hero" id="topo">
         <div className="landing-hero-copy">
@@ -121,13 +96,13 @@ export default function LandingPage() {
         <div className="landing-hero-product" aria-label="Captura real do painel Aether Flow">
           <div className="landing-static-frame">
             <div className="landing-live-frame-head"><span><i className="live-dot" /> AETHER FLOW · CAPTURA REAL DO PAINEL</span><small>Dados fictícios para demonstração</small></div>
-            <img src="/demo/panel.png" alt="Painel real do Aether Flow com alertas e oportunidades fictícias" />
+            <Image src="/demo/panel.png" alt="Painel real do Aether Flow com alertas e oportunidades fictícias" width={1440} height={980} sizes="(max-width: 700px) 100vw, 58vw" priority />
           </div>
         </div>
       </section>
 
       <section className="landing-stat-strip" aria-label="Resultados acompanhados pelo Aether Flow">
-        <div><strong>1 fila</strong><span>para o que precisa de atenção</span></div><div><strong>1 responsável</strong><span>para cada contato e oportunidade</span></div><div><strong>1 histórico</strong><span>para entender o que aconteceu</span></div><div><strong>0 planilhas</strong><span>para procurar antes de agir</span></div>
+        <div><strong>1 fila</strong><span>para o que precisa de atenção</span></div><div><strong>1 responsável</strong><span>para cada contato e oportunidade</span></div><div><strong>1 histórico</strong><span>para entender o que aconteceu</span></div><div><strong>CSV pronto</strong><span>para trazer e levar sua base</span></div>
       </section>
 
       <section className="landing-section landing-before-after" id="como-funciona">
@@ -157,17 +132,19 @@ export default function LandingPage() {
 
       <section className="landing-team-section" id="equipe">
         <div className="landing-team-copy"><span className="landing-eyebrow">EQUIPE SEM DESENCONTRO</span><h2>Todo contato tem um dono. Todo dono sabe o que fazer.</h2><p>O administrador adiciona funcionários, define a função e acompanha quem ficou responsável por cada atendimento. Assim a conversa não some entre várias pessoas.</p><a className="landing-secondary light-button" href="/login">Ver o ambiente <ArrowRight size={16} /></a></div>
-        <div className="landing-team-card"><div className="team-card-head"><span>RESPONSÁVEIS</span><b>3 de 3 vagas usadas</b></div><div className="team-person"><span className="team-avatar blue-avatar">M</span><div><strong>Murilo Suporte</strong><small>Administrador · 4 oportunidades</small></div><span className="team-pill owner-pill">Admin</span></div><div className="team-person"><span className="team-avatar green-avatar">J</span><div><strong>João Oliveira</strong><small>Responsável · 2 oportunidades</small></div><span className="team-pill">Em dia</span></div><div className="team-person"><span className="team-avatar amber-avatar">A</span><div><strong>Ana Costa</strong><small>Responsável · 1 oportunidade</small></div><span className="team-pill">1 ação hoje</span></div><div className="team-owner-note"><ShieldCheck size={15} /> O administrador controla acessos e mantém cada empresa isolada.</div></div>
+        <div className="landing-team-card"><div className="team-card-head"><span>RESPONSÁVEIS</span><b>3 de 3 vagas usadas</b></div><div className="team-person"><span className="team-avatar blue-avatar">M</span><div><strong>Marina Alves</strong><small>Administrador · 4 oportunidades</small></div><span className="team-pill owner-pill">Admin</span></div><div className="team-person"><span className="team-avatar green-avatar">J</span><div><strong>João Oliveira</strong><small>Responsável · 2 oportunidades</small></div><span className="team-pill">Em dia</span></div><div className="team-person"><span className="team-avatar amber-avatar">A</span><div><strong>Ana Costa</strong><small>Responsável · 1 oportunidade</small></div><span className="team-pill">1 ação hoje</span></div><div className="team-owner-note"><ShieldCheck size={15} /> O administrador controla acessos e mantém cada empresa isolada.</div></div>
       </section>
+
+      <LandingCommercialSection />
 
       <section className="landing-section landing-faq" id="duvidas">
         <div className="landing-section-heading"><span className="landing-eyebrow">DÚVIDAS</span><h2>O que você costuma querer saber antes de começar.</h2></div>
-        <div className="landing-faq-list"><details><summary>Minha equipe vai conseguir usar? <ChevronDown size={17} /></summary><p>Sim. O fluxo começa com poucos campos, mostra o próximo passo e permite abrir uma mensagem pronta sem procurar em outra ferramenta.</p></details><details><summary>O que acontece quando eu entro pela primeira vez? <ChevronDown size={17} /></summary><p>Você cria o ambiente da empresa, cadastra a primeira oportunidade e pode seguir pelo tutorial rápido dentro do painel.</p></details><details><summary>Os dados de outras empresas aparecem para mim? <ChevronDown size={17} /></summary><p>Não. Cada usuário acessa apenas as empresas das quais participa, com permissões definidas pelo administrador.</p></details><details><summary>Posso começar com poucos contatos? <ChevronDown size={17} /></summary><p>Sim. O Aether Flow funciona desde o primeiro contato e cresce junto com o seu processo comercial.</p></details></div>
+        <div className="landing-faq-list"><details><summary>Minha equipe vai conseguir usar? <ChevronDown size={17} /></summary><p>Sim. O fluxo começa com poucos campos, mostra o próximo passo e permite abrir uma mensagem pronta sem procurar em outra ferramenta.</p></details><details><summary>O que acontece quando eu entro pela primeira vez? <ChevronDown size={17} /></summary><p>Você configura o ambiente da empresa, cadastra a primeira oportunidade e pode seguir pelo tutorial rápido dentro do painel.</p></details><details><summary>Consigo trazer os dados que já tenho? <ChevronDown size={17} /></summary><p>Sim. O Aether Flow importa oportunidades por CSV e exporta contatos e oportunidades para você manter a portabilidade da operação.</p></details><details><summary>Os dados de outras empresas aparecem para mim? <ChevronDown size={17} /></summary><p>Não. Cada usuário acessa apenas as empresas das quais participa, com permissões definidas pelo administrador.</p></details><details><summary>Quanto custa o acesso? <ChevronDown size={17} /></summary><p>O valor é informado durante a liberação do acesso. Você pode conhecer as telas reais e o funcionamento do produto antes da contratação.</p></details></div>
       </section>
 
       <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Veja o fluxo completo antes de decidir.</h2><p>Confira as telas reais do produto ou entre no ambiente liberado pela Aether Works.</p></div><div className="landing-actions"><a className="landing-primary" href="#produto">Ver telas reais <ArrowRight size={17} /></a><a className="landing-secondary" href="/login">Já tenho acesso</a></div></section>
 
-      <footer className="landing-footer"><a className="landing-brand" href="#topo"><span className="brand-mark">A</span><span><strong>Aether Flow</strong><small>AETHER WORKS</small></span></a><span>Radar de oportunidades para equipes que precisam agir no momento certo.</span><a href="/login">Entrar</a></footer>
+      <LandingFooter />
     </main>
   );
 }
