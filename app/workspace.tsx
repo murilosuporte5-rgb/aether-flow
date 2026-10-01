@@ -533,7 +533,7 @@ export default function Workspace({
                 <span className="sr-only">Busca global</span>
                 <input
                   aria-label="Busca global"
-                  placeholder="Buscar cliente, empresa, telefone…"
+                  placeholder="Buscar contato, oportunidade ou telefone…"
                   value={globalQuery}
                   onChange={(e) => setGlobalQuery(e.target.value)}
                 />
@@ -716,13 +716,7 @@ export default function Workspace({
             </button>}
           </div>
           {tab === "today" && snapshotReady && !loading && (
-            <FeatureGuide
-              canManageTeam={data.companies?.some((company) => company.id === data.company?.id && company.role === "owner") === true}
-              onSelectTab={(nextTab) => {
-                setTab(nextTab);
-                setSelected(null);
-              }}
-            />
+            <FeatureGuide canManageTeam={data.companies?.some((company) => company.id === data.company?.id && company.role === "owner") === true} />
           )}
           {snapshotReady && !loading && tab !== "team" && <BusinessOperations data={data} reload={()=>void fetchData(template,companyId)}/>}
           {tab === "today" && snapshotReady && !loading && (

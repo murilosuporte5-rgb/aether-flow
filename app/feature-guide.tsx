@@ -1,40 +1,43 @@
 "use client";
 
-import { BarChart3, BookOpen, Columns3, MessageCircle, Plus, Radar, Users } from "lucide-react";
+import { BarChart3, BookOpen, Check, ChevronLeft, ChevronRight, Columns3, MessageCircle, Plus, Radar, Users, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
-type GuideTab = "today" | "list" | "pipeline" | "team";
+type Props = { canManageTeam: boolean };
+type Step = { title: string; detail: string; icon: typeof Radar };
 
-type Props = {
-  onSelectTab: (tab: GuideTab) => void;
-  canManageTeam: boolean;
-};
-
-const items = [
-  { title: "Radar", detail: "Comece em Hoje: a fila mostra o próximo retorno e o que está vencido.", icon: Radar, action: "Abrir Hoje", tab: "today" as const },
-  { title: "Oportunidades", detail: "Registre uma venda e acompanhe cada etapa até ganhar ou perder.", icon: Plus, action: "Ver oportunidades", tab: "list" as const },
-  { title: "Pipeline", detail: "Mova os negócios entre as etapas para enxergar o processo inteiro.", icon: Columns3, action: "Abrir pipeline", tab: "pipeline" as const },
-  { title: "Contatos e mensagens", detail: "Abra um contato para ver seu histórico e use mensagens prontas no atendimento.", icon: MessageCircle, action: "Abrir contatos", href: "/contatos" },
-  { title: "Métricas e CSV", detail: "Em Hoje, abra Operações para consultar resultados, importar ou exportar dados.", icon: BarChart3, action: "Ver métricas", tab: "today" as const },
+const baseSteps: Step[] = [
+  { title: "Radar", detail: "Comece em Hoje: a fila organiza retornos vencidos, ações do dia e oportunidades sem próximo passo.", icon: Radar },
+  { title: "Oportunidades", detail: "Cadastre uma venda e acompanhe o caminho desde o primeiro contato até o resultado.", icon: Plus },
+  { title: "Pipeline", detail: "Mova cada oportunidade entre as etapas para enxergar o processo inteiro.", icon: Columns3 },
+  { title: "Contatos e mensagens", detail: "Abra o cliente para ver o histórico e use mensagens prontas no atendimento.", icon: MessageCircle },
+  { title: "Métricas e CSV", detail: "Em Hoje, abra Operações para consultar resultados, importar uma planilha ou exportar seus dados.", icon: BarChart3 },
 ];
 
-export default function FeatureGuide({ onSelectTab, canManageTeam }: Props) {
-  const entries = canManageTeam
-    ? [...items, { title: "Equipe", detail: "Adicione até três funcionários e acompanhe quem atende cada oportunidade.", icon: Users, action: "Gerir equipe", tab: "team" as const }]
-    : items;
+export default function FeatureGuide({ canManageTeam }: Props) {
+  const steps = useMemo(() => canManageTeam ? [...baseSteps, { title: "Equipe", detail: "Adicione até três funcionários e acompanhe quem atende cada oportunidade.", icon: Users }] : baseSteps, [canManageTeam]);
+  const [open, setOpen] = useState(false), [index, setIndex] = useState(0);
+  useEffect(() => { if (window.localStorage.getItem("aether-flow:tutorial-seen") !== "1") setOpen(true); }, []);
+  function close() { setOpen(false); window.localStorage.setItem("aether-flow:tutorial-seen", "1"); }
+  const step = steps[index];
   return (
-    <details className="feature-guide">
-      <summary><BookOpen size={16} /> <span>Como usar o Aether Flow</span><small>tutorial rápido</small></summary>
-      <div className="feature-guide-grid">
-        {entries.map((item) => {
-          const { title, detail, icon: Icon, action, tab } = item;
-          const href = "href" in item ? item.href : undefined;
-          return <article key={title} className="feature-guide-item">
-            <div className="feature-guide-icon"><Icon size={16} /></div>
-            <div><strong>{title}</strong><p>{detail}</p></div>
-            {href ? <a href={href}>{action}</a> : <button type="button" onClick={() => onSelectTab(tab!)}>{action}</button>}
-          </article>
-        })}
+    <section className={`feature-guide ${open ? "is-open" : ""}`} aria-label="Tutorial rápido do Aether Flow">
+      <div className="feature-guide-head">
+        <button type="button" className="feature-guide-trigger" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+          <BookOpen size={16} /><span>Como usar o Aether Flow</span><small>{open ? "passo a passo" : "tutorial rápido"}</small>
+        </button>
+        {open && <button type="button" className="feature-guide-close" onClick={close} aria-label="Fechar tutorial"><X size={16} /></button>}
       </div>
-    </details>
+      {open && <div className="feature-guide-body">
+        <div className="feature-guide-progress" aria-label={`Passo ${index + 1} de ${steps.length}`}>
+          {steps.map((item, itemIndex) => <span key={item.title} className={itemIndex === index ? "active" : itemIndex < index ? "done" : ""} />)}
+        </div>
+        <div className="feature-guide-step"><div className="feature-guide-icon"><step.icon size={19} /></div><div><span className="eyebrow">PASSO {index + 1} DE {steps.length}</span><strong>{step.title}</strong><p>{step.detail}</p></div></div>
+        <div className="feature-guide-actions">
+          <button type="button" className="feature-guide-secondary" onClick={() => setIndex((value) => Math.max(0, value - 1))} disabled={index === 0}><ChevronLeft size={15} /> Voltar</button>
+          {index < steps.length - 1 ? <button type="button" className="primary" onClick={() => setIndex((value) => value + 1)}>Próximo <ChevronRight size={15} /></button> : <button type="button" className="primary" onClick={close}><Check size={15} /> Concluir</button>}
+        </div>
+      </div>}
+    </section>
   );
 }

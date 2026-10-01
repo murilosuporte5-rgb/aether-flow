@@ -11,6 +11,7 @@ import {
 import type { Row, Data } from "./workspace";
 import WhatsAppAction from "./whatsapp-action";
 import StaleIndicator from "./stale-indicator";
+import WeeklySummary from "./weekly-summary";
 import {
   comparePriority,
   daysSinceInteraction,
@@ -135,6 +136,7 @@ export default function Dashboard({
           <div className="radar-cash"><span>VALOR EM ABERTO</span><strong>{money(active.reduce((sum, row) => sum + (row.estimated_value || 0), 0))}</strong><small>{active.length} oportunidades acompanhadas</small></div>
         </div>
       </section>
+      <WeeklySummary data={data} rows={rows} open={open} />
       <div className="dashboard-grid">
         <section className="priority-panel">
           <div className="panel-heading">
