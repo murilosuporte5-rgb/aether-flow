@@ -214,7 +214,8 @@ export default function Workspace({
     [initialAction, setInitialAction] = useState<string | null>(null),
     [settings, setSettings] = useState(false),
     [contactSelected, setContactSelected] = useState<string | null>(null),
-    [globalQuery, setGlobalQuery] = useState("");
+    [globalQuery, setGlobalQuery] = useState(""),
+    [notificationOpen, setNotificationOpen] = useState(false);
   const writeLock = useRef(false),
     retries = useRef(new Map<string, string>()),
     fetchSequence = useRef(0);
@@ -362,6 +363,10 @@ export default function Workspace({
     : user.name;
   const firstName = rawDisplayName.trim().split(/\s+/)[0] || "cliente";
   const attentionCount = open.filter((r) => priorityRank(r) <= 3).length;
+  const attentionRows = open
+    .filter((r) => priorityRank(r) <= 3)
+    .sort(comparePriority)
+    .slice(0, 4);
   const currentRole = data.companies?.find((company) => company.id === data.company?.id)?.role;
   const greeting = greetingForNow(),
     todayLabel = longToday();
@@ -589,9 +594,31 @@ export default function Workspace({
             </div>
           )}
           <div className="topright">
-            <button className="notification-button" type="button" aria-label={`${attentionCount} alertas de atenção`} title="Abrir radar de atenção" onClick={() => { setTab("today"); setSelected(null); }}>
-              <Bell size={17} /><span>{attentionCount}</span>
-            </button>
+            <div className="notification-wrap">
+              <button className="notification-button" type="button" aria-expanded={notificationOpen} aria-label={`${attentionCount} alertas de atenção`} title="Abrir alertas de atenção" onClick={() => setNotificationOpen((value) => !value)}>
+                <Bell size={17} /><span>{attentionCount}</span>
+              </button>
+              {notificationOpen && (
+                <div className="notification-popover" role="dialog" aria-label="Alertas de atenção">
+                  <div className="notification-popover-head">
+                    <div><span className="eyebrow">RADAR DE ATENÇÃO</span><strong>{attentionCount ? `${attentionCount} itens pedem atenção` : "Tudo em dia"}</strong></div>
+                    <button type="button" aria-label="Fechar alertas" onClick={() => setNotificationOpen(false)}><X size={15} /></button>
+                  </div>
+                  {attentionRows.length ? (
+                    <div className="notification-list">
+                      {attentionRows.map((r) => (
+                        <button key={r.id} type="button" className="notification-row" onClick={() => { setTab("today"); setSelected(r.id); setNotificationOpen(false); }}>
+                          <span className={`notification-dot ${statusText(r) === "Vencido" ? "late" : statusText(r) === "Hoje" ? "today" : "missing"}`} />
+                          <span><strong>{r.contact_name}</strong><small>{statusText(r)} · {r.title}</small></span>
+                          <ArrowUpRight size={14} />
+                        </button>
+                      ))}
+                    </div>
+                  ) : <p className="notification-empty">Nenhum retorno vencido ou ação pendente agora.</p>}
+                  <button type="button" className="notification-all" onClick={() => { setTab("today"); setSelected(null); setNotificationOpen(false); }}>Abrir radar completo <ArrowUpRight size={14} /></button>
+                </div>
+              )}
+            </div>
             <div className="topbar-user"><span className="topbar-user-avatar">{user.name.slice(0, 1).toUpperCase()}</span><span><strong>{firstName}</strong><small>{currentRole === "owner" ? "Administrador" : "Equipe"}</small></span></div>
             {data.company?.demo && (
               <span className="demo-pill">DEMONSTRAÇÃO</span>
