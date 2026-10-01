@@ -1,12 +1,13 @@
 "use client";
 
-import { Bell, CalendarDays, Columns3, LayoutList, MessageCircle, Search, Users } from "lucide-react";
+import { Bell, CalendarDays, Columns3, FileSpreadsheet, LayoutList, MessageCircle, Search, Users } from "lucide-react";
 import { useState } from "react";
 import Dashboard from "../dashboard";
 import Contacts from "../contacts";
 import type { Data, Row } from "../workspace";
+import "./demo-workspace.css";
 
-export type DemoView = "panel" | "alerts" | "contacts" | "pipeline" | "team";
+export type DemoView = "panel" | "alerts" | "contacts" | "pipeline" | "messages" | "data" | "team";
 
 const companyId = "00000000-0000-4000-8000-000000000001";
 const ownerId = "00000000-0000-4000-8000-000000000002";
@@ -84,6 +85,8 @@ const copy: Record<DemoView, [string, string]> = {
   alerts: ["Radar de atenção", "Retornos, compromissos e oportunidades sem próximo passo em uma fila só."],
   contacts: ["Contatos", "Clientes e suas oportunidades em um só lugar."],
   pipeline: ["Pipeline", "Mova as oportunidades conforme o processo avança."],
+  messages: ["Mensagens prontas", "Modelos para dar continuidade às conversas com clareza."],
+  data: ["Métricas, importação e exportação", "Acompanhe resultados e mantenha seus dados em movimento."],
   team: ["Equipe", "Defina responsáveis e mantenha cada atendimento acompanhado."],
 };
 
@@ -91,6 +94,18 @@ function noop() {}
 
 function PipelineDemo() {
   return <div className="board demo-board">{stages.slice(0, 5).map((stage) => <section className="column" key={stage.id}><header><span className={`stage-dot ${stage.kind}`} /><strong>{stage.name}</strong><span>{demoData.opportunities.filter((row) => row.stage_id === stage.id).length}</span></header><div className="column-content">{demoData.opportunities.filter((row) => row.stage_id === stage.id).map((row) => <article className="kanban-card" key={row.id}><button type="button" className="card-open"><strong>{row.contact_name}</strong><span>{row.title}</span><small>{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(row.estimated_value || 0)} · {row.owner_name}</small></button><div className="card-footer"><span>{row.next_action_at ? "Próxima ação agendada" : "Sem próxima ação"}</span><select aria-label={`Estágio de ${row.contact_name}`} defaultValue={row.stage_id}><option value={row.stage_id}>{row.stage_name}</option></select></div></article>)}</div></section>)}</div>;
+}
+
+function MessagesDemo() {
+  const items = [
+    ["Acompanhamento", "Olá, Mariana. Estou entrando em contato para dar continuidade à nossa conversa sobre Proposta comercial."],
+    ["Proposta", "Olá, Mariana. Podemos conversar sobre a proposta de Proposta comercial?"],
+  ];
+  return <section className="demo-workspace-card demo-message-grid"><div><div className="section-head"><div><span className="eyebrow">BIBLIOTECA</span><h2>Mensagens prontas</h2></div><span className="demo-count">2 modelos</span></div><p className="demo-muted">Escolha um modelo e personalize com os dados do contato.</p><div className="demo-message-list">{items.map(([name, body]) => <article key={name}><span className="demo-template-icon"><MessageCircle size={16} /></span><div><strong>{name}</strong><p>{body}</p><small>Usa variáveis de contato e oportunidade</small></div></article>)}</div></div><div className="demo-message-compose"><span className="eyebrow">NOVA MENSAGEM</span><h3>Crie um modelo para sua equipe</h3><label>Nome da mensagem<input value="Retorno após reunião" readOnly /></label><label>Texto<textarea value="Olá, {nome}. Obrigado pela conversa sobre {oportunidade}. Podemos avançar?" readOnly rows={4} /></label><button className="primary" type="button">Salvar modelo</button></div></section>;
+}
+
+function DataDemo() {
+  return <section className="demo-workspace-card demo-data-card"><div className="section-head"><div><span className="eyebrow">DADOS DA OPERAÇÃO</span><h2>Resultados e portabilidade</h2></div><span className="demo-period">Outubro de 2026</span></div><div className="demo-data-metrics"><div><small>VALOR EM ABERTO</small><strong>R$ 22.400</strong></div><div><small>VALOR GANHO</small><strong>R$ 3.100</strong></div><div><small>GANHOS NO PERÍODO</small><strong>1</strong></div><div><small>TAXA DE GANHO</small><strong>50%</strong></div></div><div className="demo-transfer-grid"><article><span className="demo-transfer-icon"><FileSpreadsheet size={18} /></span><div><strong>Exportar seus dados</strong><p>Baixe contatos e oportunidades em arquivos CSV.</p><div className="demo-export-actions"><button type="button">↓ Contatos CSV</button><button type="button">↓ Oportunidades CSV</button></div></div></article><article><span className="demo-transfer-icon import"><FileSpreadsheet size={18} /></span><div><strong>Importar oportunidades</strong><p>Traga uma planilha, confira as colunas e revise os dados antes de importar.</p><div className="demo-upload-box">⇧　 Escolher arquivo CSV <small>Até 500 linhas · prévia antes de confirmar</small></div></div></article></div></section>;
 }
 
 function TeamDemo() {
@@ -119,7 +134,8 @@ export default function DemoWorkspace({ view }: { view: DemoView }) {
         <button type="button" className={activeTab === "pipeline" ? "active" : ""} onClick={() => nav("pipeline")}><Columns3 size={18} /> Pipeline</button>
         <button type="button" className={activeTab === "contacts" ? "active" : ""} onClick={() => nav("contacts")}><Users size={18} /> Contatos</button>
         <button type="button" className={activeTab === "team" ? "active" : ""} onClick={() => nav("team")}><Users size={18} /> Equipe</button>
-        <button type="button"><MessageCircle size={18} /> Mensagens</button>
+        <button type="button" className={activeTab === "messages" ? "active" : ""} onClick={() => nav("messages")}><MessageCircle size={18} /> Mensagens</button>
+        <button type="button" className={activeTab === "data" ? "active" : ""} onClick={() => nav("data")}><FileSpreadsheet size={18} /> Métricas e CSV</button>
       </nav>
       <div className="sidebar-bottom"><div className="demo-note"><span className="demo-dot" /> DEMONSTRAÇÃO<p>Dados fictícios para conhecer o funcionamento sem alterar uma conta real.</p></div><div className="account"><span className="avatar">M</span><div><strong>Marina Alves</strong><small>marina@aether.exemplo</small></div></div></div>
     </aside>
@@ -131,6 +147,8 @@ export default function DemoWorkspace({ view }: { view: DemoView }) {
         {activeTab === "alerts" && <><div className="signal-grid"><div className="signal-card danger"><span className="signal-icon">!</span><span className="signal-label">Retornos vencidos</span><strong>1</strong><small>Empresa Horizonte · ontem</small></div><div className="signal-card blue"><span className="signal-icon">◉</span><span className="signal-label">Ações para hoje</span><strong>1</strong><small>Mariana Souza · 14:30</small></div><div className="signal-card amber"><span className="signal-icon">↗</span><span className="signal-label">Sem próximo passo</span><strong>1</strong><small>Grupo Aurora · proposta</small></div><div className="signal-card neutral"><span className="signal-icon">◌</span><span className="signal-label">Aguardando decisão</span><strong>2</strong><small>R$ 14.700 em movimento</small></div></div><section className="priority-panel"><div className="panel-heading"><div><span className="eyebrow">FILA DE TRABALHO</span><h3>Alertas ordenados pela urgência</h3></div><button type="button">Resolver pendências →</button></div><div className="priority-row"><div className="priority-stripe late" /><div className="priority-info"><div className="priority-name"><button type="button">Empresa Horizonte</button><span className="state late">Vencido</span></div><p>Projeto sob medida <span>·</span> Em negociação</p><div className="priority-sub"><span>Retorno · ontem</span><span>Marina Alves</span></div></div><div className="priority-actions"><button type="button" aria-label="Abrir alerta">→</button><button type="button" aria-label="Agendar retorno">◷</button></div></div><div className="priority-row"><div className="priority-stripe due" /><div className="priority-info"><div className="priority-name"><button type="button">Mariana Souza</button><span className="state today">Hoje</span></div><p>Proposta comercial <span>·</span> Proposta</p><div className="priority-sub"><span>Ligar · hoje 14:30</span><span>João Oliveira</span></div></div><div className="priority-actions"><button type="button" aria-label="Abrir alerta">→</button><button type="button" aria-label="Concluir ação">✓</button></div></div></section></>}
         {activeTab === "contacts" && <Contacts data={demoData} selected={selectedContact} onSelect={setSelectedContact} openOpportunity={(id) => setSelectedRow(demoData.opportunities.find((row) => row.id === id) || null)} create={noop} refresh={noop} />}
         {activeTab === "pipeline" && <><div className="pipeline-filters"><label><Search size={17} /><input placeholder="Buscar no pipeline" readOnly /></label><label>Responsável <select defaultValue="all"><option value="all">Todos</option><option value={joaoId}>João Oliveira</option></select></label></div><PipelineDemo /></>}
+        {activeTab === "messages" && <MessagesDemo />}
+        {activeTab === "data" && <DataDemo />}
         {activeTab === "team" && <TeamDemo />}
         <p className="panel-footnote">Captura de demonstração com dados fictícios. A operação real mantém dados separados por empresa e permissões por função.</p>
       </div>
