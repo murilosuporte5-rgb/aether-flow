@@ -65,6 +65,10 @@ jobs:
           done
           echo "Local runtime health timeout."
           exit 1
+      - name: Business operations acceptance
+        env:
+          LOCAL_QA_STATUS_FILE: ${{ runner.temp }}/local-supabase.json
+        run: node tests/business-acceptance.mjs
       - name: Authenticated mobile and isolation
         env:
           LOCAL_QA_STATUS_FILE: ${{ runner.temp }}/local-supabase.json
