@@ -52,6 +52,7 @@ export default function CoreForm({
   onSave,
   onOpenOpportunity,
   onDuplicateReset,
+  quick = false,
 }: {
   mode: CoreMode;
   row: Row | null;
@@ -65,6 +66,7 @@ export default function CoreForm({
   onSave: (payload: Record<string, unknown>) => Promise<boolean>;
   onOpenOpportunity: (id: string) => void;
   onDuplicateReset: () => void;
+  quick?: boolean;
 }) {
   const [name, setName] = useState(
     mode === "create" ? "" : row?.contact_name || "",
@@ -216,7 +218,7 @@ export default function CoreForm({
         <div className="modal-head">
           <div>
             <span className="eyebrow">AETHER FLOW</span>
-            <h2 id="core-form-heading">{heading}</h2>
+            <h2 id="core-form-heading">{quick ? "Entrada rápida" : heading}</h2>
           </div>
           <button
             type="button"
@@ -330,7 +332,7 @@ export default function CoreForm({
                 </>
               )}
             </div>
-            <details className="more-details">
+            {!quick && <details className="more-details">
               <summary>Mais detalhes</summary>
               <div className="form-grid">
                 <label>
@@ -414,7 +416,7 @@ export default function CoreForm({
                   />
                 </label>
               </div>
-            </details>
+            </details>}
           </>
         ) : (
           <div className="form-grid">

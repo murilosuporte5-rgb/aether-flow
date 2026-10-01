@@ -25,6 +25,7 @@ import ProductFeedback from "./product-feedback";
 import PipelineSettings from "./pipeline-settings";
 import Contacts from "./contacts";
 import BusinessOperations from "./business-operations";
+import MessageBank from "./message-bank";
 import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
 import {
   comparePriority,
@@ -196,6 +197,7 @@ export default function Workspace({
     [notice, setNotice] = useState(""),
     [selected, setSelected] = useState<string | null>(null),
     [modal, setModal] = useState<CoreMode | null>(null),
+    [quickMode, setQuickMode] = useState(false),
     [search, setSearch] = useState(""),
     [filter, setFilter] = useState("all"),
     [stageFilter, setStageFilter] = useState("all"),
@@ -308,6 +310,7 @@ export default function Workspace({
       if (kind === "create") setSelected(j.id || null);
       setDuplicate(null);
       setModal(null);
+      setQuickMode(false);
       setInitialAction(null);
       await fetchData(template, data.company?.id || null, true);
       if (
@@ -479,6 +482,9 @@ export default function Workspace({
           <a className={tab === "contacts" ? "active" : ""} href="/contatos">
             <Users size={18} /> Contatos
           </a>
+          <a href="/mensagens">
+            <MessageCircle size={18} /> Mensagens
+          </a>
           {adminAccess && (
             <a className="admin-nav" href="/admin">
               Acessos
@@ -632,11 +638,18 @@ export default function Workspace({
                     {!loading && (
                       <>
                         <i />
-                        <strong>
-                          {attentionCount}{" "}
-                          {attentionCount === 1 ? "item pede" : "itens pedem"}{" "}
-                          atenção
-                        </strong>
+                        <button
+                          className="attention-link"
+                          type="button"
+                          onClick={() => {
+                            const ids = pendingQueue(data.opportunities).map((r) => r.id);
+                            setQueue({ ids, resolved: [] });
+                            setSelected(ids[0] || null);
+                          }}
+                          aria-label="Abrir itens que pedem atenção"
+                        >
+                          {attentionCount} {attentionCount === 1 ? "item pede" : "itens pedem"} atenção
+                        </button>
                       </>
                     )}
                   </div>
@@ -677,6 +690,18 @@ export default function Workspace({
               }}
             >
               <Plus size={17} /> Nova oportunidade
+            </button>
+            <button
+              className="quick-entry-button"
+              type="button"
+              disabled={loading || !snapshotReady}
+              onClick={() => {
+                setQuickMode(true);
+                setSelected(null);
+                setModal("create");
+              }}
+            >
+              <ArrowUpRight size={16} /> Modo rápido
             </button>
           </div>
           {snapshotReady && !loading && <BusinessOperations data={data} reload={()=>void fetchData(template,companyId)}/>}
@@ -1144,35 +1169,13 @@ export default function Workspace({
               <details>
                 <summary>Preparar mensagem</summary>
                 <p>{messageTemplate(row.contact_name, row.title)}</p>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(
-                        messageTemplate(row.contact_name, row.title),
-                      );
-                      setNotice("Mensagem copiada.");
-                    } catch {
-                      setError(
-                        "Não foi possível copiar. Selecione o texto acima.",
-                      );
-                    }
-                  }}
-                >
+                <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(messageTemplate(row.contact_name, row.title)); setNotice("Mensagem copiada."); } catch { setError("Não foi possível copiar. Selecione o texto acima."); } }}>
                   Copiar mensagem
                 </button>
-                <WhatsAppAction
-                  companyId={data.company!.id}
-                  opportunityId={row.id}
-                  phone={row.phone}
-                  name={row.contact_name}
-                  message={messageTemplate(row.contact_name, row.title)}
-                  onRecorded={() =>
-                    void fetchData(template, data.company!.id, true)
-                  }
-                />
+                <WhatsAppAction companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} message={messageTemplate(row.contact_name, row.title)} onRecorded={() => void fetchData(template, data.company!.id, true)} />
               </details>
             </div>
+            <MessageBank companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} title={row.title} />
             <div className="detail-grid">
               <div>
                 <span>Telefone</span>
@@ -1280,6 +1283,7 @@ export default function Workspace({
           onDuplicateReset={() => setDuplicate(null)}
           onClose={() => {
             setModal(null);
+            setQuickMode(false);
             setDuplicate(null);
             setClosingStage(null);
             setInitialAction(null);
@@ -1292,6 +1296,7 @@ export default function Workspace({
           onSave={(payload) =>
             run(modal === "close" ? "stage" : modal, payload)
           }
+          quick={quickMode && modal === "create"}
         />
       )}
       {settings && snapshotReady && (

@@ -161,3 +161,13 @@
 .business-metrics dd {margin:4px 0;font-weight:700;}
 .business-export {display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;}
 .business-operations pre {overflow:auto;max-width:100%;max-height:220px;}
+/* Focused empty states and fast capture */
+.first-opportunity{padding:24px 26px;background:linear-gradient(135deg,#fff 0%,#f7fbff 100%)}
+.first-opportunity h2{margin:0 0 10px;font-size:21px;color:#172b4d}
+.first-opportunity ol{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:0;margin:16px 0 20px;list-style:none;counter-reset:steps}
+.first-opportunity li{counter-increment:steps;padding:12px 12px 12px 38px;border:1px solid #e2eaf4;border-radius:10px;background:#fff;font-size:14px;line-height:1.35;position:relative;color:#35506f}
+.first-opportunity li::before{content:counter(steps);position:absolute;left:12px;top:11px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#e8f1ff;color:#245d9e;font-size:12px;font-weight:800}
+.attention-link{border:0;background:transparent;color:#245d9e;font:inherit;font-weight:800;padding:2px 4px;border-radius:5px;cursor:pointer}.attention-link:hover{background:#eaf2ff;text-decoration:underline}
+.quick-entry-button{min-height:44px;border:1px solid #b8cceb;border-radius:9px;background:#f4f8ff;color:#245d9e;padding:9px 13px;font-weight:700;display:inline-flex;align-items:center;gap:7px}.heading{flex-wrap:wrap}.heading>.quick-entry-button{order:3;margin-left:8px}
+@media(max-width:600px){.first-opportunity ol{grid-template-columns:1fr}.first-opportunity{padding:20px 16px}.heading>.quick-entry-button{margin-left:0;margin-top:8px}}
+.message-picker{display:grid;gap:6px;margin:10px 0}.message-picker select,.message-bank-form input,.message-bank-form textarea{border:1px solid #d7dde7;border-radius:8px;padding:10px;font:inherit}.message-preview{background:#f7faff;border:1px solid #e0e8f2;border-radius:8px;padding:12px}.message-bank-form{display:grid;gap:10px;margin-top:12px}.message-bank-page{max-width:980px;margin:auto}.message-bank-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px}.message-bank-list{display:grid;gap:10px}.message-bank-list article{border:1px solid #dbe4f0;border-radius:10px;padding:16px;background:#fff}.message-bank-list p{margin:8px 0;color:#53657c;line-height:1.45}@media(max-width:700px){.message-bank-grid{grid-template-columns:1fr}}

@@ -31,3 +31,9 @@
 - Evidência ainda ausente: E2E autenticado de produção para os novos fluxos administrativos/importação e testes de compensação forçada em cada etapa de provisionamento. O gate agora comprova as fronteiras de privilégio e triggers no banco descartável.
 - Aceitação integrada posterior: PR #18 mesclado em `c5598355b2aa2daba5410898230cffbce44a52c6`; CI `36799232059` PASS, incluindo `business-acceptance.mjs`; Railway `0b17736d-afe9-4199-944c-d582655a82f8` SUCCESS em `main`; health 200, login 200 e API protegida 401 reconfirmados.
 - Pendência externa permanece somente no Auth: leaked-password protection e E2E administrativo de produção dependem de credencial/token Supabase ausente nesta sessão. Os fluxos novos agora têm aceitação integrada no ambiente descartável.
+
+## Delta de experiência — 2026-10-01
+- Decisão: preservar os comandos e validações existentes; reduzir fricção somente na camada de interface.
+- Implementado na branch `saas-completion-20260930`: estados vazios compactos e responsivos; chip de atenção clicável para abrir a fila; modo rápido com os campos mínimos já validados; biblioteca de mensagens com modelos padrão, variáveis e seleção antes do WhatsApp; aba `/mensagens`.
+- Evidências: `npm test` 24/24 PASS; `npm run check` PASS; `npm run build` PASS; diff limpo e PR draft #21 publicado.
+- Persistência corrigida neste delta: tabela `message_templates` com RLS por membro da empresa e API autenticada de leitura/criação/exclusão. Railway continua em `main` SUCCESS; esta branch aguarda revisão/merge e aplicação da migration no release.
