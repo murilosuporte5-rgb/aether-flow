@@ -1,4 +1,4 @@
-import {CheckCircle2,ShieldCheck,Zap} from 'lucide-react';
+import {ArrowUpRight,CheckCircle2,Clock3,ShieldCheck,Target} from 'lucide-react';
 import LoginForm from './form';
 
 export default function LoginPage(){
@@ -7,13 +7,18 @@ export default function LoginPage(){
    <section className="auth-visual">
     <div className="auth-brand"><span className="brand-mark">A</span><strong>Aether Flow</strong></div>
     <div className="auth-copy">
-     <div className="eyebrow">OPERAÇÃO COMERCIAL</div>
-     <h1>O próximo passo, sempre à vista.</h1>
-     <p>Centralize oportunidades, retornos e prioridades sem perder tempo procurando o que fazer depois.</p>
+     <div className="eyebrow">RADAR DE OPORTUNIDADES</div>
+     <h1>Saiba quem precisa de retorno antes que a venda esfrie.</h1>
+     <p>O Aether Flow organiza urgência, compromissos e oportunidades paradas em uma fila clara para sua equipe agir.</p>
+     <div className="auth-preview" aria-label="Prévia do radar de atenção">
+      <div className="auth-preview-head"><span>RADAR DE ATENÇÃO</span><strong>HOJE</strong></div>
+      <div className="auth-preview-row"><span className="auth-preview-icon late"><Clock3 size={14}/></span><div><strong>Retorno vencido</strong><small>Proposta comercial · há 2 dias</small></div><span className="auth-preview-tag">Agir agora</span></div>
+      <div className="auth-preview-row"><span className="auth-preview-icon due"><Target size={14}/></span><div><strong>Ação para hoje</strong><small>Ligação de acompanhamento</small></div><span className="auth-preview-tag">Hoje</span></div>
+      <div className="auth-preview-row"><span className="auth-preview-icon missing"><ArrowUpRight size={14}/></span><div><strong>Sem próximo passo</strong><small>Defina o que acontece depois</small></div><span className="auth-preview-tag">Revisar</span></div>
+     </div>
      <div className="auth-benefits">
-      <span><Zap size={16}/> Prioridades do dia em uma tela</span>
-      <span><CheckCircle2 size={16}/> Próximas ações organizadas</span>
-      <span><ShieldCheck size={16}/> Ambiente separado por empresa</span>
+      <span><CheckCircle2 size={16}/> Fila ordenada pela urgência real</span>
+      <span><ShieldCheck size={16}/> Cada empresa em seu próprio ambiente</span>
      </div>
     </div>
     <small>Aether Works · Aether Flow</small>
