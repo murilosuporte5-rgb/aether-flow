@@ -117,14 +117,22 @@ export default function Contacts({
               {contacts.map((c) => {
                 const list = related(c.id);
                 return (
-                  <tr key={c.id}>
+                  <tr
+                    key={c.id}
+                    className="contact-row"
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Abrir contato ${c.name}`}
+                    onClick={() => onSelect(c.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        onSelect(c.id);
+                      }
+                    }}
+                  >
                     <td>
-                      <button
-                        className="text-button"
-                        onClick={() => onSelect(c.id)}
-                      >
-                        {c.name}
-                      </button>
+                      <button className="text-button contact-name" onClick={(e) => { e.stopPropagation(); onSelect(c.id); }}>{c.name}</button>
                       <small>{formatPhone(c.phone)}</small>
                     </td>
                     <td>{c.organization || "Não informada"}</td>

@@ -25,6 +25,7 @@ export default function DemoShowcase() {
         <div><span className="eyebrow">DEMONSTRAÇÃO GUIADA</span><strong>Do primeiro contato ao caixa</strong></div>
         <span className="demo-showcase-count">{index + 1}/{steps.length}</span>
       </div>
+      <div className="demo-frosted-app" aria-hidden="true"><span>HOJE</span><b>Radar de oportunidades</b><i>Mariana Souza · Proposta</i><i>Empresa Horizonte · Retorno vencido</i><em>+ R$ 9.600 em vendas</em></div>
       <div className="demo-showcase-stage">
         <div className="demo-showcase-copy" aria-live="polite">
           <span className="demo-step-kicker">AGORA NO RADAR</span>

@@ -48,3 +48,9 @@
 - Corrigida a inconsistência do cadastro público: senha mínima passou de 8 para 12 caracteres, alinhada a criação e reset administrativos.
 - Evidências: PR #23, CI isolado PASS (inclui 24 testes, TypeScript, build, mobile, isolamento e aceitação empresarial); Railway `b3631acf-959e-4abf-93fa-a3232d543474` SUCCESS em `main` (`6b53cb9`); health 200, login 200 e API 401.
 - Pendências externas reais: o painel Supabase confirma que proteção contra senhas vazadas está disponível apenas no plano Pro; não há prova de restauração/RPO-RTO no plano Free. A política mínima de senha foi ajustada para 12 caracteres. Advisors continuam sinalizando funções SECURITY DEFINER intencionais, com guards e isolamento verificados.
+
+## Delta visual de operação — 2026-10-01
+- Decisão: tornar o radar, métricas e ações de contato visíveis no primeiro olhar, sem alterar contratos, dados ou o bloqueio externo do Supabase.
+- Implementado na branch `visual-radar-contacts-20261001`: radar explícito no dashboard com valor em aberto; linha inteira de contato clicável e acessível por teclado; resumo aberto com valor em aberto, valor ganho, ganhos do período e taxa; seletor CSV com aparência de botão; login com demonstração guiada e painel fosco com valor verde também em viewport estreita.
+- Evidências locais: `npm test` 24/24 PASS; `npm run check` PASS; `npm run build` PASS; `git diff --check` PASS; `/login` local mostra radar/demonstração guiada no accessibility tree.
+- Pendências: CI, merge, Railway `main` SUCCESS e healthcheck final.
