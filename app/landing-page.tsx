@@ -107,7 +107,7 @@ export default function LandingPage() {
 
       <section className="landing-section landing-before-after" id="como-funciona">
         <div className="landing-section-heading"><span className="landing-eyebrow">O ANTES E O DEPOIS</span><h2>O que fica espalhado na cabeça vira uma próxima ação clara.</h2><p>A equipe não precisa adivinhar qual conversa vem primeiro. O sistema transforma o movimento comercial em uma fila que dá para acompanhar.</p></div>
-        <div className="before-after-list">{beforeAfter.map((item) => <div className="before-after-row" key={item.before}><div><span>ANTES</span><p>{item.before}</p></div><ArrowRight size={19} /><div className="after"><span>DEPOIS</span><p>{item.after}</p></div></div>)}</div>
+        <div className="before-after-list">{beforeAfter.map((item) => <div className="before-after-row" key={item.before}><div className="before"><span>✕ &nbsp; ANTES</span><p>{item.before}</p></div><ArrowRight size={19} /><div className="after"><span>✓ &nbsp; DEPOIS</span><p>{item.after}</p></div></div>)}</div>
       </section>
 
       <section className="landing-section landing-how" aria-labelledby="how-title">
@@ -117,7 +117,7 @@ export default function LandingPage() {
 
       <section className="landing-section landing-audience" id="para-quem">
         <div className="landing-section-heading"><span className="landing-eyebrow">PARA QUEM É</span><h2>Serve para a sua empresa. Seja qual for o ramo.</h2><p>Cada equipe perde uma oportunidade de um jeito. O Aether Flow deixa o próximo passo visível para todos.</p></div>
-        <div className="landing-audience-grid"><article><span>01</span><h3>Salão e barbearia</h3><p>Retornos, orçamentos e clientes que pediram para pensar não ficam esquecidos.</p></article><article><span>02</span><h3>Oficina e serviços</h3><p>Cada orçamento tem responsável, prazo e histórico até virar serviço fechado.</p></article><article><span>03</span><h3>Clínicas e consultórios</h3><p>A equipe acompanha o próximo contato sem depender de uma planilha compartilhada.</p></article><article><span>04</span><h3>Times comerciais</h3><p>Gestores enxergam o que está parado e quem precisa agir agora.</p></article></div>
+        <div className="landing-audience-grid"><article><span>💇 01</span><h3>Salão e barbearia</h3><p>Retornos, orçamentos e clientes que pediram para pensar não ficam esquecidos.</p></article><article><span>🔧 02</span><h3>Oficina e serviços</h3><p>Cada orçamento tem responsável, prazo e histórico até virar serviço fechado.</p></article><article><span>🐾 03</span><h3>Pet shop</h3><p>Agendamentos, serviços e retornos ficam em uma fila simples para a equipe.</p></article><article><span>🩺 04</span><h3>Clínicas e consultórios</h3><p>A equipe acompanha o próximo contato sem depender de uma planilha compartilhada.</p></article><article><span>📈 05</span><h3>Times comerciais</h3><p>Gestores enxergam o que está parado e quem precisa agir agora.</p></article></div>
       </section>
 
       <section className="landing-product-section" id="produto">

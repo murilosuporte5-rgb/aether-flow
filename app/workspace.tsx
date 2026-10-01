@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
   Bell,
+  Boxes,
   CalendarDays,
   Check,
   ChevronDown,
@@ -10,6 +11,8 @@ import {
   Columns3,
   LayoutList,
   MessageCircle,
+  Menu,
+  MoreHorizontal,
   Plus,
   Search,
   SlidersHorizontal,
@@ -216,7 +219,9 @@ export default function Workspace({
     [settings, setSettings] = useState(false),
     [contactSelected, setContactSelected] = useState<string | null>(null),
     [globalQuery, setGlobalQuery] = useState(""),
-    [notificationOpen, setNotificationOpen] = useState(false);
+    [notificationOpen, setNotificationOpen] = useState(false),
+    [mobileMenuOpen, setMobileMenuOpen] = useState(false),
+    [attentionFocused, setAttentionFocused] = useState(false);
   const writeLock = useRef(false),
     retries = useRef(new Map<string, string>()),
     fetchSequence = useRef(0);
@@ -461,21 +466,36 @@ export default function Workspace({
             {data.company?.name || "Carregando empresa…"}
           </div>
         )}
-        <nav aria-label="Navegação principal">
+        <button
+          type="button"
+          className="mobile-nav-toggle"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="workspace-navigation"
+          onClick={() => setMobileMenuOpen((open) => !open)}
+        >
+          <Menu size={18} />
+          <span>{mobileMenuOpen ? "Fechar menu" : "Abrir menu"}</span>
+          <MoreHorizontal size={16} />
+        </button>
+        <nav id="workspace-navigation" className={mobileMenuOpen ? "mobile-nav-open" : ""} aria-label="Navegação principal">
           <button
-            className={tab === "today" ? "active" : ""}
+            className={tab === "today" && !attentionFocused ? "active" : ""}
             onClick={() => {
               setTab("today");
+              setAttentionFocused(false);
               setSelected(null);
+              setMobileMenuOpen(false);
             }}
           >
             <CalendarDays size={18} /> Hoje
           </button>
           <button
-            className="alert-nav"
+            className={`alert-nav ${attentionFocused ? "active" : ""}`}
             onClick={() => {
               setTab("today");
+              setAttentionFocused(true);
               setSelected(null);
+              setMobileMenuOpen(false);
               window.setTimeout(() => document.getElementById("radar-de-atencao")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
             }}
             title="Abrir alertas de atenção"
@@ -486,7 +506,9 @@ export default function Workspace({
             className={tab === "list" ? "active" : ""}
             onClick={() => {
               setTab("list");
+              setAttentionFocused(false);
               setSelected(null);
+              setMobileMenuOpen(false);
             }}
           >
             <LayoutList size={18} /> Oportunidades
@@ -495,20 +517,25 @@ export default function Workspace({
             className={tab === "pipeline" ? "active" : ""}
             onClick={() => {
               setTab("pipeline");
+              setAttentionFocused(false);
               setSelected(null);
+              setMobileMenuOpen(false);
             }}
           >
             <Columns3 size={18} /> Pipeline
           </button>
-          <a className={tab === "contacts" ? "active" : ""} href="/contatos">
+          <a href="/operacao" onClick={() => setMobileMenuOpen(false)}>
+            <Boxes size={18} /> Operação
+          </a>
+          <a className={tab === "contacts" ? "active" : ""} href="/contatos" onClick={() => setMobileMenuOpen(false)}>
             <Users size={18} /> Contatos
           </a>
           {data.companies?.find((c) => c.id === data.company?.id)?.role === "owner" && (
-            <button className={tab === "team" ? "active" : ""} onClick={() => { setTab("team"); setSelected(null); }}>
+            <button className={tab === "team" ? "active" : ""} onClick={() => { setTab("team"); setAttentionFocused(false); setSelected(null); setMobileMenuOpen(false); }}>
               <Users size={18} /> Equipe
             </button>
           )}
-          <a href="/mensagens">
+          <a href="/mensagens" onClick={() => setMobileMenuOpen(false)}>
             <MessageCircle size={18} /> Mensagens
           </a>
           {adminAccess && (
