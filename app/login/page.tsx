@@ -1,5 +1,6 @@
 import {ArrowUpRight,CheckCircle2,Clock3,ShieldCheck,Target} from 'lucide-react';
 import LoginForm from './form';
+import DemoShowcase from '../demo-showcase';
 
 export default function LoginPage(){
  return <main className="login login-v2">
@@ -16,9 +17,13 @@ export default function LoginPage(){
       <div className="auth-preview-row"><span className="auth-preview-icon due"><Target size={14}/></span><div><strong>Ação para hoje</strong><small>Ligação de acompanhamento</small></div><span className="auth-preview-tag">Hoje</span></div>
       <div className="auth-preview-row"><span className="auth-preview-icon missing"><ArrowUpRight size={14}/></span><div><strong>Sem próximo passo</strong><small>Defina o que acontece depois</small></div><span className="auth-preview-tag">Revisar</span></div>
      </div>
+     <DemoShowcase />
      <div className="auth-benefits">
       <span><CheckCircle2 size={16}/> Fila ordenada pela urgência real</span>
       <span><ShieldCheck size={16}/> Cada empresa em seu próprio ambiente</span>
+     </div>
+     <div className="auth-capabilities" aria-label="Seis recursos do Aether Flow">
+      <span>Radar</span><span>Modo rápido</span><span>Mensagens prontas</span><span>Métricas</span><span>Importação CSV</span><span>WhatsApp</span>
      </div>
     </div>
     <small>Aether Works · Aether Flow</small>
