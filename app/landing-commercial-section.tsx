@@ -4,7 +4,7 @@ const planItems = [
   "Radar de retornos, compromissos e oportunidades paradas",
   "Contatos, pipeline, mensagens e histórico no mesmo fluxo",
   "Importação e exportação em CSV",
-  "Produtos, categorias e movimentações da operação sem limite de registros",
+  "Produtos, categorias, lotes, validade e histórico de movimentações sem limite de registros",
   "Até 3 integrantes no ambiente da empresa, com responsável por atendimento",
   "Tutorial rápido para a primeira configuração",
 ];
@@ -30,7 +30,7 @@ export default function LandingCommercialSection() {
           <div><span>PLANO AETHER FLOW</span><h3>Acesso Aether Flow</h3></div>
           <span className="landing-plan-badge"><Users size={15} /> até 3 pessoas</span>
         </div>
-        <p className="landing-plan-price"><strong>R$ 67 <small>/mês</small></strong><span>por empresa · cancele quando quiser</span></p>
+        <p className="landing-plan-price"><strong>R$ 67 <small>/mês</small></strong><span>por empresa · cancele quando quiser, sem multa</span></p>
         <ul>{planItems.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul>
         <a className="landing-primary landing-plan-cta" href="#produto">Ver telas reais <ArrowRight size={17} /></a>
         <small>Garantia de 7 dias · acesso já liberado? <a href="/login">Entrar no ambiente</a></small>
