@@ -16,10 +16,10 @@ export default function LandingHeader() {
         <span><strong>Aether Flow</strong><small>RADAR DE OPORTUNIDADES</small></span>
       </a>
       <nav className={`landing-links${menuOpen ? " is-open" : ""}`} id="landing-navigation" aria-label="Navegação principal">
-        <a href="#como-funciona" onClick={closeMenu}>Como funciona</a>
-        <a href="#para-quem" onClick={closeMenu}>Para quem é</a>
+        <a href="/landing/como-funciona" onClick={closeMenu}>Como funciona</a>
+        <a href="/landing/para-quem" onClick={closeMenu}>Para quem é</a>
         <a href="#produto" onClick={closeMenu}>Telas reais</a>
-        <a href="#recursos" onClick={closeMenu}>Recursos</a>
+        <a href="/landing/recursos" onClick={closeMenu}>Recursos</a>
         <a href="#plano" onClick={closeMenu}>Preço</a>
         <a href="#duvidas" onClick={closeMenu}>Dúvidas</a>
         <a className="landing-mobile-action" href="/login" onClick={closeMenu}>Entrar</a>
