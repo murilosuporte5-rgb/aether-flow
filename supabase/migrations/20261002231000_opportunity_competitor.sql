@@ -54,7 +54,6 @@ begin
       end if;
     end if;
     competitor_value := nullif(btrim(p_command->>'competitor'),''); if competitor_value is not null and length(competitor_value)>160 then raise exception 'Concorrente deve ter até 160 caracteres.'; end if;
-    competitor_value := nullif(btrim(p_command->>'competitor'),''); if competitor_value is not null and length(competitor_value)>160 then raise exception 'Concorrente deve ter até 160 caracteres.'; end if;
       tag_list := array( select btrim(x) from unnest(string_to_array(coalesce(p_command->>'tags',''),',')) x where btrim(x) <> '' );
     if cardinality(tag_list) > 8 or exists(select 1 from unnest(tag_list) x where length(x) > 32) then raise exception 'Use até oito tags com no máximo 32 caracteres.'; end if;
     proposal_link := nullif(btrim(p_command->>'proposalUrl'),''); contract_link := nullif(btrim(p_command->>'contractUrl'),''); drive_link := nullif(btrim(p_command->>'driveUrl'),'');
@@ -79,7 +78,6 @@ begin
       update public.contacts set name=btrim(p_command->>'contactName'),phone='+'||normalized,organization=nullif(btrim(p_command->>'organization'),'') where company_id=p_company_id and id=o.contact_id;
       if nullif(p_command->>'ownerId','') is not null then new_owner_id := (p_command->>'ownerId')::uuid; if not exists(select 1 from public.memberships m where m.company_id=p_company_id and m.user_id=new_owner_id) then raise exception 'Responsável não pertence à empresa.'; end if; else new_owner_id := o.owner_id; end if;
       competitor_value := nullif(btrim(p_command->>'competitor'),''); if competitor_value is not null and length(competitor_value)>160 then raise exception 'Concorrente deve ter até 160 caracteres.'; end if;
-    competitor_value := nullif(btrim(p_command->>'competitor'),''); if competitor_value is not null and length(competitor_value)>160 then raise exception 'Concorrente deve ter até 160 caracteres.'; end if;
       tag_list := array( select btrim(x) from unnest(string_to_array(coalesce(p_command->>'tags',''),',')) x where btrim(x) <> '' );
       if cardinality(tag_list) > 8 or exists(select 1 from unnest(tag_list) x where length(x) > 32) then raise exception 'Use até oito tags com no máximo 32 caracteres.'; end if;
       proposal_link := nullif(btrim(p_command->>'proposalUrl'),''); contract_link := nullif(btrim(p_command->>'contractUrl'),''); drive_link := nullif(btrim(p_command->>'driveUrl'),'');
