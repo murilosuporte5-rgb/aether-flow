@@ -111,6 +111,7 @@ try {
     await page.goto(base + "/login");
     await page.getByLabel("E-mail", { exact: true }).fill(tenant.email);
     await page.getByLabel("Senha", { exact: true }).fill(tenant.password);
+    await page.getByRole("checkbox", { name: /Termos de uso/ }).check();
     await page.getByRole("button", { name: "Entrar no Aether Flow", exact: true }).click();
     await page.waitForURL(base + "/");
     await page.getByRole("button", { name: "Nova oportunidade", exact: true }).waitFor();

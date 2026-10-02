@@ -187,6 +187,7 @@ try {
     await page.goto(base + "/login");
     await page.getByLabel("E-mail", { exact: true }).fill(tenant.email);
     await page.getByLabel("Senha", { exact: true }).fill(tenant.password);
+    await page.getByRole("checkbox", { name: /Termos de uso/ }).check();
     await page
       .getByRole("button", { name: "Entrar no Aether Flow", exact: true })
       .click();
@@ -657,6 +658,7 @@ try {
   await setupPage.goto(base + "/login");
   await setupPage.getByLabel("E-mail", { exact: true }).fill(setup.email);
   await setupPage.getByLabel("Senha", { exact: true }).fill(setup.password);
+  await setupPage.getByRole("checkbox", { name: /Termos de uso/ }).check();
   await setupPage
     .getByRole("button", { name: "Entrar no Aether Flow", exact: true })
     .click();
