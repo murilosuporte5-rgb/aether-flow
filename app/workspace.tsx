@@ -55,6 +55,7 @@ export type Row = {
   owner_id: string;
   owner_name: string;
   estimated_value: number | null;
+  commercial_availability?: "available" | "reserved" | "consult" | null;
   next_action_type: string | null;
   next_action_at: string | null;
   next_action_note: string | null;
@@ -478,6 +479,14 @@ export default function Workspace({
           <MoreHorizontal size={16} />
         </button>
         <nav id="workspace-navigation" className={mobileMenuOpen ? "mobile-nav-open" : ""} aria-label="Navegação principal">
+          <button
+            type="button"
+            className="mobile-nav-close"
+            aria-label="Fechar menu"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <X size={18} /> <span>Menu</span>
+          </button>
           <button
             className={tab === "today" && !attentionFocused ? "active" : ""}
             onClick={() => {
@@ -1284,6 +1293,10 @@ export default function Workspace({
               <div>
                 <span>Valor estimado</span>
                 <strong>{money(row.estimated_value)}</strong>
+              </div>
+              <div>
+                <span>Disponibilidade comercial</span>
+                <strong>{row.commercial_availability === "available" ? "Disponível" : row.commercial_availability === "reserved" ? "Reservado" : row.commercial_availability === "consult" ? "Sob consulta" : "Sem indicação"}</strong>
               </div>
               <div>
                 <span>Último contato</span>
