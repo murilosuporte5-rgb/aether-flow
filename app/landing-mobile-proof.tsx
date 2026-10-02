@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, Check, Smartphone } from "lucide-react";
+import { ArrowRight, Check, Monitor } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const shots = [
-  { src: "/demo/mobile/radar.jpg", label: "Radar no celular", text: "Veja primeiro o que pede atenção." },
-  { src: "/demo/mobile/equipe.jpg", label: "Equipe no celular", text: "Responsáveis e acessos cabem na rotina." },
-  { src: "/demo/mobile/tutorial.jpg", label: "Primeiro acesso", text: "Um tutorial curto mostra o caminho." },
+  { src: "/demo/panel.png", label: "Painel real", text: "Veja primeiro o que pede atenção." },
+  { src: "/demo/alerts.png", label: "Alertas reais", text: "Compromissos e prioridades no mesmo lugar." },
+  { src: "/demo/team.png", label: "Equipe real", text: "Responsáveis e acessos sem desencontro." },
 ];
 
 export default function LandingMobileProof() {
@@ -27,8 +27,8 @@ export default function LandingMobileProof() {
         <a className="landing-secondary" href="/demo?view=panel#demo-screen">Abrir demonstração <ArrowRight size={16} /></a>
       </div>
       <div className="landing-mobile-stage">
-        <div className="landing-mobile-device"><div className="landing-mobile-notch" /><div key={shot.src} className="landing-mobile-shot"><Image src={shot.src} alt={shot.label} width={738} height={1600} sizes="(max-width: 700px) 58vw, 300px" /></div></div>
-        <div className="landing-mobile-caption"><span className="mobile-caption-icon"><Smartphone size={15} /></span><div><strong>{shot.label}</strong><small>{shot.text}</small></div><span className="mobile-caption-count">{active + 1}/{shots.length}</span></div>
+        <div className="landing-proof-device"><div key={shot.src} className="landing-mobile-shot"><Image src={shot.src} alt={`${shot.label} do Aether Flow`} width={1440} height={980} sizes="(max-width: 700px) 100vw, 500px" /></div></div>
+        <div className="landing-mobile-caption"><span className="mobile-caption-icon"><Monitor size={15} /></span><div><strong>{shot.label}</strong><small>{shot.text}</small></div><span className="mobile-caption-count">{active + 1}/{shots.length}</span></div>
         <div className="landing-mobile-dots" role="tablist" aria-label="Capturas do celular">{shots.map((item, index) => <button key={item.src} type="button" role="tab" aria-selected={index === active} aria-label={item.label} className={index === active ? "active" : ""} onClick={() => setActive(index)} />)}</div>
       </div>
     </section>
