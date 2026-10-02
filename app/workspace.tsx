@@ -253,7 +253,7 @@ export default function Workspace({
   }, [modal]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !modal && !busy) setSelected(null);
+      if (event.key === "Escape" && !modal && !busy) { setSelected(null); setMobileMenuOpen(false); }
     };
     document.addEventListener("keydown", key);
     return () => document.removeEventListener("keydown", key);
@@ -702,7 +702,7 @@ export default function Workspace({
             </span>
           </div>
         </header>
-        <div className="page-body">
+        <div className={`page-body workspace-view-${tab}-${attentionFocused ? "attention" : "default"}`}>
           {error && (
             <div role="alert" className="alert error">
               {error}{" "}
