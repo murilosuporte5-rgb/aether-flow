@@ -31,7 +31,7 @@ export default function LandingCommercialSection() {
           <div><span>PLANO AETHER FLOW</span><h3>Acesso Aether Flow</h3></div>
           <span className="landing-plan-badge"><Users size={15} /> até 3 pessoas</span>
         </div>
-        <p className="landing-plan-price"><strong>R$ 67 <small>/mês</small></strong><span>por empresa · cancele quando quiser, sem multa</span></p>
+        <p className="landing-plan-price"><span className="landing-plan-trial">7 dias grátis para testar</span><strong><small>R$</small> 67 <small>/mês</small></strong><span>por empresa · até 3 pessoas · cancele quando quiser</span></p>
         <ul>{planItems.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul>
         <a className="landing-primary landing-plan-cta" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Teste grátis por 7 dias <ArrowRight size={17} /></a>
         <small>Garantia de 7 dias · acesso já liberado? <a href="/login">Entrar no ambiente</a></small>

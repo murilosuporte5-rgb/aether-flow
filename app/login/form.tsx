@@ -5,7 +5,7 @@ import {useRouter} from 'next/navigation';
 import {createClient} from '@/lib/supabase/browser';
 
 export default function LoginForm(){
- const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[showPassword,setShowPassword]=useState(false),[remember,setRemember]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[cooldown,setCooldown]=useState(0);
+ const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[showPassword,setShowPassword]=useState(false),[remember,setRemember]=useState(true),[acceptedTerms,setAcceptedTerms]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[cooldown,setCooldown]=useState(0);
  const router=useRouter();
  useEffect(()=>{const stored=window.localStorage.getItem('aether-flow:remember-email');if(stored)setEmail(stored);const tick=()=>setCooldown(Math.max(0,Number(window.localStorage.getItem('aether-flow:login-lock-until')||0)-Date.now()));tick();const timer=window.setInterval(tick,1000);return()=>window.clearInterval(timer)},[]);
 
@@ -24,9 +24,10 @@ export default function LoginForm(){
  return <form className="login-form login-form-v2" onSubmit={passwordLogin}>
   <label><span>E-mail</span><input type="email" value={email} onChange={e=>setEmail(e.target.value)} autoComplete="username" placeholder="seu@email.com" required/></label>
   <label><span>Senha</span><div className="password-control"><input type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" placeholder="Sua senha" required/><button type="button" className="field-icon-btn" onClick={()=>setShowPassword(v=>!v)} aria-label={showPassword?'Ocultar senha':'Mostrar senha'}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></div></label>
-  <div className="login-options"><label className="remember-label"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)}/><span>Lembrar-me</span></label><a className="forgot-link" href="/recuperar-senha">Esqueceu sua senha?</a></div>
+  <div className="login-options"><label className="remember-label"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)}/><span>Lembrar meu e-mail</span></label><a className="forgot-link" href="/recuperar-senha">Esqueceu sua senha?</a></div>
+  <label className="terms-label"><input type="checkbox" checked={acceptedTerms} onChange={e=>setAcceptedTerms(e.target.checked)} required/><span>Li e aceito os <a href="/termos" target="_blank" rel="noreferrer">Termos de uso</a> e a <a href="/privacidade" target="_blank" rel="noreferrer">Política de privacidade</a>.</span></label>
   {error&&<p role="alert" className="form-error">{error}</p>}
-  <button type="submit" className="primary login-action" disabled={busy||cooldown>0} aria-busy={busy}><>{busy?<LoaderCircle className="loading-spinner" size={17}/>:<LogIn size={17}/>}</>{busy?'Entrando…':cooldown>0?`Aguarde ${Math.ceil(cooldown/1000)}s`:'Entrar no Aether Flow'}</button>
+  <button type="submit" className="primary login-action" disabled={busy||cooldown>0||!acceptedTerms} aria-busy={busy}><>{busy?<LoaderCircle className="loading-spinner" size={17}/>:<LogIn size={17}/>}</>{busy?'Entrando…':cooldown>0?`Aguarde ${Math.ceil(cooldown/1000)}s`:'Entrar no Aether Flow'}</button>
   {busy&&<div className="login-loading" role="status" aria-live="polite"><LoaderCircle className="loading-spinner" size={22}/><strong>Preparando seu ambiente</strong><span>Validando acesso com segurança…</span></div>}
  </form>;
 }

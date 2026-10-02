@@ -5,15 +5,19 @@ import { ArrowRight, Check, Monitor } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const shots = [
-  { src: "/demo/panel.png", label: "Painel real", text: "Veja primeiro o que pede atenção." },
-  { src: "/demo/pipeline.png", label: "Pipeline real", text: "Acompanhe cada negociação até o resultado." },
-  { src: "/demo/messages.png", label: "Mensagens reais", text: "Use contexto e modelos sem perder o ritmo." },
+  { src: "/demo/panel-v2.png", label: "Painel real", text: "Veja primeiro o que pede atenção." },
+  { src: "/demo/alerts-v2.png", label: "Alertas reais", text: "Prioridades aparecem em ordem de urgência." },
+  { src: "/demo/contacts-v2.png", label: "Contatos reais", text: "Dados, histórico e responsável no mesmo lugar." },
+  { src: "/demo/pipeline-v2.png", label: "Pipeline real", text: "Acompanhe cada negociação até o resultado." },
+  { src: "/demo/messages-v2.png", label: "Mensagens reais", text: "Use contexto e modelos sem perder o ritmo." },
+  { src: "/demo/data-v2.png", label: "Dados reais", text: "Métricas e CSV prontos para acompanhar." },
+  { src: "/demo/team-v2.png", label: "Equipe real", text: "Funções e responsáveis ficam visíveis." },
 ];
 
 export default function LandingMobileProof() {
   const [active, setActive] = useState(0);
   useEffect(() => {
-    const timer = window.setInterval(() => setActive((current) => (current + 1) % shots.length), 4200);
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % shots.length), 3600);
     return () => window.clearInterval(timer);
   }, []);
   const shot = shots[active];
