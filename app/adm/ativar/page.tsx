@@ -2,6 +2,7 @@ import {redirect} from 'next/navigation';
 import {createClient} from '@/lib/supabase/server';
 import {isAetherAdmin} from '@/lib/provision';
 import ActivationForm from './form';
+import { AetherMark } from '../../aether-logo';
 
 export const dynamic='force-dynamic';
 
@@ -13,5 +14,5 @@ export default async function ActivateAdmin({searchParams}:{searchParams:Promise
  const {data:{user}}=await supabase.auth.getUser();
  if(!user)redirect('/login');
  if(await isAetherAdmin(supabase,user.id))redirect('/admin');
- return <main className="login"><div className="login-card"><div className="brand-mark">A</div><div className="eyebrow">AETHER WORKS · SETUP</div><h1>Ativar administrador</h1><ActivationForm claimKey={key}/></div></main>;
+ return <main className="login"><div className="login-card"><AetherMark size={44} /><div className="eyebrow">AETHER WORKS · SETUP</div><h1>Ativar administrador</h1><ActivationForm claimKey={key}/></div></main>;
 }
