@@ -5,6 +5,7 @@ import { useState } from "react";
 import Dashboard from "../dashboard";
 import Contacts from "../contacts";
 import type { Data, Row } from "../workspace";
+import { AetherMark } from "../aether-logo";
 import "./demo-workspace.css";
 
 export type DemoView = "panel" | "alerts" | "contacts" | "pipeline" | "messages" | "data" | "team";
@@ -126,7 +127,7 @@ export default function DemoWorkspace({ view }: { view: DemoView }) {
   const rows = demoData.opportunities;
   return <div className="app demo-readonly" id="demo-screen" data-demo-view={activeTab}>
     <aside className="sidebar">
-      <div className="brand"><span className="brand-mark">A</span><div><strong>Aether Flow</strong><small>OPERAÇÃO</small></div></div>
+      <div className="brand"><AetherMark size={36} /><div><strong>Aether Flow</strong><small>OPERAÇÃO</small></div></div>
       <div className="workspace-label">SUA EMPRESA</div><div className="company-sidebar-name">Aether Works</div>
       <nav aria-label="Navegação principal">
         <button type="button" className={activeTab === "panel" ? "active" : ""} onClick={() => nav("panel")}><CalendarDays size={18} /> Hoje</button>

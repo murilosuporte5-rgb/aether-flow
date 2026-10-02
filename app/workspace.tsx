@@ -32,6 +32,7 @@ import BusinessOperations from "./business-operations";
 import MessageBank from "./message-bank";
 import Team from "./team";
 import FeatureGuide from "./feature-guide";
+import { AetherMark } from "./aether-logo";
 import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
 import {
   comparePriority,
@@ -432,7 +433,7 @@ export default function Workspace({
     <div className="app">
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark">A</span>
+          <AetherMark size={36} />
           <div>
             <strong>Aether Flow</strong>
             <small>OPERAÇÃO</small>

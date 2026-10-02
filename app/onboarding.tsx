@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import {templates,type TemplateKey} from '@/lib/templates';
+import { AetherMark } from './aether-logo';
 
 export default function Onboarding({email,adminAccess}:{email:string,adminAccess:boolean}){
  const [companyName,setCompanyName]=useState(''),[template,setTemplate]=useState<TemplateKey>('generic'),[busy,setBusy]=useState(false),[error,setError]=useState('');
@@ -18,7 +19,7 @@ export default function Onboarding({email,adminAccess}:{email:string,adminAccess
 
  return <main className="login">
   <div className="login-card">
-   <div className="brand-mark">A</div>
+   <AetherMark size={44} />
    <div className="eyebrow">AETHER FLOW · PRIMEIRO ACESSO</div>
    <h1>Configure sua empresa.</h1>
    <p>Leva menos de um minuto. Seu ambiente será criado separado dos demais clientes.</p>
