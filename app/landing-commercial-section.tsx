@@ -1,4 +1,5 @@
 import { ArrowRight, Check, FileSpreadsheet, GraduationCap, ShieldCheck, Users } from "lucide-react";
+import { trialWhatsAppUrl } from "./landing-cta";
 
 const planItems = [
   "Radar de retornos, compromissos e oportunidades paradas",
@@ -32,7 +33,7 @@ export default function LandingCommercialSection() {
         </div>
         <p className="landing-plan-price"><strong>R$ 67 <small>/mês</small></strong><span>por empresa · cancele quando quiser, sem multa</span></p>
         <ul>{planItems.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul>
-        <a className="landing-primary landing-plan-cta" href="#produto">Ver telas reais <ArrowRight size={17} /></a>
+        <a className="landing-primary landing-plan-cta" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Teste grátis por 7 dias <ArrowRight size={17} /></a>
         <small>Garantia de 7 dias · acesso já liberado? <a href="/login">Entrar no ambiente</a></small>
       </article>
     </section>
