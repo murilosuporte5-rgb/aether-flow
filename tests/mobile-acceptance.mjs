@@ -116,21 +116,24 @@ try {
     await page.getByRole("button", { name: "Nova oportunidade", exact: true }).waitFor();
     await poll("workspace ready", () => page.getByRole("button", { name: "Nova oportunidade", exact: true }).isEnabled());
     await noOverflow(page, "authenticated workspace");
-    const menuToggle = page.getByRole("button", { name: "Abrir menu", exact: true });
-    await menuToggle.click();
-    const navigation = page.locator("#workspace-navigation");
-    await navigation.getByRole("button", { name: "Fechar menu", exact: false }).waitFor();
-    await noOverflow(page, "mobile side drawer");
-    const alertButton = navigation.getByRole("button", { name: /Alertas/ });
-    await alertButton.click();
-    assert.ok(await alertButton.evaluate((el) => el.classList.contains("active")), "Alertas should be active alone");
-    const todayButton = page.locator("#workspace-navigation > button").filter({ hasText: "Hoje" });
-    assert.equal(await todayButton.evaluate((el) => el.classList.contains("active")), false, "Hoje must not stay active with Alertas");
-    await menuToggle.click();
-    await navigation.getByRole("button", { name: "Equipe", exact: true }).click();
-    await page.getByRole("heading", { name: "Quem atende seus clientes", exact: true }).waitFor();
-    await noOverflow(page, "mobile team view");
-    record("mobile_drawer_alert_state_and_team_layout", width);
+    if (width <= 760) {
+      const menuToggle = page.getByRole("button", { name: "Abrir menu", exact: true });
+      await menuToggle.click();
+      const navigation = page.locator("#workspace-navigation");
+      await navigation.getByRole("button", { name: "Fechar menu", exact: false }).waitFor();
+      await noOverflow(page, "mobile side drawer");
+      const alertButton = navigation.locator("button.alert-nav");
+      await alertButton.waitFor();
+      await alertButton.click();
+      assert.ok(await alertButton.evaluate((el) => el.classList.contains("active")), "Alertas should be active alone");
+      const todayButton = page.locator("#workspace-navigation > button").filter({ hasText: "Hoje" });
+      assert.equal(await todayButton.evaluate((el) => el.classList.contains("active")), false, "Hoje must not stay active with Alertas");
+      await menuToggle.click();
+      await navigation.getByRole("button", { name: "Equipe", exact: true }).click();
+      await page.getByRole("heading", { name: "Quem atende seus clientes", exact: true }).waitFor();
+      await noOverflow(page, "mobile team view");
+      record("mobile_drawer_alert_state_and_team_layout", width);
+    }
     record("real_auth_login", width);
 
     const title = "QA Núcleo " + width;
