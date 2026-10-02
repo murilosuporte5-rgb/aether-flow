@@ -376,15 +376,29 @@ export default function Workspace({
       (x) => x.next_action_at && day(x.next_action_at) > nowDay,
     );
   const waiting = open.filter((x) => x.next_action_type === "Aguardar cliente");
+  const pendingContactDays = new Map<string, string[]>();
+  open.forEach((opportunity) => {
+    if (!opportunity.next_action_at) return;
+    const key = `${opportunity.contact_id}:${day(opportunity.next_action_at)}`;
+    pendingContactDays.set(key, [...(pendingContactDays.get(key) || []), opportunity.id]);
+  });
+  const conflictIds = new Set(
+    [...pendingContactDays.values()].filter((ids) => ids.length > 1).flat(),
+  );
+  const conflictRows = open.filter((opportunity) => conflictIds.has(opportunity.id));
   const rawDisplayName = user.name.includes("@")
     ? user.email.split("@")[0].replace(/[._-]+/g, " ")
     : user.name;
   const firstName = rawDisplayName.trim().split(/\s+/)[0] || "cliente";
-  const attentionCount = open.filter((r) => priorityRank(r) <= 3).length;
-  const attentionRows = open
-    .filter((r) => priorityRank(r) <= 3)
-    .sort(comparePriority)
-    .slice(0, 4);
+  const attentionRows = [...new Map(
+    [...conflictRows, ...open.filter((r) => priorityRank(r) <= 3)]
+      .sort((a, b) => (conflictIds.has(a.id) === conflictIds.has(b.id) ? comparePriority(a, b) : conflictIds.has(a.id) ? -1 : 1))
+      .map((opportunity) => [opportunity.id, opportunity]),
+  ).values()].slice(0, 4);
+  const attentionCount = new Set([
+    ...conflictRows.map((opportunity) => opportunity.id),
+    ...open.filter((opportunity) => priorityRank(opportunity) <= 3).map((opportunity) => opportunity.id),
+  ]).size;
   const currentRole = data.companies?.find((company) => company.id === data.company?.id)?.role;
   const greeting = greetingForNow(),
     todayLabel = longToday();
@@ -428,7 +442,9 @@ export default function Workspace({
       (a) => a.opportunity_id === r.id && a.status === "pending",
     );
   const statusText = (r: Row) =>
-    r.status === "won"
+    conflictIds.has(r.id)
+      ? "Conflito de agenda"
+      : r.status === "won"
       ? "Ganho"
       : r.status === "lost"
         ? "Perdido"
@@ -682,7 +698,7 @@ export default function Workspace({
                     <div className="notification-list">
                       {attentionRows.map((r) => (
                         <button key={r.id} type="button" className="notification-row" onClick={() => { setTab("today"); setSelected(r.id); setNotificationOpen(false); }}>
-                          <span className={`notification-dot ${statusText(r) === "Vencido" ? "late" : statusText(r) === "Hoje" ? "today" : "missing"}`} />
+                          <span className={`notification-dot ${statusText(r) === "Vencido" ? "late" : statusText(r) === "Hoje" ? "today" : statusText(r) === "Conflito de agenda" ? "conflict" : "missing"}`} />
                           <span><strong>{r.contact_name}</strong><small>{statusText(r)} · {r.title}</small></span>
                           <ArrowUpRight size={14} />
                         </button>
