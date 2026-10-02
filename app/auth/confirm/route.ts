@@ -24,5 +24,9 @@ export async function GET(request:Request){
    return redirectTo(target);
   }
  }
+ // Supabase can deliver recovery tokens in the URL fragment (implicit flow).
+ // Fragments never reach this server route, so let the client activation page
+ // consume them instead of incorrectly declaring the link invalid.
+ if(type==='recovery') return redirectTo('/activate?mode=recovery');
  return redirectTo('/login?access=invalid');
 }
