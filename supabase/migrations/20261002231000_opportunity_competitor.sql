@@ -58,7 +58,7 @@ begin
     if cardinality(tag_list) > 8 or exists(select 1 from unnest(tag_list) x where length(x) > 32) then raise exception 'Use até oito tags com no máximo 32 caracteres.'; end if;
     proposal_link := nullif(btrim(p_command->>'proposalUrl'),''); contract_link := nullif(btrim(p_command->>'contractUrl'),''); drive_link := nullif(btrim(p_command->>'driveUrl'),'');
     if proposal_link is not null and proposal_link !~* '^https?://' or contract_link is not null and contract_link !~* '^https?://' or drive_link is not null and drive_link !~* '^https?://' then raise exception 'Os links devem começar com http:// ou https://.'; end if;
-    insert into public.opportunities(company_id,contact_id,title,stage_id,owner_id,estimated_value,status,source,details,commercial_availability,tags,proposal_url,contract_url,drive_url)
+    insert into public.opportunities(company_id,contact_id,title,stage_id,owner_id,estimated_value,status,source,details,commercial_availability,tags,proposal_url,contract_url,drive_url,competitor)
     values(p_company_id,cid,btrim(p_command->>'title'),st.id,owner_id,value_amount,'open',nullif(btrim(p_command->>'source'),''),nullif(btrim(p_command->>'details'),''),nullif(p_command->>'commercialAvailability',''),tag_list,proposal_link,contract_link,drive_link,competitor_value) returning * into o;
     oid := o.id;
     perform private.append_opportunity_event(p_company_id,oid,'created','Oportunidade criada',jsonb_build_object('contact_id',cid,'stage_id',st.id));
