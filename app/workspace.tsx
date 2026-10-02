@@ -74,6 +74,7 @@ export type Row = {
   proposal_url?: string | null;
   contract_url?: string | null;
   drive_url?: string | null;
+  competitor?: string | null;
   win_reason?: string | null;
 };
 export type Stage = {
@@ -1333,10 +1334,11 @@ export default function Workspace({
                 <strong>{formatDate(row.last_interaction_at)}</strong>
               </div>
             </div>
-            {(row.tags?.length || row.proposal_url || row.contract_url || row.drive_url || row.win_reason) && (
+            {(row.tags?.length || row.proposal_url || row.contract_url || row.drive_url || row.competitor || row.win_reason) && (
               <div className="detail-metadata" aria-label="Metadados da oportunidade">
                 {row.tags?.map((tag) => <span className="opportunity-tag" key={tag}>{tag}</span>)}
                 {row.win_reason && <span className="metadata-note">Ganho por: {row.win_reason}</span>}
+                {row.competitor && <span className="metadata-note">Concorrente: {row.competitor}</span>}
                 {row.proposal_url && <a href={row.proposal_url} target="_blank" rel="noreferrer">Proposta ↗</a>}
                 {row.contract_url && <a href={row.contract_url} target="_blank" rel="noreferrer">Contrato ↗</a>}
                 {row.drive_url && <a href={row.drive_url} target="_blank" rel="noreferrer">Drive ↗</a>}

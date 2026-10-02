@@ -94,6 +94,7 @@ export default function CoreForm({
   const [proposalUrl, setProposalUrl] = useState(mode === "create" ? "" : row?.proposal_url || "");
   const [contractUrl, setContractUrl] = useState(mode === "create" ? "" : row?.contract_url || "");
   const [driveUrl, setDriveUrl] = useState(mode === "create" ? "" : row?.drive_url || "");
+  const [competitor, setCompetitor] = useState(mode === "create" ? "" : row?.competitor || "");
   const [stageId, setStageId] = useState(
     data.stages.find((s) => s.kind === "open")?.id || "",
   );
@@ -213,6 +214,7 @@ export default function CoreForm({
                 proposalUrl,
                 contractUrl,
                 driveUrl,
+                competitor,
                 stageId,
                 ...(ownerId ? { ownerId } : {}),
                 ...(mode === "create" && type
@@ -435,6 +437,10 @@ export default function CoreForm({
                   Link do Drive
                   <input type="url" value={driveUrl} onChange={(e) => setDriveUrl(e.target.value)} placeholder="https://drive.google.com/..." />
                 </label>
+                <label>
+                  Concorrente
+                  <input value={competitor} onChange={(e) => setCompetitor(e.target.value)} maxLength={160} placeholder="Quem disputa esta venda?" />
+                </label>
                 <label className="wide">
                   Descrição
                   <textarea
@@ -590,6 +596,7 @@ export default function CoreForm({
                     proposalUrl,
                     contractUrl,
                     driveUrl,
+                    competitor,
                     stageId,
                     reuseContactId: duplicate.id,
                     ...(ownerId ? { ownerId } : {}),
