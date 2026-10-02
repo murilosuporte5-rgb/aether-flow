@@ -133,6 +133,9 @@ try {
       await page.getByRole("heading", { name: "Quem atende seus clientes", exact: true }).waitFor();
       await noOverflow(page, "mobile team view");
       record("mobile_drawer_alert_state_and_team_layout", width);
+      await menuToggle.click();
+      await navigation.getByRole("button", { name: "Hoje", exact: true }).click();
+      await page.getByRole("button", { name: "Nova oportunidade", exact: true }).waitFor();
     }
     record("real_auth_login", width);
 
