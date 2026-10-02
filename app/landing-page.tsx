@@ -153,12 +153,12 @@ export default function LandingPage() {
         <div><strong>Fila de prioridades</strong><span>retornos ordenados por urgência</span></div><div><strong>Responsável definido</strong><span>em cada contato e oportunidade</span></div><div><strong>Histórico completo</strong><span>para entender cada atendimento</span></div><div><strong>Métricas e CSV</strong><span>para medir e mover sua base</span></div>
       </section>
 
-      <section className="landing-section landing-before-after" id="como-funciona">
+      <section className="landing-section landing-before-after" id="antes-depois">
         <div className="landing-section-heading"><span className="landing-eyebrow">O ANTES E O DEPOIS</span><h2>O que fica espalhado na cabeça vira uma próxima ação clara.</h2><p>A equipe não precisa adivinhar qual conversa vem primeiro. O sistema transforma o movimento comercial em uma fila que dá para acompanhar.</p></div>
         <div className="before-after-list">{beforeAfter.map((item) => <div className="before-after-row" key={item.before}><div className="before"><span>✕ &nbsp; ANTES</span><p>{item.before}</p></div><ArrowRight size={19} /><div className="after"><span>✓ &nbsp; DEPOIS</span><p>{item.after}</p></div></div>)}</div>
       </section>
 
-      <section className="landing-section landing-how" aria-labelledby="how-title">
+      <section className="landing-section landing-how" id="como-funciona" aria-labelledby="how-title">
         <div className="landing-section-heading"><span className="landing-eyebrow">COMO FUNCIONA</span><h2 id="how-title">É simples assim: 1, 2, 3.</h2><p>Do primeiro cadastro ao próximo retorno, sem transformar a operação em mais uma tarefa.</p></div>
         <div className="landing-step-grid">{steps.map(([number, title, text]) => <article key={number}><span className="step-number">{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
       </section>

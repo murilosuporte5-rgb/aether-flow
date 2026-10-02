@@ -14,12 +14,14 @@ export default function WeeklySummary({ data, rows, open }: Props) {
   const actions = data.history.filter((event) => event.event === "activity_completed" && recent(event.created_at)).length;
   const won = data.history.filter((event) => event.event === "won" && recent(event.created_at)).length;
   const lost = data.history.filter((event) => event.event === "lost" && recent(event.created_at)).length;
-  const proposals = rows.filter((row) => row.status === "open" && (/propost/i.test(row.stage_name) || row.next_action_type === "Aguardar cliente") && !!row.next_action_at).length;
+  const proposalRows = rows.filter((row) => row.status === "open" && (/propost/i.test(row.stage_name) || row.next_action_type === "Aguardar cliente") && !!row.next_action_at);
+  const proposals = proposalRows.length;
+  const proposalValue = proposalRows.reduce((sum, row) => sum + (row.estimated_value || 0), 0);
   const priorities = rows.filter((row) => row.status === "open" && (!row.next_action_at || Date.parse(row.next_action_at) <= end)).sort(comparePriority).slice(0, 3);
   const cards = [
     [Plus, "Criadas", created, "novas oportunidades"],
     [Activity, "Ações", actions, "retornos concluídos"],
-    [CircleDollarSign, "Aguardando", proposals, "propostas com retorno"],
+    [CircleDollarSign, "Aguardando", proposals, `${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(proposalValue)} em propostas`],
     [TrendingUp, "Ganhos", won, "fechamentos"],
     [TrendingDown, "Perdas", lost, "resultados registrados"],
   ] as const;
