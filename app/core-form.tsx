@@ -90,6 +90,10 @@ export default function CoreForm({
   const [details, setDetails] = useState(
     mode === "create" ? "" : row?.details || "",
   );
+  const [tags, setTags] = useState(mode === "create" ? "" : (row?.tags || []).join(", "));
+  const [proposalUrl, setProposalUrl] = useState(mode === "create" ? "" : row?.proposal_url || "");
+  const [contractUrl, setContractUrl] = useState(mode === "create" ? "" : row?.contract_url || "");
+  const [driveUrl, setDriveUrl] = useState(mode === "create" ? "" : row?.drive_url || "");
   const [stageId, setStageId] = useState(
     data.stages.find((s) => s.kind === "open")?.id || "",
   );
@@ -111,6 +115,7 @@ export default function CoreForm({
   const [outcome, setOutcome] = useState(closingStage?.kind || "");
   const [lossReason, setLossReason] = useState("");
   const [lossNote, setLossNote] = useState("");
+  const [winReason, setWinReason] = useState("");
   const [result, setResult] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [localError, setLocalError] = useState("");
@@ -192,7 +197,7 @@ export default function CoreForm({
             return;
           }
           const nextStep = close
-            ? { outcome, lossReason, lossNote }
+            ? { outcome, lossReason, lossNote, winReason }
             : { type, dueAt: isoInput(due), note };
           const payload: Record<string, unknown> = capture
             ? {
@@ -204,6 +209,10 @@ export default function CoreForm({
                 organization,
                 source,
                 details,
+                tags,
+                proposalUrl,
+                contractUrl,
+                driveUrl,
                 stageId,
                 ...(ownerId ? { ownerId } : {}),
                 ...(mode === "create" && type
@@ -213,7 +222,7 @@ export default function CoreForm({
             : mode === "complete"
               ? { activityId, nextStep, result, contactConfirmed: confirmed }
               : mode === "close"
-                ? { stageId: closingStage?.id, lossReason, lossNote }
+                ? { stageId: closingStage?.id, lossReason, lossNote, winReason }
                 : { actionType: type, dueAt: isoInput(due), note };
           // The ID survives uncertain network outcomes; only known failures get a new ID.
           await onSave({ ...payload, requestId: requestId.current });
@@ -410,6 +419,22 @@ export default function CoreForm({
                     </label>
                   </>
                 )}
+                <label>
+                  Tags
+                  <input value={tags} onChange={(e) => setTags(e.target.value)} maxLength={280} placeholder="urgente, indicação, proposta" />
+                </label>
+                <label>
+                  Link da proposta
+                  <input type="url" value={proposalUrl} onChange={(e) => setProposalUrl(e.target.value)} placeholder="https://..." />
+                </label>
+                <label>
+                  Link do contrato
+                  <input type="url" value={contractUrl} onChange={(e) => setContractUrl(e.target.value)} placeholder="https://..." />
+                </label>
+                <label>
+                  Link do Drive
+                  <input type="url" value={driveUrl} onChange={(e) => setDriveUrl(e.target.value)} placeholder="https://drive.google.com/..." />
+                </label>
                 <label className="wide">
                   Descrição
                   <textarea
@@ -501,6 +526,15 @@ export default function CoreForm({
                     </label>
                   </>
                 )}
+                {outcome === "won" && (
+                  <label>
+                    Motivo do ganho *
+                    <select value={winReason} onChange={(e) => setWinReason(e.target.value)} required>
+                      <option value="" disabled>Selecione</option>
+                      {['Preço e condição','Urgência do cliente','Indicação','Relacionamento','Necessidade clara','Outro'].map((reason) => <option key={reason}>{reason}</option>)}
+                    </select>
+                  </label>
+                )}
               </>
             ) : (
               <>
@@ -552,6 +586,10 @@ export default function CoreForm({
                     organization,
                     source,
                     details,
+                    tags,
+                    proposalUrl,
+                    contractUrl,
+                    driveUrl,
                     stageId,
                     reuseContactId: duplicate.id,
                     ...(ownerId ? { ownerId } : {}),
