@@ -5,6 +5,9 @@ import {
   Check,
   ChevronDown,
   CircleCheck,
+  Bell,
+  ClipboardList,
+  Package,
   MessageCircle,
   ShieldCheck,
   Sparkles,
@@ -52,6 +55,24 @@ const featureCards = [
     tone: "slate",
     title: "Ambiente protegido",
     text: "Os dados ficam separados por empresa, com acesso individual e ações registradas no histórico.",
+  },
+  {
+    icon: Package,
+    tone: "blue",
+    title: "Produtos e validade",
+    text: "Acompanhe saldo, lote, validade e estoque mínimo junto da rotina comercial da empresa.",
+  },
+  {
+    icon: Bell,
+    tone: "amber",
+    title: "Alertas de operação",
+    text: "Receba sinais quando um item estiver baixo, próximo da validade ou precisar de reposição.",
+  },
+  {
+    icon: ClipboardList,
+    tone: "green",
+    title: "Pedidos e avarias",
+    text: "Registre pedidos de reposição e avarias com responsável, quantidade e histórico auditável.",
   },
 ];
 
