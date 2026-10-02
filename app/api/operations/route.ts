@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     const [categories, suppliers, products, movements, requests] = await Promise.all([
       ctx.s.from("operation_categories").select("id,name").eq("company_id", companyId).order("name"),
       ctx.s.from("operation_suppliers").select("id,name,contact").eq("company_id", companyId).order("name"),
-      ctx.s.from("operation_products").select("id,name,sku,status,value,quantity,minimum_quantity,lot_code,expires_at,category_id,supplier_id,owner_id,created_at,updated_at").eq("company_id", companyId).order("updated_at", { ascending: false }),
+      ctx.s.from("operation_products").select("id,name,sku,status,commercial_availability,value,quantity,minimum_quantity,lot_code,expires_at,category_id,supplier_id,owner_id,created_at,updated_at").eq("company_id", companyId).order("updated_at", { ascending: false }),
       ctx.s.from("operation_movements").select("id,product_id,type,quantity,note,actor_id,created_at").eq("company_id", companyId).order("created_at", { ascending: false }).limit(100),
       ctx.s.from("operation_requests").select("id,product_id,quantity,note,status,requested_by,created_at").eq("company_id", companyId).order("created_at", { ascending: false }).limit(100),
     ]);
@@ -61,10 +61,11 @@ export async function POST(request: Request) {
     }
     if (body.kind === "product") {
       const name = text(body.name, 160), sku = text(body.sku, 80) || null, lotCode = text(body.lotCode, 80) || null, expiresAt = text(body.expiresAt, 10) || null;
+      const commercialAvailability = body.commercialAvailability === "available" || body.commercialAvailability === "reserved" || body.commercialAvailability === "consult" ? body.commercialAvailability : null;
       const value = Number(body.value || 0), quantity = Number(body.quantity || 0), minimumQuantity = Number(body.minimumQuantity || 0);
-      if (name.length < 1 || !Number.isFinite(value) || value < 0 || !Number.isInteger(quantity) || quantity < 0 || !Number.isInteger(minimumQuantity) || minimumQuantity < 0 || (expiresAt && !/^\d{4}-\d{2}-\d{2}$/.test(expiresAt))) return fail("Produto inválido.");
+      if ((body.commercialAvailability != null && !["available", "reserved", "consult"].includes(String(body.commercialAvailability))) || name.length < 1 || !Number.isFinite(value) || value < 0 || !Number.isInteger(quantity) || quantity < 0 || !Number.isInteger(minimumQuantity) || minimumQuantity < 0 || (expiresAt && !/^\d{4}-\d{2}-\d{2}$/.test(expiresAt))) return fail("Produto inválido.");
       const status = quantity <= minimumQuantity || (expiresAt ? new Date(`${expiresAt}T00:00:00Z`).getTime() <= Date.now() + 30 * 86400000 : false) ? "attention" : "active";
-      const { data, error } = await ctx.s.from("operation_products").insert({ company_id: companyId, name, sku, value, quantity, minimum_quantity: minimumQuantity, lot_code: lotCode, expires_at: expiresAt, status, owner_id: ctx.user.id, category_id: text(body.categoryId, 80) || null, supplier_id: text(body.supplierId, 80) || null }).select("*").single();
+      const { data, error } = await ctx.s.from("operation_products").insert({ company_id: companyId, name, sku, value, quantity, minimum_quantity: minimumQuantity, lot_code: lotCode, expires_at: expiresAt, status, commercial_availability: commercialAvailability, owner_id: ctx.user.id, category_id: text(body.categoryId, 80) || null, supplier_id: text(body.supplierId, 80) || null }).select("*").single();
       if (error) return fail(error.code === "42501" ? "Gestor da empresa requerido." : "Não foi possível criar o produto.", error.code === "42501" ? 403 : 400);
       return Response.json({ ok: true, product: data });
     }
