@@ -19,6 +19,7 @@ import LandingFooter from "./landing-footer";
 import LandingHeader from "./landing-header";
 import LandingProductGallery from "./landing-product-gallery";
 import LandingMobileProof from "./landing-mobile-proof";
+import { trialWhatsAppUrl } from "./landing-cta";
 
 const featureCards = [
   {
@@ -98,6 +99,25 @@ const steps = [
   ["03", "Aja no momento certo", "O radar organiza a fila, a mensagem abre no WhatsApp e o histórico registra o resultado."],
 ];
 
+const nicheGroups = [
+  {
+    title: "Atendimento e serviços",
+    items: [
+      ["💈", "Salão e barbearia", "Orçamentos, retornos e horários sem cliente esquecido."],
+      ["🛠️", "Oficina e serviços", "Cada orçamento com prazo, responsável e histórico."],
+      ["🐶", "Pet shop", "Banho, tosa e retornos organizados numa fila simples."],
+      ["🩺", "Clínicas e consultórios", "A equipe acompanha o próximo contato com clareza."],
+    ],
+  },
+  {
+    title: "Times que vendem",
+    items: [
+      ["🧠", "Consultorias", "Propostas, reuniões e decisões no mesmo fluxo."],
+      ["🎯", "Times comerciais", "Gestores enxergam valor parado e quem deve agir."],
+    ],
+  },
+] as const;
+
 export default function LandingPage() {
   return (
     <main className="landing-page">
@@ -109,8 +129,8 @@ export default function LandingPage() {
           <h1>Saiba quem precisa de retorno antes que a venda esfrie.</h1>
           <p className="landing-lede">O Aether Flow organiza urgência, compromissos e oportunidades paradas em uma fila clara para sua equipe agir.</p>
           <div className="landing-actions">
-            <a className="landing-primary" href="#produto">Ver telas reais <ArrowRight size={17} /></a>
-            <a className="landing-secondary" href="/login">Entrar no meu ambiente</a>
+            <a className="landing-primary" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Teste grátis por 7 dias <ArrowRight size={17} /></a>
+            <a className="landing-secondary" href="#produto">Ver telas reais</a>
           </div>
           <div className="landing-proof"><CircleCheck size={17} /> Sem planilha perdida <span /> <ShieldCheck size={17} /> Dados separados por empresa</div>
         </div>
@@ -139,7 +159,7 @@ export default function LandingPage() {
 
       <section className="landing-section landing-audience" id="para-quem">
         <div className="landing-section-heading"><span className="landing-eyebrow">PARA QUEM É</span><h2>Serve para a sua empresa. Seja qual for o ramo.</h2><p>Cada equipe perde uma oportunidade de um jeito. O Aether Flow deixa o próximo passo visível para todos.</p></div>
-        <div className="landing-audience-grid"><article><span>💇 01</span><h3>Salão e barbearia</h3><p>Retornos, orçamentos e clientes que pediram para pensar não ficam esquecidos.</p></article><article><span>🔧 02</span><h3>Oficina e serviços</h3><p>Cada orçamento tem responsável, prazo e histórico até virar serviço fechado.</p></article><article><span>🐾 03</span><h3>Pet shop</h3><p>Agendamentos, serviços e retornos ficam em uma fila simples para a equipe.</p></article><article><span>🩺 04</span><h3>Clínicas e consultórios</h3><p>A equipe acompanha o próximo contato sem depender de uma planilha compartilhada.</p></article><article><span>📈 05</span><h3>Times comerciais</h3><p>Gestores enxergam o que está parado e quem precisa agir agora.</p></article></div>
+        <div className="landing-niche-groups">{nicheGroups.map((group) => <section className="landing-niche-group" key={group.title}><h3>{group.title}</h3><div className="landing-audience-grid">{group.items.map(([emoji, title, text], index) => <article key={title}><span>{emoji} <small>{String(index + 1).padStart(2, "0")}</small></span><h4>{title}</h4><p>{text}</p></article>)}</div></section>)}</div>
       </section>
 
       <section className="landing-product-section" id="produto">
@@ -166,7 +186,7 @@ export default function LandingPage() {
         <div className="landing-faq-list"><details><summary>Minha equipe vai conseguir usar? <ChevronDown size={17} /></summary><p>Sim. O fluxo começa com poucos campos, mostra o próximo passo e permite abrir uma mensagem pronta sem procurar em outra ferramenta.</p></details><details><summary>O que acontece quando eu entro pela primeira vez? <ChevronDown size={17} /></summary><p>Você configura o ambiente da empresa, cadastra a primeira oportunidade e pode seguir pelo tutorial rápido dentro do painel.</p></details><details><summary>Consigo trazer os dados que já tenho? <ChevronDown size={17} /></summary><p>Sim. O Aether Flow importa oportunidades por CSV e exporta contatos e oportunidades para você manter a portabilidade da operação.</p></details><details><summary>Os dados de outras empresas aparecem para mim? <ChevronDown size={17} /></summary><p>Não. Cada usuário acessa apenas as empresas das quais participa, com permissões definidas pelo administrador.</p></details><details><summary>Quanto custa o acesso? <ChevronDown size={17} /></summary><p>R$ 67 por mês por empresa, com até três integrantes no plano atual. Cancele quando quiser, sem taxa de implantação e sem fidelidade.</p></details></div>
       </section>
 
-      <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Veja o fluxo completo antes de decidir.</h2><p>Confira as telas reais do produto ou entre no ambiente liberado pela Aether Works.</p></div><div className="landing-actions"><a className="landing-primary" href="#produto">Ver telas reais <ArrowRight size={17} /></a><a className="landing-secondary" href="/login">Já tenho acesso</a></div></section>
+      <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Teste o Aether Flow por 7 dias.</h2><p>Fale com a Aether Works e receba o acesso para experimentar a operação com sua equipe.</p></div><div className="landing-actions"><a className="landing-primary" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Teste grátis por 7 dias <ArrowRight size={17} /></a><a className="landing-secondary" href="#produto">Ver telas reais</a></div></section>
 
       <LandingFooter />
     </main>

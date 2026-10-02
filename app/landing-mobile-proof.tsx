@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 
 const shots = [
   { src: "/demo/panel.png", label: "Painel real", text: "Veja primeiro o que pede atenção." },
-  { src: "/demo/alerts.png", label: "Alertas reais", text: "Compromissos e prioridades no mesmo lugar." },
-  { src: "/demo/team.png", label: "Equipe real", text: "Responsáveis e acessos sem desencontro." },
+  { src: "/demo/pipeline.png", label: "Pipeline real", text: "Acompanhe cada negociação até o resultado." },
+  { src: "/demo/messages.png", label: "Mensagens reais", text: "Use contexto e modelos sem perder o ritmo." },
 ];
 
 export default function LandingMobileProof() {

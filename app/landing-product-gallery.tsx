@@ -14,6 +14,16 @@ const screens = [
   { label: "Equipe", view: "team", imageHeight: 980, icon: Users, title: "Responsáveis claros para cada contato", tone: "slate" },
 ];
 
+const liveStats: Record<string, [string, string, string]> = {
+  panel: ["37 oportunidades", "R$ 22.400 em aberto", "82% com próximo passo"],
+  alerts: ["12 alertas", "7 para hoje", "R$ 14.700 aguardando"],
+  contacts: ["42 contatos", "37 ativos", "18 retornos"],
+  pipeline: ["42 oportunidades", "18 em proposta", "9 ganhos"],
+  messages: ["24 mensagens", "11 modelos", "96% com contexto"],
+  data: ["500 linhas", "42 oportunidades", "0 duplicadas"],
+  team: ["3 responsáveis", "42 atendimentos", "100% atribuídos"],
+};
+
 export default function LandingProductGallery() {
   const [active, setActive] = useState(0);
   const screen = screens[active];
@@ -25,6 +35,7 @@ export default function LandingProductGallery() {
       </div>
       <div key={screen.view} id="landing-gallery-panel" role="tabpanel" aria-labelledby={`landing-gallery-tab-${screen.view}`} className={`landing-gallery-screen ${screen.tone}`}>
         <div className="gallery-screen-head"><div><span>Aether Flow · visão real</span><h3>{screen.title}</h3></div><span className="gallery-screen-icon"><Icon size={18} /></span></div>
+        <div className="gallery-live-stats" aria-label="Indicadores da demonstração">{liveStats[screen.view].map((stat) => <span key={stat}><strong>{stat.split(" ", 1)[0]}</strong><small>{stat.slice(stat.indexOf(" ") + 1)}</small></span>)}</div>
         <Image className="gallery-real-shot" src={`/demo/${screen.view}.png`} alt={`Captura real do Aether Flow: ${screen.label}`} width={1440} height={screen.imageHeight} sizes="(max-width: 700px) 100vw, 760px" />
         <div className="gallery-screen-footer"><Check size={14} /> Dados da sua empresa, separados e com histórico</div>
       </div>

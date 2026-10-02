@@ -1,12 +1,13 @@
 import {ArrowUpRight,CheckCircle2,Clock3,ShieldCheck,Target} from 'lucide-react';
 import LoginForm from './form';
+import { AetherMark } from '../aether-logo';
 
 export default async function LoginPage({searchParams}:{searchParams?:Promise<{reset?:string}>}){
  const params=searchParams?await searchParams:{};
  return <main className="login login-v2">
   <div className="auth-shell">
    <section className="auth-visual">
-    <div className="auth-brand"><span className="brand-mark">A</span><strong>Aether Flow</strong></div>
+    <div className="auth-brand"><AetherMark /><strong>Aether Flow</strong></div>
     <div className="auth-copy">
      <div className="eyebrow">RADAR DE OPORTUNIDADES</div>
      <h1>Saiba quem precisa de retorno antes que a venda esfrie.</h1>
@@ -29,7 +30,7 @@ export default async function LoginPage({searchParams}:{searchParams?:Promise<{r
    </section>
 
    <section className="login-card login-card-v2">
-    <div className="mobile-auth-brand"><span className="brand-mark">A</span><strong>Aether Flow</strong></div>
+    <div className="mobile-auth-brand"><AetherMark /><strong>Aether Flow</strong></div>
     <div className="eyebrow">BEM-VINDO</div>
     <h2>Entre no seu ambiente</h2>
     <p>Use o e-mail e a senha liberados pela Aether Works.</p>
