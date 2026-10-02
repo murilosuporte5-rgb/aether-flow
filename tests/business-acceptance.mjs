@@ -43,6 +43,18 @@ try {
 
   const customerClient = createClient(api, anon, options);
   assert.ok((await customerClient.auth.signInWithPassword({ email: customer.email, password: customer.password })).data.session);
+  const employee = await makeUser("QA team employee"); users.push(employee);
+  const extraUser = await makeUser("QA unauthorized employee"); users.push(extraUser);
+  await checked(customerClient.rpc("team_add_member", { p_company_id: company.id, p_user_id: employee.id, p_display_name: "QA team employee", p_role: "member" }));
+  const team = await checked(customerClient.rpc("team_catalog", { p_company_id: company.id }));
+  assert.ok(team.some((member) => member.user_id === employee.id && member.role === "member"));
+  const employeeClient = createClient(api, anon, options);
+  assert.ok((await employeeClient.auth.signInWithPassword({ email: employee.email, password: employee.password })).data.session);
+  assert.ok((await employeeClient.rpc("team_add_member", { p_company_id: company.id, p_user_id: extraUser.id, p_display_name: "QA unauthorized employee", p_role: "member" })).error);
+  await checked(customerClient.rpc("team_set_role", { p_company_id: company.id, p_user_id: employee.id, p_role: "manager" }));
+  assert.equal((await checked(customerClient.rpc("team_catalog", { p_company_id: company.id }))).find((member) => member.user_id === employee.id).role, "manager");
+  await checked(customerClient.rpc("team_remove_member", { p_company_id: company.id, p_user_id: employee.id }));
+  assert.ok(!(await checked(customerClient.rpc("team_catalog", { p_company_id: company.id }))).some((member) => member.user_id === employee.id));
   const requestId = randomUUID();
   const rows = [{ phone: "71999999999", contactName: "Import QA", title: "Importada", stageId: open, dueAt: null }];
   const imported = await checked(customerClient.rpc("import_opportunities", { p_company_id: company.id, p_request_id: requestId, p_rows: rows }));
@@ -87,7 +99,7 @@ try {
   await checked(operatorClient.rpc("admin_update_company", { p_company_id: company.id, p_action: "suspend", p_value: "" }));
   assert.ok((await customerClient.rpc("import_opportunities", { p_company_id: company.id, p_request_id: randomUUID(), p_rows: rows })).error);
   await checked(operatorClient.rpc("admin_update_company", { p_company_id: company.id, p_action: "activate", p_value: "" }));
-  console.log(JSON.stringify({ status: "PASS", checks: ["admin_catalog", "trial_extension", "feedback_review", "import", "import_retry", "commercial_availability_states", "suspended_write_denied", "reactivation"] }));
+  console.log(JSON.stringify({ status: "PASS", checks: ["admin_catalog", "trial_extension", "feedback_review", "team_owner_manage", "team_member_cannot_manage", "import", "import_retry", "commercial_availability_states", "suspended_write_denied", "reactivation"] }));
 } finally {
   for (const company of companies) await admin.from("companies").delete().eq("id", company);
   for (const user of users) await admin.auth.admin.deleteUser(user.id);
