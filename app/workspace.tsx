@@ -16,6 +16,7 @@ import {
   MoreHorizontal,
   Plus,
   Search,
+  Share2,
   SlidersHorizontal,
   X,
   Users,
@@ -1265,6 +1266,13 @@ export default function Workspace({
             )}
             <div className="detail-controls">
               <button onClick={() => setModal("edit")}>Editar dados</button>
+              <button type="button" onClick={async () => {
+                const summary = [`Aether Flow · ${row.contact_name}`, row.title, `Etapa: ${row.stage_name}`, `Valor: ${money(row.estimated_value)}`, `Responsável: ${row.owner_name}`, `Próximo passo: ${row.next_action_type || "Definir ação"}`].join("\n");
+                try {
+                  if (navigator.share) await navigator.share({ title: `Aether Flow · ${row.contact_name}`, text: summary });
+                  else { await navigator.clipboard.writeText(summary); setNotice("Resumo copiado para compartilhar."); }
+                } catch { setNotice("Resumo pronto para compartilhar."); }
+              }}><Share2 size={14} /> Compartilhar resumo</button>
               {wa(row.phone) && (
                 <WhatsAppAction
                   className="whatsapp-button"
