@@ -95,6 +95,8 @@ export default function CoreForm({
   const [contractUrl, setContractUrl] = useState(mode === "create" ? "" : row?.contract_url || "");
   const [driveUrl, setDriveUrl] = useState(mode === "create" ? "" : row?.drive_url || "");
   const [competitor, setCompetitor] = useState(mode === "create" ? "" : row?.competitor || "");
+  const [negotiationSummary, setNegotiationSummary] = useState(mode === "create" ? "" : row?.negotiation_summary || "");
+  const [objections, setObjections] = useState(mode === "create" ? "" : row?.objections || "");
   const [stageId, setStageId] = useState(
     data.stages.find((s) => s.kind === "open")?.id || "",
   );
@@ -215,6 +217,8 @@ export default function CoreForm({
                 contractUrl,
                 driveUrl,
                 competitor,
+                negotiationSummary,
+                objections,
                 stageId,
                 ...(ownerId ? { ownerId } : {}),
                 ...(mode === "create" && type
@@ -442,6 +446,14 @@ export default function CoreForm({
                   <input value={competitor} onChange={(e) => setCompetitor(e.target.value)} maxLength={160} placeholder="Quem disputa esta venda?" />
                 </label>
                 <label className="wide">
+                  Resumo da negociação
+                  <textarea value={negotiationSummary} onChange={(e) => setNegotiationSummary(e.target.value)} maxLength={500} rows={2} placeholder="Necessidade, proposta e contexto principal" />
+                </label>
+                <label className="wide">
+                  Objeções
+                  <textarea value={objections} onChange={(e) => setObjections(e.target.value)} maxLength={500} rows={2} placeholder="Preço, prazo, aprovação ou outras barreiras" />
+                </label>
+                <label className="wide">
                   Descrição
                   <textarea
                     value={details}
@@ -597,6 +609,8 @@ export default function CoreForm({
                     contractUrl,
                     driveUrl,
                     competitor,
+                    negotiationSummary,
+                    objections,
                     stageId,
                     reuseContactId: duplicate.id,
                     ...(ownerId ? { ownerId } : {}),

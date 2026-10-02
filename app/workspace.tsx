@@ -75,6 +75,8 @@ export type Row = {
   contract_url?: string | null;
   drive_url?: string | null;
   competitor?: string | null;
+  negotiation_summary?: string | null;
+  objections?: string | null;
   win_reason?: string | null;
 };
 export type Stage = {
@@ -1334,7 +1336,7 @@ export default function Workspace({
                 <strong>{formatDate(row.last_interaction_at)}</strong>
               </div>
             </div>
-            {(row.tags?.length || row.proposal_url || row.contract_url || row.drive_url || row.competitor || row.win_reason) && (
+            {(row.tags?.length || row.proposal_url || row.contract_url || row.drive_url || row.competitor || row.negotiation_summary || row.objections || row.win_reason) && (
               <div className="detail-metadata" aria-label="Metadados da oportunidade">
                 {row.tags?.map((tag) => <span className="opportunity-tag" key={tag}>{tag}</span>)}
                 {row.win_reason && <span className="metadata-note">Ganho por: {row.win_reason}</span>}
@@ -1344,6 +1346,8 @@ export default function Workspace({
                 {row.drive_url && <a href={row.drive_url} target="_blank" rel="noreferrer">Drive ↗</a>}
               </div>
             )}
+            {row.negotiation_summary && <p className="details-note"><strong>Resumo da negociação:</strong> {row.negotiation_summary}</p>}
+            {row.objections && <p className="details-note"><strong>Objeções:</strong> {row.objections}</p>}
             {row.details && <p className="details-note">{row.details}</p>}
             <div className="detail-section">
               <h3>Estágio atual</h3>
