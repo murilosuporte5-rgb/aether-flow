@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       ctx.s.from("operation_requests").select("id,product_id,quantity,note,status,requested_by,created_at").eq("company_id", companyId).order("created_at", { ascending: false }).limit(100),
     ]);
     for (const result of [categories, suppliers, products, movements, requests]) if (result.error) throw result.error;
-    return Response.json({ categories: categories.data || [], suppliers: suppliers.data || [], products: products.data || [], movements: movements.data || [], requests: requests.data || [], canManage: ctx.role === "owner" || ctx.role === "manager" });
+    return Response.json({ categories: categories.data || [], suppliers: suppliers.data || [], products: products.data || [], movements: movements.data || [], requests: requests.data || [], canManage: ctx.role === "owner" || ctx.role === "manager" || ctx.role === "admin" });
   } catch (error) {
     console.error("operations GET", { type: error instanceof Error ? error.name : "unknown" });
     return fail("Não foi possível carregar a operação.", 500);
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     if (!/^[0-9a-f-]{36}$/i.test(companyId)) return fail("Empresa inválida.");
     const ctx = await context(companyId);
     if (!ctx) return fail("Empresa não autorizada.", 403);
-    if (!['owner', 'manager'].includes(ctx.role)) return fail("Gestor da empresa requerido.", 403);
+    if (!['owner', 'manager', 'admin'].includes(ctx.role)) return fail("Gestor da empresa requerido.", 403);
     if (body.kind === "movement") {
       const productId = text(body.productId, 80), type = text(body.type, 10);
       const quantity = Number(body.quantity);
