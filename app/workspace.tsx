@@ -36,6 +36,7 @@ import Team from "./team";
 import FeatureGuide from "./feature-guide";
 import { AetherMark } from "./aether-logo";
 import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
+import { conflictOpportunityIds } from "@/lib/conflict-alerts";
 import {
   comparePriority,
   priorityRank,
@@ -377,15 +378,7 @@ export default function Workspace({
       (x) => x.next_action_at && day(x.next_action_at) > nowDay,
     );
   const waiting = open.filter((x) => x.next_action_type === "Aguardar cliente");
-  const pendingContactDays = new Map<string, string[]>();
-  open.forEach((opportunity) => {
-    if (!opportunity.next_action_at) return;
-    const key = `${opportunity.contact_id}:${day(opportunity.next_action_at)}`;
-    pendingContactDays.set(key, [...(pendingContactDays.get(key) || []), opportunity.id]);
-  });
-  const conflictIds = new Set(
-    [...pendingContactDays.values()].filter((ids) => ids.length > 1).flat(),
-  );
+  const conflictIds = conflictOpportunityIds(open);
   const conflictRows = open.filter((opportunity) => conflictIds.has(opportunity.id));
   const rawDisplayName = user.name.includes("@")
     ? user.email.split("@")[0].replace(/[._-]+/g, " ")
