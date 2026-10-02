@@ -50,10 +50,44 @@ try {
   assert.equal((await checked(customerClient.rpc("import_opportunities", { p_company_id: company.id, p_request_id: requestId, p_rows: rows }))).retry, true);
   assert.equal((await admin.from("opportunities").select("id", { count: "exact", head: true }).eq("company_id", company.id)).count, 1);
 
+  const availabilityRequest = randomUUID();
+  const availability = await checked(customerClient.rpc("apply_workspace_command", {
+    p_company_id: company.id,
+    p_request_id: availabilityRequest,
+    p_command: {
+      kind: "create",
+      contactName: "Availability QA",
+      phone: "71999999998",
+      title: "Disponibilidade comercial",
+      stageId: open,
+      value: "250",
+      commercialAvailability: "available",
+    },
+  }));
+  assert.equal(availability.ok, true);
+  assert.equal((await checked(admin.from("opportunities").select("commercial_availability").eq("id", availability.id).single())).commercial_availability, "available");
+  const updateAvailability = async (state) => checked(customerClient.rpc("apply_workspace_command", {
+    p_company_id: company.id,
+    p_request_id: randomUUID(),
+    p_command: {
+      kind: "edit",
+      id: availability.id,
+      contactName: "Availability QA",
+      phone: "71999999998",
+      title: "Disponibilidade comercial",
+      value: "250",
+      commercialAvailability: state,
+    },
+  }));
+  await updateAvailability("reserved");
+  assert.equal((await checked(admin.from("opportunities").select("commercial_availability").eq("id", availability.id).single())).commercial_availability, "reserved");
+  await updateAvailability("consult");
+  assert.equal((await checked(admin.from("opportunities").select("commercial_availability").eq("id", availability.id).single())).commercial_availability, "consult");
+
   await checked(operatorClient.rpc("admin_update_company", { p_company_id: company.id, p_action: "suspend", p_value: "" }));
   assert.ok((await customerClient.rpc("import_opportunities", { p_company_id: company.id, p_request_id: randomUUID(), p_rows: rows })).error);
   await checked(operatorClient.rpc("admin_update_company", { p_company_id: company.id, p_action: "activate", p_value: "" }));
-  console.log(JSON.stringify({ status: "PASS", checks: ["admin_catalog", "trial_extension", "feedback_review", "import", "import_retry", "suspended_write_denied", "reactivation"] }));
+  console.log(JSON.stringify({ status: "PASS", checks: ["admin_catalog", "trial_extension", "feedback_review", "import", "import_retry", "commercial_availability_states", "suspended_write_denied", "reactivation"] }));
 } finally {
   for (const company of companies) await admin.from("companies").delete().eq("id", company);
   for (const user of users) await admin.auth.admin.deleteUser(user.id);
