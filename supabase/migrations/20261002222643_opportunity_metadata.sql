@@ -12,7 +12,7 @@ create or replace function public.apply_workspace_command(p_company_id uuid,p_re
 returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
   actor uuid := (select auth.uid()); k text := p_command->>'kind';
-  oid uuid; cid uuid; aid uuid; owner_id uuid; new_owner_id uuid; normalized text; tag_list text[]; proposal_url text; contract_url text; drive_url text; win_reason text; contact_name text;
+  oid uuid; cid uuid; aid uuid; owner_id uuid; new_owner_id uuid; normalized text; tag_list text[]; proposal_link text; contract_link text; drive_link text; win_reason_value text; contact_name text;
   o public.opportunities%rowtype; st public.pipeline_stages%rowtype; ct public.contacts%rowtype;
   receipt public.workspace_commands%rowtype; reply jsonb; next_step jsonb;
   due timestamptz; action_type text; action_note text; reason text; note text;
@@ -53,8 +53,8 @@ begin
     end if;
     tag_list := array( select btrim(x) from unnest(string_to_array(coalesce(p_command->>'tags',''),',')) x where btrim(x) <> '' );
     if cardinality(tag_list) > 8 or exists(select 1 from unnest(tag_list) x where length(x) > 32) then raise exception 'Use até oito tags com no máximo 32 caracteres.'; end if;
-    proposal_url := nullif(btrim(p_command->>'proposalUrl'),''); contract_url := nullif(btrim(p_command->>'contractUrl'),''); drive_url := nullif(btrim(p_command->>'driveUrl'),'');
-    if proposal_url is not null and proposal_url !~* '^https?://' or contract_url is not null and contract_url !~* '^https?://' or drive_url is not null and drive_url !~* '^https?://' then raise exception 'Os links devem começar com http:// ou https://.'; end if;
+    proposal_link := nullif(btrim(p_command->>'proposalUrl'),''); contract_link := nullif(btrim(p_command->>'contractUrl'),''); drive_link := nullif(btrim(p_command->>'driveUrl'),'');
+    if proposal_link is not null and proposal_link !~* '^https?://' or contract_link is not null and contract_link !~* '^https?://' or drive_link is not null and drive_link !~* '^https?://' then raise exception 'Os links devem começar com http:// ou https://.'; end if;
     insert into public.opportunities(company_id,contact_id,title,stage_id,owner_id,estimated_value,status,source,details,commercial_availability,tags,proposal_url,contract_url,drive_url)
     values(p_company_id,cid,btrim(p_command->>'title'),st.id,owner_id,value_amount,'open',nullif(btrim(p_command->>'source'),''),nullif(btrim(p_command->>'details'),''),nullif(p_command->>'commercialAvailability',''),tag_list,proposal_url,contract_url,drive_url) returning * into o;
     oid := o.id;
@@ -76,9 +76,9 @@ begin
       if nullif(p_command->>'ownerId','') is not null then new_owner_id := (p_command->>'ownerId')::uuid; if not exists(select 1 from public.memberships m where m.company_id=p_company_id and m.user_id=new_owner_id) then raise exception 'Responsável não pertence à empresa.'; end if; else new_owner_id := o.owner_id; end if;
       tag_list := array( select btrim(x) from unnest(string_to_array(coalesce(p_command->>'tags',''),',')) x where btrim(x) <> '' );
       if cardinality(tag_list) > 8 or exists(select 1 from unnest(tag_list) x where length(x) > 32) then raise exception 'Use até oito tags com no máximo 32 caracteres.'; end if;
-      proposal_url := nullif(btrim(p_command->>'proposalUrl'),''); contract_url := nullif(btrim(p_command->>'contractUrl'),''); drive_url := nullif(btrim(p_command->>'driveUrl'),'');
-      if proposal_url is not null and proposal_url !~* '^https?://' or contract_url is not null and contract_url !~* '^https?://' or drive_url is not null and drive_url !~* '^https?://' then raise exception 'Os links devem começar com http:// ou https://.'; end if;
-      update public.opportunities set title=btrim(p_command->>'title'),estimated_value=value_amount,source=nullif(btrim(p_command->>'source'),''),details=nullif(btrim(p_command->>'details'),''),commercial_availability=nullif(p_command->>'commercialAvailability',''),owner_id=new_owner_id,tags=tag_list,proposal_url=proposal_url,contract_url=contract_url,drive_url=drive_url,updated_at=now() where company_id=p_company_id and id=oid;
+      proposal_link := nullif(btrim(p_command->>'proposalUrl'),''); contract_link := nullif(btrim(p_command->>'contractUrl'),''); drive_link := nullif(btrim(p_command->>'driveUrl'),'');
+      if proposal_link is not null and proposal_link !~* '^https?://' or contract_link is not null and contract_link !~* '^https?://' or drive_link is not null and drive_link !~* '^https?://' then raise exception 'Os links devem começar com http:// ou https://.'; end if;
+      update public.opportunities set title=btrim(p_command->>'title'),estimated_value=value_amount,source=nullif(btrim(p_command->>'source'),''),details=nullif(btrim(p_command->>'details'),''),commercial_availability=nullif(p_command->>'commercialAvailability',''),owner_id=new_owner_id,tags=tag_list,proposal_url=proposal_link,contract_url=contract_link,drive_url=drive_link,updated_at=now() where company_id=p_company_id and id=oid;
       perform private.append_opportunity_event(p_company_id,oid,'edited','Dados da oportunidade atualizados');
     elsif k in ('schedule','reschedule') then
       if o.status <> 'open' then raise exception 'Reabra a oportunidade antes de agendar.'; end if;
@@ -123,7 +123,7 @@ begin
     reason := coalesce(next_step->>'lossReason',p_command->>'lossReason');
     note := coalesce(next_step->>'lossNote',p_command->>'lossNote');
     if terminal='lost' and (reason is null or reason not in ('Preço','Sem resposta','Escolheu concorrente','Adiado','Sem orçamento','Não qualificado','Sem prioridade','Outro')) then raise exception 'Informe o motivo da perda.'; end if;
-    win_reason := nullif(btrim(p_command->>'winReason'),''); if terminal='won' and (win_reason is null or win_reason not in ('Preço e condição','Urgência do cliente','Indicação','Relacionamento','Necessidade clara','Outro')) then raise exception 'Informe o motivo do ganho.'; end if;
+    win_reason_value := nullif(btrim(p_command->>'winReason'),''); if terminal='won' and (win_reason_value is null or win_reason_value not in ('Preço e condição','Urgência do cliente','Indicação','Relacionamento','Necessidade clara','Outro')) then raise exception 'Informe o motivo do ganho.'; end if;
     if terminal='lost' and reason='Outro' and coalesce(btrim(note),'')='' then raise exception 'Descreva o motivo da perda.'; end if;
     if length(coalesce(note,''))>500 then raise exception 'Observação deve ter até 500 caracteres.'; end if;
     if k <> 'stage' then
@@ -132,7 +132,7 @@ begin
     end if;
     update public.activities set status='replaced' where company_id=p_company_id and opportunity_id=oid and status='pending';
     update public.opportunities set stage_id=st.id,status=terminal,next_action_type=null,next_action_at=null,next_action_note=null,
-      loss_reason=case when terminal='lost' then reason else null end,loss_note=case when terminal='lost' then nullif(btrim(note),'') else null end,win_reason=case when terminal='won' then win_reason else null end,updated_at=now()
+      loss_reason=case when terminal='lost' then reason else null end,loss_note=case when terminal='lost' then nullif(btrim(note),'') else null end,win_reason=case when terminal='won' then win_reason_value else null end,updated_at=now()
       where company_id=p_company_id and id=oid;
     perform private.append_opportunity_event(p_company_id,oid,'stage_changed',o.stage_id::text||' → '||st.name,jsonb_build_object('from',o.stage_id,'to',st.id));
     perform private.append_opportunity_event(p_company_id,oid,terminal,case when terminal='won' then 'Oportunidade ganha' else 'Oportunidade perdida' end);
