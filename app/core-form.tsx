@@ -78,6 +78,9 @@ export default function CoreForm({
   const [value, setValue] = useState(
     mode === "create" ? "" : row?.estimated_value?.toString() || "",
   );
+  const [commercialAvailability, setCommercialAvailability] = useState<"" | "available" | "reserved" | "consult">(
+    mode === "create" ? "" : row?.commercial_availability || "",
+  );
   const [organization, setOrganization] = useState(
     mode === "create" ? "" : row?.organization || "",
   );
@@ -197,6 +200,7 @@ export default function CoreForm({
                 phone: phoneForStorage(phone),
                 title,
                 value,
+                commercialAvailability,
                 organization,
                 source,
                 details,
@@ -342,6 +346,15 @@ export default function CoreForm({
                     onChange={(e) => setOrganization(e.target.value)}
                     maxLength={100}
                   />
+                </label>
+                <label>
+                  Disponibilidade comercial
+                  <select value={commercialAvailability} onChange={(e) => setCommercialAvailability(e.target.value as "" | "available" | "reserved" | "consult")}>
+                    <option value="">Sem indicação</option>
+                    <option value="available">Disponível</option>
+                    <option value="reserved">Reservado</option>
+                    <option value="consult">Sob consulta</option>
+                  </select>
                 </label>
                 <label>
                   Origem
