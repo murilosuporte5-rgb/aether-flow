@@ -93,7 +93,7 @@ export default function CoreForm({
   const [stageId, setStageId] = useState(
     data.stages.find((s) => s.kind === "open")?.id || "",
   );
-  const [ownerId, setOwnerId] = useState("");
+  const [ownerId, setOwnerId] = useState(mode === "create" ? "" : row?.owner_id || "");
   const [type, setType] = useState(
     initialActionType ||
       (mode === "schedule" || mode === "reschedule"
@@ -376,7 +376,7 @@ export default function CoreForm({
                     ))}
                   </select>
                 </label>
-                {mode === "create" && (
+                {capture && (
                   <>
                     <label>
                       Responsável
