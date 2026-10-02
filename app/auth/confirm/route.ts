@@ -3,6 +3,7 @@ import {NextResponse} from 'next/server';
 import type {EmailOtpType} from '@supabase/supabase-js';
 
 const otpTypes=new Set<EmailOtpType>(['signup','invite','magiclink','recovery','email_change','email']);
+const redirectTo=(path:string)=>new NextResponse(null,{status:307,headers:{Location:path}});
 
 export async function GET(request:Request){
  const url=new URL(request.url),hash=url.searchParams.get('token_hash'),type=url.searchParams.get('type'),code=url.searchParams.get('code');
@@ -13,15 +14,15 @@ export async function GET(request:Request){
   const {error}=await s.auth.verifyOtp({token_hash:hash,type:type as EmailOtpType});
   if(!error){
    const target=type==='invite'?'/activate':type==='recovery'?'/activate?mode=recovery':next;
-   return NextResponse.redirect(new URL(target,url.origin));
+   return redirectTo(target);
   }
  }
  if(code){
   const {error}=await s.auth.exchangeCodeForSession(code);
   if(!error){
    const target=type==='recovery'?'/activate?mode=recovery':next;
-   return NextResponse.redirect(new URL(target,url.origin));
+   return redirectTo(target);
   }
  }
- return NextResponse.redirect(new URL('/login?access=invalid',url.origin));
+ return redirectTo('/login?access=invalid');
 }
