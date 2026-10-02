@@ -69,6 +69,10 @@ export default function Dashboard({
     future = active.filter(
       (r) => r.next_action_at && dateKey(r.next_action_at) > today,
     );
+  const moneyFor = (items: Row[]) => items.reduce((sum, row) => sum + (row.estimated_value || 0), 0);
+  const stale = active.filter((r) => (daysSinceInteraction(r.last_interaction_at) ?? -1) >= STALE_THRESHOLDS.stale);
+  const riskRows = Array.from(new Set([...overdue, ...missing, ...stale]));
+  const proposalRows = active.filter((r) => /propost/i.test(r.stage_name) || r.next_action_type === "Aguardar cliente");
   const urgent = active
     .filter(
       (r) =>
@@ -133,7 +137,12 @@ export default function Dashboard({
           <button onClick={() => viewList("overdue")}><span>Retornos vencidos</span><strong>{overdue.length}</strong><small>Prioridade imediata</small></button>
           <button onClick={() => viewList("today")}><span>Ações para hoje</span><strong>{due.length}</strong><small>Compromissos do dia</small></button>
           <button onClick={() => viewList("none")}><span>Sem próximo passo</span><strong>{missing.length}</strong><small>Evite oportunidades paradas</small></button>
-          <div className="radar-cash"><span>VALOR EM ABERTO</span><strong>{money(active.reduce((sum, row) => sum + (row.estimated_value || 0), 0))}</strong><small>{active.length} oportunidades acompanhadas</small></div>
+          <div className="radar-cash"><span>VALOR EM ABERTO</span><strong>{money(moneyFor(active))}</strong><small>{active.length} oportunidades acompanhadas</small></div>
+        <div className="risk-strip" aria-label="Valores que pedem atenção">
+          <div><span>VALOR EM RISCO</span><strong>{money(moneyFor(riskRows))}</strong><small>{riskRows.length} oportunidades vencidas, paradas ou sem próximo passo</small></div>
+          <div><span>RETORNOS VENCIDOS</span><strong>{money(moneyFor(overdue))}</strong><small>{overdue.length} oportunidades precisam de ação imediata</small></div>
+          <div><span>AGUARDANDO DECISÃO</span><strong>{money(moneyFor(proposalRows))}</strong><small>{proposalRows.length} propostas aguardando resposta</small></div>
+        </div>
         </div>
       </section>
       <WeeklySummary data={data} rows={rows} open={open} />
@@ -347,3 +356,5 @@ export default function Dashboard({
     </div>
   );
 }
+
+
