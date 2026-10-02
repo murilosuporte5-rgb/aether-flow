@@ -123,7 +123,7 @@ begin
     reason := coalesce(next_step->>'lossReason',p_command->>'lossReason');
     note := coalesce(next_step->>'lossNote',p_command->>'lossNote');
     if terminal='lost' and (reason is null or reason not in ('Preço','Sem resposta','Escolheu concorrente','Adiado','Sem orçamento','Não qualificado','Sem prioridade','Outro')) then raise exception 'Informe o motivo da perda.'; end if;
-    win_reason_value := nullif(btrim(p_command->>'winReason'),''); if terminal='won' and (win_reason_value is null or win_reason_value not in ('Preço e condição','Urgência do cliente','Indicação','Relacionamento','Necessidade clara','Outro')) then raise exception 'Informe o motivo do ganho.'; end if;
+    win_reason_value := coalesce(nullif(btrim(p_command->>'winReason'),''),'Outro'); if terminal='won' and win_reason_value not in ('Preço e condição','Urgência do cliente','Indicação','Relacionamento','Necessidade clara','Outro') then raise exception 'Informe o motivo do ganho.'; end if;
     if terminal='lost' and reason='Outro' and coalesce(btrim(note),'')='' then raise exception 'Descreva o motivo da perda.'; end if;
     if length(coalesce(note,''))>500 then raise exception 'Observação deve ter até 500 caracteres.'; end if;
     if k <> 'stage' then
