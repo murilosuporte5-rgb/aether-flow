@@ -18,6 +18,7 @@ import LandingCommercialSection from "./landing-commercial-section";
 import LandingFooter from "./landing-footer";
 import LandingHeader from "./landing-header";
 import LandingProductGallery from "./landing-product-gallery";
+import LandingMobileProof from "./landing-mobile-proof";
 
 const featureCards = [
   {
@@ -145,6 +146,8 @@ export default function LandingPage() {
         <div className="landing-section-heading light"><span className="landing-eyebrow">O SISTEMA POR DENTRO</span><h2>Não é maquete. É a operação rodando.</h2><p>Veja como o radar transforma cada conversa em uma ação que alguém consegue concluir.</p></div>
         <LandingProductGallery />
       </section>
+
+      <LandingMobileProof />
 
       <section className="landing-section" id="recursos">
         <div className="landing-section-heading"><span className="landing-eyebrow">RECURSOS PARA VENDER MELHOR</span><h2>Menos cliques para agir. Mais clareza para decidir.</h2><p>As ferramentas aparecem juntas porque fazem parte do mesmo fluxo comercial.</p></div>
