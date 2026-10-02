@@ -2,14 +2,14 @@
 import {useEffect,useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {createClient} from '@/lib/supabase/browser';
+import {readAuthHashTokens} from '@/lib/auth-recovery';
 export default function ActivateForm(){
  const [password,setPassword]=useState(''),[confirm,setConfirm]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false),[ready,setReady]=useState(false);
  const router=useRouter();
  useEffect(()=>{
-  const s=createClient();const hash=new URLSearchParams(window.location.hash.slice(1));
-  const access=hash.get('access_token'),refresh=hash.get('refresh_token');
+  const s=createClient();const tokens=readAuthHashTokens(window.location.hash);
   void (async()=>{
-   if(access&&refresh){const result=await s.auth.setSession({access_token:access,refresh_token:refresh});if(result.error){setError('Convite inválido ou expirado. Peça um novo convite.');return}history.replaceState({},'',location.pathname)}
+   if(tokens){const result=await s.auth.setSession({access_token:tokens.accessToken,refresh_token:tokens.refreshToken});if(result.error){setError('Convite inválido ou expirado. Peça um novo convite.');return}history.replaceState({},'',location.pathname)}
    const {data:{user}}=await s.auth.getUser();setReady(!!user);if(!user)setError('Abra o link enviado ao seu e-mail para ativar o acesso.');
   })();
  },[]);
