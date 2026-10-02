@@ -18,7 +18,10 @@ export async function GET(request:Request){
  }
  if(code){
   const {error}=await s.auth.exchangeCodeForSession(code);
-  if(!error)return NextResponse.redirect(new URL(next,url.origin));
+  if(!error){
+   const target=type==='recovery'?'/activate?mode=recovery':next;
+   return NextResponse.redirect(new URL(target,url.origin));
+  }
  }
  return NextResponse.redirect(new URL('/login?access=invalid',url.origin));
 }
