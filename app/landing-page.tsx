@@ -8,11 +8,17 @@ import {
   Bell,
   ClipboardList,
   Package,
+  PawPrint,
+  Scissors,
+  Stethoscope,
+  Briefcase,
   MessageCircle,
   ShieldCheck,
   Sparkles,
   Target,
+  TrendingUp,
   Users,
+  Wrench,
 } from "lucide-react";
 import LandingCommercialSection from "./landing-commercial-section";
 import LandingFooter from "./landing-footer";
@@ -43,8 +49,8 @@ const featureCards = [
   {
     icon: BarChart3,
     tone: "violet",
-    title: "Métricas que explicam",
-    text: "Ganhos, perdas, taxa de ganho e valor em aberto aparecem sem esconder o que precisa de decisão.",
+    title: "Métricas e CSV",
+    text: "Ganhos, perdas, taxa de ganho e valor em aberto ficam visíveis, com importação e exportação da base em CSV.",
   },
   {
     icon: Users,
@@ -103,20 +109,20 @@ const nicheGroups = [
   {
     title: "Atendimento e serviços",
     items: [
-      ["💈", "Salão e barbearia", "Orçamentos, retornos e horários sem cliente esquecido."],
-      ["🛠️", "Oficina e serviços", "Cada orçamento com prazo, responsável e histórico."],
-      ["🐶", "Pet shop", "Banho, tosa e retornos organizados numa fila simples."],
-      ["🩺", "Clínicas e consultórios", "A equipe acompanha o próximo contato com clareza."],
+      { icon: Scissors, title: "Salão e barbearia", text: "Orçamentos, retornos e horários sem cliente esquecido." },
+      { icon: Wrench, title: "Oficina e serviços", text: "Cada orçamento com prazo, responsável e histórico." },
+      { icon: PawPrint, title: "Pet shop", text: "Banho, tosa e retornos organizados numa fila simples." },
+      { icon: Stethoscope, title: "Clínicas e consultórios", text: "A equipe acompanha o próximo contato com clareza." },
     ],
   },
   {
     title: "Times que vendem",
     items: [
-      ["🧠", "Consultorias", "Propostas, reuniões e decisões no mesmo fluxo."],
-      ["🎯", "Times comerciais", "Gestores enxergam valor parado e quem deve agir."],
+      { icon: Briefcase, title: "Consultorias", text: "Propostas, reuniões e decisões no mesmo fluxo." },
+      { icon: TrendingUp, title: "Times comerciais", text: "Gestores enxergam valor parado e quem deve agir." },
     ],
   },
-] as const;
+];
 
 export default function LandingPage() {
   return (
@@ -138,13 +144,13 @@ export default function LandingPage() {
         <div className="landing-hero-product" aria-label="Captura real do painel Aether Flow">
           <div className="landing-static-frame">
             <div className="landing-live-frame-head"><span><i className="live-dot" /> AETHER FLOW · CAPTURA REAL DO PAINEL</span><small>Dados fictícios para demonstração</small></div>
-            <Image src="/demo/panel.png" alt="Painel real do Aether Flow com alertas e oportunidades fictícias" width={1440} height={980} sizes="(max-width: 700px) 100vw, 58vw" priority />
+            <Image src="/demo/panel-v2.png" alt="Painel real do Aether Flow com alertas e oportunidades fictícias" width={1440} height={980} sizes="(max-width: 700px) 100vw, 58vw" priority />
           </div>
         </div>
       </section>
 
       <section className="landing-stat-strip" aria-label="Resultados acompanhados pelo Aether Flow">
-        <div><strong>1 fila</strong><span>para o que precisa de atenção</span></div><div><strong>1 responsável</strong><span>para cada contato e oportunidade</span></div><div><strong>1 histórico</strong><span>para entender o que aconteceu</span></div><div><strong>CSV pronto</strong><span>para trazer e levar sua base</span></div>
+        <div><strong>Fila de prioridades</strong><span>retornos ordenados por urgência</span></div><div><strong>Responsável definido</strong><span>em cada contato e oportunidade</span></div><div><strong>Histórico completo</strong><span>para entender cada atendimento</span></div><div><strong>Métricas e CSV</strong><span>para medir e mover sua base</span></div>
       </section>
 
       <section className="landing-section landing-before-after" id="como-funciona">
@@ -159,7 +165,7 @@ export default function LandingPage() {
 
       <section className="landing-section landing-audience" id="para-quem">
         <div className="landing-section-heading"><span className="landing-eyebrow">PARA QUEM É</span><h2>Serve para a sua empresa. Seja qual for o ramo.</h2><p>Cada equipe perde uma oportunidade de um jeito. O Aether Flow deixa o próximo passo visível para todos.</p></div>
-        <div className="landing-niche-groups">{nicheGroups.map((group) => <section className="landing-niche-group" key={group.title}><h3>{group.title}</h3><div className="landing-audience-grid">{group.items.map(([emoji, title, text], index) => <article key={title}><span>{emoji} <small>{String(index + 1).padStart(2, "0")}</small></span><h4>{title}</h4><p>{text}</p></article>)}</div></section>)}</div>
+        <div className="landing-niche-groups">{nicheGroups.map((group) => <section className="landing-niche-group" key={group.title}><h3>{group.title}</h3><div className="landing-audience-grid">{group.items.map(({ icon: Icon, title, text }, index) => <article key={title}><span><Icon size={20} aria-hidden="true" /> <small>{String(index + 1).padStart(2, "0")}</small></span><h4>{title}</h4><p>{text}</p></article>)}</div></section>)}</div>
       </section>
 
       <section className="landing-product-section" id="produto">

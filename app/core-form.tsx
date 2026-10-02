@@ -169,14 +169,14 @@ export default function CoreForm({
   }, []);
   return (
     <div
-      className="modal-overlay"
+      className={`modal-overlay${quick ? " quick-modal-overlay" : ""}`}
       onMouseDown={(e) => {
         if (!busy && e.target === e.currentTarget) onClose();
       }}
     >
       <form
         ref={form}
-        className="modal core-form"
+        className={`modal core-form${quick ? " quick-modal" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="core-form-heading"

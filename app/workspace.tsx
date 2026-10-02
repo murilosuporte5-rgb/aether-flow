@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowUpRight,
+  BarChart3,
   Bell,
   Boxes,
   CalendarDays,
@@ -510,7 +511,7 @@ export default function Workspace({
             }}
             title="Abrir alertas de atenção"
           >
-            <Bell size={18} /> Alertas <span className="sidebar-alert-count">{attentionCount}</span>
+            <Bell size={18} /> Alertas {attentionCount > 0 && <span className="sidebar-alert-count">{attentionCount}</span>}
           </button>
           <button
             className={tab === "list" ? "active" : ""}
@@ -548,6 +549,21 @@ export default function Workspace({
           <a href="/mensagens" onClick={() => setMobileMenuOpen(false)}>
             <MessageCircle size={18} /> Mensagens
           </a>
+          <button type="button" onClick={() => {
+            setTab("today");
+            setAttentionFocused(false);
+            setSelected(null);
+            setMobileMenuOpen(false);
+            window.setTimeout(() => {
+              const panel = document.getElementById("metrics-csv") as HTMLDetailsElement | null;
+              if (panel) {
+                panel.open = true;
+                panel.scrollIntoView({ behavior: "smooth", block: "start" });
+              }
+            }, 0);
+          }}>
+            <BarChart3 size={18} /> Métricas e CSV
+          </button>
           {adminAccess && (
             <a className="admin-nav" href="/admin">
               Acessos

@@ -17,10 +17,10 @@ export default function LandingHeader() {
       </a>
       <nav className={`landing-links${menuOpen ? " is-open" : ""}`} id="landing-navigation" aria-label="Navegação principal">
         <a href="#como-funciona" onClick={closeMenu}>Como funciona</a>
-        <a href="#recursos" onClick={closeMenu}>Recursos</a>
         <a href="#para-quem" onClick={closeMenu}>Para quem é</a>
-        <a href="#equipe" onClick={closeMenu}>Equipe</a>
-        <a href="#plano" onClick={closeMenu}>Plano</a>
+        <a href="#produto" onClick={closeMenu}>Telas reais</a>
+        <a href="#recursos" onClick={closeMenu}>Recursos</a>
+        <a href="#plano" onClick={closeMenu}>Preço</a>
         <a href="#duvidas" onClick={closeMenu}>Dúvidas</a>
         <a className="landing-mobile-action" href="/login" onClick={closeMenu}>Entrar</a>
         <a className="landing-mobile-action landing-mobile-cta" href={trialWhatsAppUrl} target="_blank" rel="noreferrer" onClick={closeMenu}>Teste grátis por 7 dias</a>
