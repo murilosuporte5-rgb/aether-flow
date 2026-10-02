@@ -220,6 +220,7 @@ export default function CoreForm({
                 negotiationSummary,
                 objections,
                 stageId,
+                ...(mode === "edit" && row?.updated_at ? { expectedUpdatedAt: row.updated_at } : {}),
                 ...(ownerId ? { ownerId } : {}),
                 ...(mode === "create" && type
                   ? { actionType: type, dueAt: isoInput(due), note }

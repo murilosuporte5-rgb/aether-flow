@@ -67,6 +67,7 @@ export type Row = {
   details: string | null;
   last_interaction_at: string | null;
   created_at: string;
+  updated_at?: string;
   stage_entered_at: string | null;
   waiting_started_at: string | null;
   closed_at?: string | null;
