@@ -37,6 +37,7 @@ import FeatureGuide from "./feature-guide";
 import { AetherMark } from "./aether-logo";
 import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
 import { conflictOpportunityIds } from "@/lib/conflict-alerts";
+import { momentum, nextBestAction } from "@/lib/opportunity-guidance";
 import {
   comparePriority,
   priorityRank,
@@ -235,7 +236,8 @@ export default function Workspace({
     [globalQuery, setGlobalQuery] = useState(""),
     [notificationOpen, setNotificationOpen] = useState(false),
     [mobileMenuOpen, setMobileMenuOpen] = useState(false),
-    [attentionFocused, setAttentionFocused] = useState(false);
+    [attentionFocused, setAttentionFocused] = useState(false),
+    [guidanceIgnored, setGuidanceIgnored] = useState<string[]>([]);
   const writeLock = useRef(false),
     retries = useRef(new Map<string, string>()),
     fetchSequence = useRef(0),
@@ -1283,6 +1285,14 @@ export default function Workspace({
             <p className="detail-sub">{row.title}</p>
             <StaleIndicator date={row.last_interaction_at} />
             <StageElapsed row={row} />
+            {(() => {
+              const suggestion = nextBestAction(row);
+              const movement = momentum(row);
+              return <section className={`opportunity-guidance momentum-${movement.label.toLowerCase()}`} aria-label="Orientação da oportunidade">
+                <div className="guidance-momentum"><strong>Momentum: {movement.label}</strong><button type="button" onClick={() => setNotice(movement.reason)}>Por quê?</button></div>
+                {!guidanceIgnored.includes(row.id) && suggestion && <div className="guidance-next"><div><strong>Próxima melhor ação: {suggestion.action}</strong><small>{suggestion.reason}</small></div><div className="guidance-actions"><button type="button" onClick={() => { if (suggestion.action === "Atribuir responsável") setModal("edit"); else { setInitialAction("Follow-up"); setModal(row.next_action_at ? "reschedule" : "schedule"); } }}>Aceitar</button><button type="button" onClick={() => setModal("edit")}>Alterar</button><button type="button" onClick={() => setGuidanceIgnored((items) => [...items, row.id])}>Ignorar</button></div></div>}
+              </section>;
+            })()}
             {queue && (
               <div className="queue-quick-actions">
                 <strong>
@@ -1338,18 +1348,12 @@ export default function Workspace({
                 } catch { setNotice("Resumo pronto para compartilhar."); }
               }}><Share2 size={14} /> Compartilhar resumo</button>
               {wa(row.phone) && (
-                <WhatsAppAction
-                  className="whatsapp-button"
-                  companyId={data.company!.id}
-                  opportunityId={row.id}
-                  phone={row.phone}
-                  name={row.contact_name}
-                  compact={false}
-                  onRecorded={() =>
-                    void fetchData(template, data.company!.id, true)
-                  }
-                />
+                <details className="whatsapp-briefing">
+                  <summary>Ver briefing antes de abrir WhatsApp</summary>
+                  <div><strong>{row.contact_name}</strong><span>{row.stage_name} · {money(row.estimated_value)}</span><span>Última interação: {formatDate(row.last_interaction_at)}</span>{(row.objections || row.negotiation_summary) && <span>{row.objections || row.negotiation_summary}</span>}<span>Próximo passo: {row.next_action_type || "definir depois da conversa"}</span></div>
+                </details>
               )}
+              {wa(row.phone) && <WhatsAppAction className="whatsapp-button" companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} compact={false} onRecorded={() => void fetchData(template, data.company!.id, true)} />}
             </div>
             <div className="message-tools">
               <details>
