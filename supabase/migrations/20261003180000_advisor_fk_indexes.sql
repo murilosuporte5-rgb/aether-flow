@@ -1,0 +1,11 @@
+create index if not exists admin_operations_company on public.admin_operations(company_id);
+create index if not exists message_templates_created_by on public.message_templates(created_by);
+create index if not exists operation_movements_company_actor on public.operation_movements(company_id, actor_id);
+create index if not exists operation_movements_company_product on public.operation_movements(company_id, product_id);
+create index if not exists operation_products_company_category on public.operation_products(company_id, category_id);
+create index if not exists operation_products_company_owner on public.operation_products(company_id, owner_id);
+create index if not exists operation_products_company_supplier on public.operation_products(company_id, supplier_id);
+create index if not exists operation_requests_company_product on public.operation_requests(company_id, product_id);
+create index if not exists operation_requests_company_requester on public.operation_requests(company_id, requested_by);
+create index if not exists product_feedback_company_user on public.product_feedback(company_id, user_id);
+create index if not exists workspace_commands_actor on public.workspace_commands(actor_id);
