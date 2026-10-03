@@ -1137,3 +1137,12 @@ A sensação desejada é:
 O diferencial não será um efeito específico.
 
 Será a soma de dezenas de detalhes coerentes: tempo, motion, feedback, hierarquia, contexto, controle e inteligência.
+
+
+## Extensão — engajamento produtivo
+
+A pesquisa específica sobre entrada sem fricção, prazer de cadastrar leads, flow de execução, pequenas vitórias e consistência está em:
+
+`docs/AETHER_ENGAGEMENT_RESEARCH_2026.md`
+
+Ela adiciona os checkpoints K–P ao roadmap.
