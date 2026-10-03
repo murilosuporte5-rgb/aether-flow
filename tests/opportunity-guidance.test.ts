@@ -19,6 +19,8 @@ test("momentum exposes only a reasoned label", () => {
 test("note extraction proposes a follow-up without changing fields silently", () => {
   const suggestion = suggestFromNote("Vou falar com meu sócio e respondo sexta", new Date("2026-10-01T12:00:00Z"));
   assert.equal(suggestion?.actionType, "Aguardar cliente");
+  assert.equal(suggestion?.suggestedStage, "Aguardando decisão");
+  assert.equal(suggestion?.context, "Decisor adicional mencionado na anotação.");
   assert.match(suggestion?.reason || "", /sexta/i);
   assert.equal(suggestFromNote("Ainda vou avaliar o preço"), null);
 });

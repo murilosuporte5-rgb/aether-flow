@@ -133,6 +133,14 @@ export default function CoreForm({
   const requestId = useRef(crypto.randomUUID());
   const close = mode === "close" || type === "close";
   const capture = mode === "create" || mode === "edit";
+  const applyNoteSuggestion = () => {
+    if (!noteSuggestion) return;
+    setType(noteSuggestion.actionType);
+    setDue(localInput(noteSuggestion.dueAt));
+    const suggestedStage = data.stages.find((stage) => stage.name === noteSuggestion.suggestedStage);
+    if (suggestedStage) setStageId(suggestedStage.id);
+    if (!negotiationSummary.trim()) setNegotiationSummary(noteSuggestion.context);
+  };
   const activityId = data.activities.find(
     (a) => a.opportunity_id === row?.id && a.status === "pending",
   )?.id;
@@ -479,7 +487,7 @@ export default function CoreForm({
                     maxLength={500}
                     rows={2}
                   />
-                  {noteSuggestion && !close && <span className="note-suggestion" role="status"><strong>Sugestão encontrada</strong><span>{noteSuggestion.reason}</span><button type="button" onClick={() => { setType(noteSuggestion.actionType); setDue(localInput(noteSuggestion.dueAt)); }}>Usar Aguardar cliente e retorno sugerido</button></span>}
+                  {noteSuggestion && !close && <span className="note-suggestion" role="status"><strong>Sugestão encontrada</strong><span>{noteSuggestion.reason}</span><span>Etapa: {noteSuggestion.suggestedStage} · {noteSuggestion.context}</span><button type="button" onClick={applyNoteSuggestion}>Usar sugestão</button></span>}
                 </label>
               </div>
             </details>}
@@ -583,7 +591,7 @@ export default function CoreForm({
                     maxLength={500}
                     rows={2}
                   />
-                  {noteSuggestion && <span className="note-suggestion" role="status"><strong>Sugestão encontrada</strong><span>{noteSuggestion.reason}</span><button type="button" onClick={() => { setType(noteSuggestion.actionType); setDue(localInput(noteSuggestion.dueAt)); }}>Usar Aguardar cliente e retorno sugerido</button></span>}
+                  {noteSuggestion && <span className="note-suggestion" role="status"><strong>Sugestão encontrada</strong><span>{noteSuggestion.reason}</span><span>Etapa: {noteSuggestion.suggestedStage} · {noteSuggestion.context}</span><button type="button" onClick={applyNoteSuggestion}>Usar sugestão</button></span>}
                 </label>
               </>
             )}
