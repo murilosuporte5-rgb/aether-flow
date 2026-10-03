@@ -334,3 +334,12 @@ docs/AETHER_MARKET_UX_RESEARCH_2026.md
 Esse documento contém a pesquisa comparativa de mercado, evidência científica, regras de motion/psicologia e o roadmap de 30 subcheckpoints.
 
 Execute os subcheckpoints individualmente. Não tente implementar o documento inteiro de uma vez. Preserve a landing e o app existentes; use a pesquisa para refinar, não redesenhar.
+
+
+## Engajamento produtivo e prazer de uso
+
+Leia também:
+
+`docs/AETHER_ENGAGEMENT_RESEARCH_2026.md`
+
+Esse documento define como reduzir fricção de entrada, fazer o cadastro de leads devolver valor imediatamente, criar modo de execução/flow, progresso real e consistência sem gamificação punitiva. Execute os checkpoints K–P individualmente e preserve autonomia do usuário.
