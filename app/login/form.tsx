@@ -4,15 +4,18 @@ import {Eye,EyeOff,LoaderCircle,LogIn} from 'lucide-react';
 import {useRouter} from 'next/navigation';
 import {createClient} from '@/lib/supabase/browser';
 
+const TERMS_VERSION = '2026-10-03';
+
 export default function LoginForm(){
  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[showPassword,setShowPassword]=useState(false),[remember,setRemember]=useState(true),[acceptedTerms,setAcceptedTerms]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[cooldown,setCooldown]=useState(0);
  const router=useRouter();
- useEffect(()=>{const stored=window.localStorage.getItem('aether-flow:remember-email');if(stored)setEmail(stored);const tick=()=>setCooldown(Math.max(0,Number(window.localStorage.getItem('aether-flow:login-lock-until')||0)-Date.now()));tick();const timer=window.setInterval(tick,1000);return()=>window.clearInterval(timer)},[]);
+ useEffect(()=>{const stored=window.localStorage.getItem('aether-flow:remember-email');if(stored)setEmail(stored);if(window.localStorage.getItem('aether-flow:terms-version')===TERMS_VERSION)setAcceptedTerms(true);const tick=()=>setCooldown(Math.max(0,Number(window.localStorage.getItem('aether-flow:login-lock-until')||0)-Date.now()));tick();const timer=window.setInterval(tick,1000);return()=>window.clearInterval(timer)},[]);
 
  async function passwordLogin(e:React.FormEvent){
   e.preventDefault();if(cooldown>0)return;setBusy(true);setError('');
   try{
    if(remember)window.localStorage.setItem('aether-flow:remember-email',email.trim().toLowerCase());else window.localStorage.removeItem('aether-flow:remember-email');
+   window.localStorage.setItem('aether-flow:terms-version',TERMS_VERSION);
    const {error}=await createClient().auth.signInWithPassword({email:email.trim().toLowerCase(),password});
    if(error)throw error;
    window.localStorage.removeItem('aether-flow:login-failures');window.localStorage.removeItem('aether-flow:login-lock-until');
