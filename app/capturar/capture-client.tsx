@@ -19,6 +19,9 @@ export default function CaptureClient() {
   const [message, setMessage] = useState("Validando sua sessão e preparando a captura…");
   const [result, setResult] = useState<Result | null>(null);
   const [selected, setSelected] = useState("");
+  const [companyId, setCompanyId] = useState("");
+  const [recording, setRecording] = useState(false);
+  const [recorded, setRecorded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,6 +35,7 @@ export default function CaptureClient() {
         const workspaceResponse = await fetch("/api/workspace", { cache: "no-store" });
         const workspace = (await workspaceResponse.json()) as Workspace & { error?: string };
         if (!workspaceResponse.ok || !workspace.company?.id) throw new Error(workspace.error || "Entre no Aether Flow antes de capturar.");
+        setCompanyId(workspace.company.id);
         const stage = workspace.stages?.find((item) => item.kind === "open");
         if (!stage) throw new Error("A empresa ainda não tem um estágio aberto para receber a oportunidade.");
         const create = async (reuseContactId?: string) => {
@@ -79,7 +83,17 @@ export default function CaptureClient() {
         <p>{message}</p>
         {name && <div className="capture-contact"><strong>{name}</strong><span>{phone}</span><small>Origem: WhatsApp Web</small></div>}
         {status === "loading" && <div className="capture-loader" aria-label="Carregando" />}
-        {status === "done" && <div className="capture-next"><span>Próximo passo</span><div className="capture-actions">{quickResults.map((item) => <button key={item} type="button" className={selected === item ? "selected" : ""} onClick={() => setSelected(item)}>{item}</button>)}</div>{selected && <small>Resultado selecionado: {selected}. Abra a oportunidade para registrar a próxima ação.</small>}</div>}
+        {status === "done" && <div className="capture-next"><span>Resultado do contato</span><div className="capture-actions">{quickResults.map((item) => <button key={item} type="button" disabled={recording || recorded} className={selected === item ? "selected" : ""} onClick={async () => {
+          if (!result?.id || !companyId || recording || recorded) return;
+          setSelected(item); setRecording(true);
+          try {
+            const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, requestId: crypto.randomUUID(), kind: "comment", id: result.id, comment: `Resultado do contato: ${item}` }) });
+            const payload = (await response.json()) as Result;
+            if (!response.ok || !payload.ok) throw new Error(payload.error || "Não foi possível registrar o resultado.");
+            setRecorded(true);
+          } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível registrar o resultado."); setSelected(""); }
+          finally { setRecording(false); }
+        }}>{item}</button>)}</div>{recorded ? <small>Resultado registrado no histórico. Abra a oportunidade para definir a próxima ação.</small> : selected ? <small>{recording ? "Registrando…" : `Registrar “${selected}” no histórico.`}</small> : <small>Escolha uma opção para registrar o resultado sem redigitar a conversa.</small>}</div>}
         {result?.id && <a className="primary capture-link" href={`/?opportunity=${encodeURIComponent(result.id)}`}>Abrir no radar</a>}
         {status === "error" && <a className="secondary capture-link" href="/login">Entrar no Aether Flow</a>}
       </section>
