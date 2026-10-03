@@ -1293,7 +1293,18 @@ export default function Workspace({
             <div className="detail-controls">
               <button onClick={() => setModal("edit")}>Editar dados</button>
               <button type="button" onClick={async () => {
-                const summary = [`Aether Flow · ${row.contact_name}`, row.title, `Etapa: ${row.stage_name}`, `Valor: ${money(row.estimated_value)}`, `Responsável: ${row.owner_name}`, `Próximo passo: ${row.next_action_type || "Definir ação"}`].join("\n");
+                const summary = [
+                  `Aether Flow · ${row.contact_name}`,
+                  row.title,
+                  `Etapa: ${row.stage_name}`,
+                  `Valor: ${money(row.estimated_value)}`,
+                  `Responsável: ${row.owner_name}`,
+                  `Próximo passo: ${row.next_action_type || "Definir ação"}`,
+                  row.next_action_note && `Nota do próximo passo: ${row.next_action_note}`,
+                  row.negotiation_summary && `Resumo: ${row.negotiation_summary}`,
+                  row.objections && `Objeções: ${row.objections}`,
+                  row.tags?.length && `Tags: ${row.tags.join(", ")}`,
+                ].filter((line): line is string => Boolean(line)).join("\n");
                 try {
                   if (navigator.share) await navigator.share({ title: `Aether Flow · ${row.contact_name}`, text: summary });
                   else { await navigator.clipboard.writeText(summary); setNotice("Resumo copiado para compartilhar."); }
