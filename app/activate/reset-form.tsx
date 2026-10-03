@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
-import { readAuthHashTokens } from "@/lib/auth-recovery";
+import { readAuthHashError, readAuthHashTokens } from "@/lib/auth-recovery";
 
 export default function ResetPasswordForm() {
   const [password, setPassword] = useState("");
@@ -15,6 +15,11 @@ export default function ResetPasswordForm() {
 
   useEffect(() => {
     const client = createClient();
+    const hashError = readAuthHashError(window.location.hash);
+    if (hashError) {
+      setError(hashError);
+      return;
+    }
     const tokens = readAuthHashTokens(window.location.hash);
 
     void (async () => {

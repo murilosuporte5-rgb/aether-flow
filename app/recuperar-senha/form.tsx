@@ -14,7 +14,13 @@ export default function RecoveryForm() {
     setBusy(true); setError(""); setNotice("");
     try {
       const clean = email.trim().toLowerCase();
-      const { error: resetError } = await createClient().auth.resetPasswordForEmail(clean, { redirectTo: `${window.location.origin}/auth/confirm?type=recovery` });
+      // Keep the recovery intent explicit for both implicit and PKCE links.
+      // Supabase may omit `type` when it returns a `code`, so the callback
+      // needs a safe, explicit destination for the password form.
+      const recoveryRedirect = new URL("/auth/confirm", window.location.origin);
+      recoveryRedirect.searchParams.set("type", "recovery");
+      recoveryRedirect.searchParams.set("next", "/activate?mode=recovery");
+      const { error: resetError } = await createClient().auth.resetPasswordForEmail(clean, { redirectTo: recoveryRedirect.toString() });
       if (resetError) throw resetError;
       setNotice("Se o e-mail estiver cadastrado, o link de recuperação já foi enviado.");
     } catch {
