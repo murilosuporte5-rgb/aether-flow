@@ -135,7 +135,7 @@ try {
       const menuToggle = page.getByRole("button", { name: "Abrir menu", exact: true });
       await menuToggle.click();
       const navigation = page.locator("#workspace-navigation");
-      await navigation.getByRole("button", { name: "Fechar menu", exact: false }).waitFor();
+      await page.getByRole("button", { name: "Fechar menu", exact: true }).waitFor();
       await noOverflow(page, "mobile side drawer");
       const alertButton = navigation.locator("button.alert-nav");
       await alertButton.waitFor();
