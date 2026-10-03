@@ -35,9 +35,8 @@ export default function CaptureClient() {
     const value = new Date();
     if (offset === 0) value.setHours(value.getHours() + 1, 0, 0, 0);
     else {
-      value.setDate(value.getDate() + offset);
-      if (offset === 2 && value.getDay() === 0) value.setDate(value.getDate() + 1);
-      if (offset === 2 && value.getDay() === 6) value.setDate(value.getDate() + 2);
+      value.setDate(value.getDate() + (offset === 2 ? 1 : offset));
+      if (offset === 2) while (value.getDay() === 0 || value.getDay() === 6) value.setDate(value.getDate() + 1);
       value.setHours(10, 0, 0, 0);
     }
     const local = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
