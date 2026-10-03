@@ -1,290 +1,316 @@
-# AETHER FLOW — ORDEM DE TRABALHO + EVIDÊNCIA
+# AETHER FLOW — SOMENTE O QUE AINDA FALTA
 
-Continue trabalhando no Aether Flow por etapas pequenas. Preserve o que já está bom e refine o produto atual.
+O Aether já recebeu muitas melhorias. Antes de implementar qualquer item abaixo, confira o estado atual do `main` para não repetir trabalho.
 
-## Antes de decidir
+Não refaça funcionalidades que já existem. Trabalhe apenas nas pendências abaixo, em etapas pequenas.
 
-Quando houver uma decisão importante de UX, animação, psicologia, conversão, tipografia, acessibilidade ou comportamento:
+Quando uma decisão importante envolver UX, animação, psicologia, conversão, tipografia ou comportamento, pesquise referências atuais e evidência em HCI/design systems antes de escolher a solução.
 
-1. pesquise referências atuais;
-2. compare produtos maduros;
-3. procure evidência em HCI, psicologia, design systems ou estudos científicos;
-4. escolha a solução mais simples que faça sentido para o Aether;
-5. registre brevemente no commit o que foi pesquisado e por que a solução foi escolhida.
+## 1. Fechar o fluxo do Capture
 
-Não aplique uma ideia só porque parece bonita.
+O Capture básico, deduplicação, reutilização de contato, captura manual/mobile e registro rápido de resultado já existem.
 
-Use como referências de mercado, quando fizer sentido: HubSpot, Pipedrive, Attio, Linear, Superhuman, Intercom, Notion, Slack, Asana, Duolingo, Figma, Canva, Stripe, Microsoft Fluent, Atlassian e IBM Carbon.
+Agora falta transformar:
 
-## 1. Capture e entrada de leads
+**capturar → resultado → próxima ação**
+
+em um fluxo único.
 
 Faça:
-- melhorar captura de nome e telefone no WhatsApp Web;
-- tratar duplicados;
-- reutilizar contato existente;
-- manter captura em poucos cliques;
-- melhorar captura manual/mobile;
-- depois da captura, mostrar confirmação e sugerir próximo passo;
-- nunca enviar mensagens automaticamente.
+- depois de “Respondeu”, “Não respondeu”, “Pediu retorno”, “Proposta enviada” ou “Vai decidir”, sugerir imediatamente o próximo passo;
+- oferecer opções rápidas como Hoje, Amanhã, próximo dia útil e escolher data;
+- permitir confirmar sem precisar abrir outra tela;
+- ao terminar, mostrar claramente que o lead está acompanhado;
+- manter opção de abrir a oportunidade se o usuário quiser editar mais detalhes.
 
 Por quê:
-o usuário precisa sentir que vale a pena colocar o lead no Aether porque o sistema já começa a organizar por ele.
+o Capture só fica realmente valioso quando o usuário termina a conversa e o Aether já sabe o que deve acontecer depois.
 
-Direção de mercado:
-HubSpot, Attio e Pipedrive caminham para menos cadastro manual e mais contexto automático.
+## 2. Refinar a fila “Resolver pendências”
 
-## 2. Reduzir trabalho manual
+A fila, progresso e avanço para o próximo item já existem.
 
-Faça:
-- resultado do contato em poucos cliques;
-- sugestão de próxima ação;
-- próximo lead sem voltar ao dashboard;
-- fila simples de novos leads;
-- modo para resolver uma oportunidade por vez;
-- ações repetitivas em um único gesto quando forem previsíveis.
+Não recrie isso.
 
-Por quê:
-o Aether deve parecer uma ferramenta que tira trabalho do usuário, não um CRM que pede trabalho.
+Melhore o que existe:
+- deixar a experiência mais parecida com um modo de foco;
+- mostrar uma oportunidade por vez com contexto essencial;
+- facilitar WhatsApp → resultado → próxima ação → próximo item;
+- preservar o progresso se houver refresh ou saída acidental, quando isso puder ser feito de forma simples e segura;
+- no fim, mostrar um resumo curto do que foi resolvido;
+- permitir sair a qualquer momento.
 
 Evidência:
-pesquisa de flow em HCI associa objetivo claro + feedback relevante e imediato a maior sensação de fluxo.
+pesquisa sobre flow favorece objetivo claro, feedback imediato e continuidade da tarefa.
 
-## 3. Entrada no aplicativo sem burocracia
+## 3. Remover a fricção restante do login
+
+Ainda existe aceite obrigatório de Termos/Privacidade em todo login.
+
+Melhore:
+- registrar a versão aceita;
+- pedir novo aceite apenas quando necessário;
+- se o usuário já estiver autenticado e abrir `/login`, levar direto ao produto;
+- preservar o comportamento seguro atual de autenticação.
+
+Não adicione novas telas de login sem necessidade.
+
+## 4. Feedback instantâneo e Undo
+
+Hoje várias ações ainda esperam servidor + reload do snapshot antes de parecer concluídas.
+
+Melhore primeiro as ações frequentes e reversíveis:
+- mudança de estágio;
+- reagendamento;
+- conclusão de ação;
+- pequenas alterações seguras.
 
 Faça:
-- evitar aceite repetitivo de termos em todo login;
-- registrar/versionar aceite quando necessário;
-- manter sessão válida quando seguro;
-- usuário autenticado deve entrar direto;
-- mostrar rapidamente o que precisa da atenção dele;
-- permitir continuar de onde parou.
+- feedback visual imediato;
+- mensagem específica, por exemplo “Movido para Proposta” em vez de apenas “Alteração salva”;
+- Undo quando a operação for realmente reversível e segura;
+- reverter a interface corretamente em caso de erro.
 
-Por quê:
-fricção antes do primeiro valor aumenta sensação de burocracia.
+Não transforme ações críticas em optimistic update sem proteção.
+
+## 5. Skeletons e percepção de carregamento
+
+O app já tem loaders e animações, mas ainda não possui um sistema consistente de skeletons.
+
+Crie skeletons para as áreas em que há espera perceptível:
+- Hoje/Radar;
+- cards de oportunidade;
+- listas principais;
+- painéis relevantes.
+
+O skeleton deve imitar a geometria real da interface para reduzir layout shift.
+
+Evidência:
+feedback visual durante espera reduz incerteza; estudos sobre percepção de espera mostram que timing e movimento precisam ser calibrados, não simplesmente acelerados.
+
+## 6. Organizar o motion system existente
+
+O app já possui várias animações, transições e `prefers-reduced-motion`.
+
+Não adicione animação em tudo.
+
+Agora:
+- padronize durations e easings;
+- crie poucos tokens reutilizáveis de motion;
+- use tempos curtos para hover/press;
+- use tempos um pouco maiores para modal/drawer/reordenação;
+- deixe animação expressiva apenas para momentos realmente importantes;
+- preserve reduced motion;
+- procure animações duplicadas ou inconsistentes e simplifique.
+
+Use como referência Atlassian Motion, Microsoft Fluent e IBM Carbon.
+
+## 7. Melhorar o encerramento de uma sessão de trabalho
+
+A fila já mostra progresso e “Fila concluída”.
+
+Melhore o fim:
+- mostrar quantidade de retornos resolvidos;
+- quantidade de próximas ações criadas;
+- valor acompanhado, somente quando os dados permitirem afirmar isso corretamente;
+- usar uma microcelebração discreta e rara;
+- não inventar pontuação, XP ou recompensa artificial.
+
+Evidência:
+Progress Principle e goal-gradient favorecem progresso real e pequenas vitórias perceptíveis.
+
+## 8. Next Best Action explicável
+
+Ainda não existe uma camada clara de Next Best Action.
+
+Comece simples e determinístico antes de usar IA complexa.
+
+Exemplos:
+- proposta enviada + vários dias sem interação + sem próxima ação → sugerir follow-up;
+- aguardando cliente além do período esperado → sugerir revisão;
+- oportunidade sem responsável → sugerir atribuição;
+- oportunidade sem próximo passo → sugerir definição.
+
+Sempre mostrar:
+- a sugestão;
+- o motivo;
+- botão para aceitar, alterar ou ignorar.
+
+Não usar score mágico.
+
+## 9. Momentum explicável
+
+Ainda não existe Momentum.
+
+Adicionar de forma simples:
+- Esquentando;
+- Estável;
+- Esfriando.
+
+Basear apenas em sinais disponíveis e explicáveis:
+- recência de interação;
+- próxima ação;
+- atraso;
+- avanço de etapa;
+- tempo parado.
+
+Sempre permitir ver “Por que?”.
+
+Não inventar precisão ou probabilidade de fechamento.
+
+## 10. Briefing antes do WhatsApp
+
+Antes de abrir o WhatsApp, quando houver contexto suficiente, mostrar de forma compacta:
+- cliente;
+- valor;
+- etapa;
+- última interação;
+- objeção/contexto comercial;
+- combinado anterior;
+- próxima ação.
 
 Objetivo:
-abrir Aether → entender o que importa → agir.
+o vendedor não precisar reconstruir mentalmente a conversa.
 
-## 4. Progresso e pequenas vitórias
+Não criar uma tela pesada. Deve ser rápido de ignorar ou abrir.
 
-Faça:
-- mostrar progresso real, por exemplo “2 de 5 prioridades resolvidas”;
-- mostrar “Lead adicionado ao Radar”;
-- mostrar “Próximo passo definido”;
-- criar um estado satisfatório quando a fila relevante chegar a zero;
-- usar microcelebração apenas em momentos importantes.
+## 11. Extração estruturada com confirmação
 
-Por quê:
-o usuário precisa perceber avanço, não apenas preenchimento de dados.
+Quando houver texto/anotação como:
 
-Evidência:
-o Progress Principle, de Amabile e Kramer, relaciona pequenas vitórias em trabalho significativo a melhor motivação e experiência de trabalho.
+“vou falar com meu sócio e respondo sexta”
 
-Evidência adicional:
-estudos de goal-gradient indicam que progresso visível pode aumentar persistência à medida que a pessoa se aproxima de uma meta.
+o Aether pode sugerir:
+- aguardando decisão;
+- retorno sexta;
+- decisor adicional/contexto;
+- observação.
 
-Não usar:
-- progresso falso;
-- moedas;
-- XP;
-- leaderboard obrigatório;
-- streak punitivo.
+Mas:
+- nunca alterar campos importantes silenciosamente;
+- mostrar o que será alterado;
+- usuário confirma ou corrige.
 
-## 5. Animação, timing e sensação de velocidade
+## 12. Tipografia e performance de fontes
 
-Faça:
-- feedback visual começar imediatamente após clique;
-- hover/press rápidos;
-- modais/drawers suaves;
-- card resolvido sair/reordenar de forma compreensível;
-- skeletons parecidos com o layout real;
-- reduced motion;
-- animação apenas quando comunica estado, direção ou resultado.
+O projeto ainda usa Google Fonts por `@import`.
 
-Por quê:
-motion deve explicar causa e efeito e melhorar percepção de resposta.
+Avalie migrar DM Sans/Manrope para `next/font` ou equivalente self-hosted do Next, preservando a aparência se ela já estiver boa.
 
-Evidência:
-Ding & Kyung, Journal of Consumer Research (2025), encontraram que em esperas digitais animações de velocidade moderada reduziram mais a espera percebida que animações estáticas, lentas ou rápidas demais.
+Objetivo:
+- reduzir dependência externa;
+- melhorar estabilidade visual;
+- evitar layout shift;
+- manter legibilidade de dashboard, números e tabelas.
 
-Importante:
-não copiar tempos cegamente. Pesquisar/testar no contexto do Aether.
+Não troque a identidade tipográfica sem motivo.
 
-Também considerar:
-Atlassian Motion, Microsoft Fluent Motion e IBM Carbon Motion para duração, easing e consistência.
+## 13. Segurança que ainda falta revisar
 
-## 6. Visual do aplicativo
+Já existem headers básicos de segurança e rate limiting em partes do sistema.
 
-Refine sem reconstruir tudo.
+Não repita isso.
 
-Faça:
-- tipografia;
-- espaçamento;
-- hierarquia;
-- proporções;
-- cards;
-- botões;
-- ícones;
-- modais;
-- sidebar;
-- loading;
-- sucesso/erro;
-- skeletons;
-- microinterações;
-- foco de teclado;
-- contraste;
-- estados vazios.
+Agora revise apenas lacunas reais:
+- avaliar CSP compatível com Next/Supabase e testar antes de endurecer;
+- tratar o cooldown em `localStorage` apenas como UX, não como defesa real;
+- verificar rate limiting server-side dos pontos realmente sensíveis;
+- revisar permissões da extensão e remover qualquer permissão não usada;
+- revisar exposição desnecessária de PII.
 
-Por quê:
-clareza visual influencia tanto estética quanto usabilidade percebida.
+Não quebrar Capture, autenticação ou integrações em nome de hardening.
 
-Evidência:
-pesquisa CHI sobre aesthetic-usability e processing fluency mostra que parte da sensação de “bonito e fácil” está ligada à facilidade de processar visualmente a interface.
+## 14. Performance mensurável
 
-## 7. Landing page
+Adicionar/usar medição para:
+- INP;
+- LCP;
+- CLS;
+- tempo das ações críticas.
 
-Não crie uma landing nova.
+Só otimizar onde houver evidência de gargalo.
 
-Refine a atual:
-- hierarquia;
-- CTA;
-- screenshots reais;
-- proporções;
-- tipografia;
-- espaçamento;
-- animações de entrada;
-- scroll;
-- confiança;
-- demonstração do produto.
+Também:
+- garantir que animações usem propriedades baratas quando possível;
+- evitar animação fora de viewport;
+- revisar imagens grandes;
+- observar o tamanho do bundle antes de adicionar dependências.
 
-Por quê:
-a landing já tem estrutura e conteúdo bons; o ganho agora é tornar valor e produto mais fáceis de perceber.
+## 15. QA visual final — sem redesign
 
-Use:
-- saliência;
-- contraste;
-- prova do produto real;
-- uma ação principal por contexto.
+A landing e o app já receberam bastante trabalho visual.
 
-Não use:
-- urgência falsa;
-- escassez falsa;
-- prova social inventada;
-- CTA piscando;
-- várias coisas disputando atenção.
+Não redesenhe.
 
-Evidência:
-pesquisa de saliência visual em HCI mostra que elementos relevantes mais salientes tendem a ser encontrados mais rapidamente.
+Faça apenas uma revisão de qualidade em:
+- 360 px;
+- 390 px;
+- 768 px;
+- 1024 px;
+- 1366 px;
+- 1440 px ou maior.
 
-## 8. Responsividade obrigatória
-
-Revise app e landing em:
-- mobile pequeno;
-- mobile grande;
-- tablet vertical;
-- tablet horizontal;
-- notebook;
-- PC/desktop comum;
-- monitor grande.
-
-Corrija:
+Corrigir somente problemas concretos:
 - overflow;
-- textos cortados;
-- cards fora de proporção;
-- botões difíceis de tocar;
-- sidebar grande demais;
-- modais cortados;
-- screenshots deformados;
-- títulos exagerados;
-- grids ruins;
-- espaços vazios estranhos.
+- modal cortado;
+- botão difícil de tocar;
+- sidebar/menu desproporcional;
+- card comprimido;
+- espaço vazio estranho;
+- screenshot deformado;
+- título exagerado;
+- quebra de grid;
+- texto pouco legível.
 
-Por quê:
-uma interface tecnicamente funcional pode continuar parecendo amadora se as proporções mudarem mal entre breakpoints.
+## 16. Padronizar detalhes técnicos pequenos
 
-## 9. Atenção e clareza
+Revise pequenas inconsistências que diminuem a sensação de produto maduro:
+- timezone usado pelo app;
+- mensagens genéricas de sucesso;
+- nomes de ações;
+- labels duplicadas;
+- estados vazios;
+- feedback de erro;
+- comportamento depois de refresh.
 
-Faça:
-- destacar a ação mais importante;
-- mostrar “há 3 dias”, “vence hoje”, “aguardando há 5 dias” quando for mais útil;
-- explicar por que uma oportunidade está no Radar;
-- evitar várias cores/alertas competindo;
-- usar urgência visual apenas quando existe urgência real.
+Exemplo atual a revisar:
+há uso misto de `America/Sao_Paulo` e `America/Bahia`. Escolha uma estratégia consistente para datas do produto.
 
-Por quê:
-o usuário precisa saber rapidamente “o que faço agora?”.
+## Ordem sugerida
 
-## 10. Inteligência útil
+Faça nesta ordem:
 
-Depois que a base estiver boa, faça:
-- Momentum: esquentando / estável / esfriando;
-- sempre explicar o motivo;
-- sugerir próxima melhor ação;
-- briefing antes de abrir WhatsApp;
-- extrair informações de anotações/conversas como sugestão;
-- pedir confirmação antes de alterar algo importante.
+1. Capture → resultado → próxima ação;
+2. Focus/Resolver pendências;
+3. login sem aceite repetitivo;
+4. feedback instantâneo + Undo;
+5. skeletons + motion system;
+6. encerramento satisfatório da sessão;
+7. Next Best Action;
+8. Momentum;
+9. briefing WhatsApp;
+10. extração estruturada;
+11. fontes/performance;
+12. segurança restante;
+13. métricas de performance;
+14. QA visual final;
+15. pequenos detalhes técnicos.
 
-Por quê:
-IA útil reduz reconstrução de contexto e trabalho administrativo.
+Em cada etapa:
 
-Regra:
-não usar score opaco se não for possível explicar claramente por que ele existe.
+1. confira se já não foi implementada;
+2. pesquise quando houver decisão de UX relevante;
+3. implemente uma mudança pequena;
+4. teste;
+5. confira mobile e desktop quando houver impacto visual;
+6. corrija;
+7. faça commit;
+8. siga.
 
-## 11. Engajamento sem deixar o app chato
+## Objetivo
 
-Faça:
-- fila que pode chegar a zero;
-- “resolver minhas 3 prioridades” como opção;
-- progresso da sessão;
-- resumo curto ao terminar;
-- ritmo semanal em vez de streak rígido;
-- permitir meta editável/desativável;
-- notificações agrupadas e apenas quando úteis.
-
-Por quê:
-o objetivo é fazer o usuário querer voltar porque consegue avançar, não porque o sistema cria ansiedade.
-
-Evidência:
-pesquisa sobre streaks mostra que sequências intactas podem aumentar engajamento, mas sequências quebradas também podem reduzir motivação. Por isso, evitar streak punitivo.
-
-Evidência:
-pesquisas sobre interrupções digitais mostram que excesso de notificações pode prejudicar foco e aumentar estresse.
-
-## 12. Segurança e performance
-
-Faça:
-- revisar headers de segurança;
-- revisar rate limiting server-side;
-- revisar proteção contra abuso;
-- reduzir permissões da extensão ao mínimo necessário;
-- evitar exposição de PII;
-- medir INP, LCP e CLS;
-- evitar motion pesado;
-- otimizar fontes e imagens.
-
-Por quê:
-produto premium precisa ser rápido e confiável, não apenas bonito.
-
-## Forma de trabalhar
-
-Faça uma parte pequena por vez:
-
-1. pesquisar se houver decisão relevante;
-2. implementar;
-3. conferir visualmente;
-4. testar em mais de um tamanho de tela;
-5. corrigir;
-6. fazer commit;
-7. seguir para a próxima.
-
-Se duas soluções parecerem possíveis, pesquise antes de escolher.
-
-Não precisa esperar terminar tudo para validar.
-
-## Objetivo final
-
-**Fazer o Aether ficar fácil de entrar, rápido para cadastrar e trabalhar leads, satisfatório de usar, visualmente profissional e bem ajustado em mobile, tablet, notebook, PC e desktop.**
+**Não adicionar funcionalidades por quantidade. Fazer o fluxo atual do Aether exigir menos pensamento e menos cliques, responder mais rápido e aproveitar melhor os dados que ele já possui.**
 
 O usuário deve sentir:
 
-**“Eu coloquei o lead no Aether, o sistema organizou o que importa e agora eu sei exatamente o que fazer.”**
+**“Joguei a oportunidade no Aether, fiz o contato, registrei o resultado em segundos e o sistema já deixou claro o que acontece depois.”**
