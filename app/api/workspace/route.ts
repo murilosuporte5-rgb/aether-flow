@@ -75,6 +75,25 @@ async function context(
   return { s, user, ...state };
 }
 async function snapshot(s: SupabaseClient, c: string) {
+  const opportunityFields =
+    "id,company_id,contact_id,title,stage_id,owner_id,estimated_value,status,source,details,commercial_availability,next_action_type,next_action_at,next_action_note,last_interaction_at,created_at,updated_at,stage_entered_at,waiting_started_at,closed_at,tags,proposal_url,contract_url,drive_url,competitor,negotiation_summary,objections,win_reason";
+  const baselineOpportunityFields =
+    "id,company_id,contact_id,title,stage_id,owner_id,estimated_value,status,source,details,last_interaction_at,created_at,updated_at,stage_entered_at,waiting_started_at,closed_at";
+  const loadOpportunities = async () => {
+    const enriched = await s
+      .from("opportunities")
+      .select(opportunityFields)
+      .eq("company_id", c)
+      .order("updated_at", { ascending: false });
+    if (!enriched.error) return enriched;
+    // Keep the workspace usable while an optional production migration is propagating.
+    console.warn("workspace opportunities enriched select failed; using baseline", enriched.error);
+    return s
+      .from("opportunities")
+      .select(baselineOpportunityFields)
+      .eq("company_id", c)
+      .order("updated_at", { ascending: false });
+  };
   const [stages, opps, contacts, acts, history, profiles, memberships] =
     await Promise.all([
       s
@@ -82,11 +101,7 @@ async function snapshot(s: SupabaseClient, c: string) {
         .select("id,name,position,kind")
         .eq("company_id", c)
         .order("position"),
-      s
-        .from("opportunities")
-        .select("id,company_id,contact_id,title,stage_id,owner_id,estimated_value,status,source,details,commercial_availability,next_action_type,next_action_at,next_action_note,last_interaction_at,created_at,updated_at,stage_entered_at,waiting_started_at,closed_at,tags,proposal_url,contract_url,drive_url,competitor,negotiation_summary,objections,win_reason")
-        .eq("company_id", c)
-        .order("updated_at", { ascending: false }),
+      loadOpportunities(),
       s.from("contacts").select("id,company_id,name,phone,email,organization,created_at").eq("company_id", c),
       s.from("activities").select("id,company_id,opportunity_id,owner_id,status,due_at,type,note,created_at").eq("company_id", c).order("due_at"),
       s
