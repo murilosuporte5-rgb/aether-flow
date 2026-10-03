@@ -219,6 +219,8 @@ export async function POST(request: Request) {
         ? "configure_pipeline"
         : command.kind === "feedback"
           ? "submit_product_feedback"
+          : command.kind === "undo_stage"
+            ? "undo_stage_change"
           : "apply_workspace_command";
     const args =
       command.kind === "feedback"
@@ -228,6 +230,14 @@ export async function POST(request: Request) {
             p_context: command.context,
             p_message: command.message,
           }
+        : command.kind === "undo_stage"
+          ? {
+              p_company_id: ctx.company.id,
+              p_request_id: requestId,
+              p_opportunity_id: command.id,
+              p_expected_stage_id: command.expectedStageId,
+              p_previous_stage_id: command.previousStageId,
+            }
         : {
             p_company_id: ctx.company.id,
             p_request_id: requestId,

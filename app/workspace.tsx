@@ -238,6 +238,7 @@ export default function Workspace({
     [mobileMenuOpen, setMobileMenuOpen] = useState(false),
     [attentionFocused, setAttentionFocused] = useState(false),
     [whatsappStarted, setWhatsappStarted] = useState(false),
+    [undoAction, setUndoAction] = useState<{ id: string; expectedStageId: string; previousStageId: string } | null>(null),
     [guidanceIgnored, setGuidanceIgnored] = useState<string[]>([]);
   const writeLock = useRef(false),
     retries = useRef(new Map<string, string>()),
@@ -336,6 +337,8 @@ export default function Workspace({
     setBusy(true);
     setError("");
     setNotice("");
+    const actionRow = data.opportunities.find((item) => item.id === (typeof payload.id === "string" ? payload.id : selected));
+    const previousStageId = actionRow?.stage_id || null;
     try {
       const r = await fetch("/api/workspace", {
           method: "POST",
@@ -362,6 +365,7 @@ export default function Workspace({
       if (r.ok || r.status < 500) retries.current.delete(fingerprint);
       if (!r.ok) throw new Error(j.error || "Falha ao salvar");
       if (kind === "create") setSelected(j.id || null);
+      if (kind === "undo_stage") setUndoAction(null);
       setDuplicate(null);
       setModal(null);
       setQuickMode(false);
@@ -381,7 +385,10 @@ export default function Workspace({
       }
       if (kind === "pipeline_configure") setSettings(false);
       const targetStage = kind === "stage" ? data.stages.find((stage) => stage.id === payload.stageId) : null;
-      setNotice(kind === "stage" && targetStage ? `Movido para ${targetStage.name}.` : kind === "schedule" || kind === "reschedule" ? "Próxima ação agendada." : kind === "complete" ? "Ação concluída e próximo passo registrado." : kind === "create" ? "Oportunidade criada." : "Dados atualizados.");
+      if (kind === "stage" && targetStage?.kind === "open" && previousStageId && previousStageId !== targetStage.id) {
+        setUndoAction({ id: String(payload.id || selected), expectedStageId: targetStage.id, previousStageId });
+      }
+      setNotice(kind === "stage" && targetStage ? `Movido para ${targetStage.name}.` : kind === "undo_stage" ? "Mudança de etapa desfeita." : kind === "schedule" || kind === "reschedule" ? "Próxima ação agendada." : kind === "complete" ? "Ação concluída e próximo passo registrado." : kind === "create" ? "Oportunidade criada." : "Dados atualizados.");
       return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha ao salvar");
@@ -776,6 +783,7 @@ export default function Workspace({
           {notice && (
             <div role="status" className="alert success">
               {notice}
+              {undoAction && <button type="button" className="notice-undo" onClick={() => void run("undo_stage", { id: undoAction.id, expectedStageId: undoAction.expectedStageId, previousStageId: undoAction.previousStageId })}>Desfazer</button>}
               <button onClick={() => setNotice("")} aria-label="Fechar aviso">
                 <X size={15} />
               </button>
