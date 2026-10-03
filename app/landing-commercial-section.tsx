@@ -5,7 +5,7 @@ const planItems = [
   "Radar de retornos, compromissos e oportunidades paradas",
   "Contatos, pipeline, mensagens e histórico no mesmo fluxo",
   "Importação e exportação em CSV",
-  "Produtos, categorias, lotes, validade e histórico de movimentações sem limite de registros",
+  "Produtos, categorias, lotes, validade e histórico de movimentações no ambiente da empresa",
   "Até 3 integrantes no ambiente da empresa, com responsável por atendimento",
   "Tutorial rápido para a primeira configuração",
 ];
@@ -34,7 +34,7 @@ export default function LandingCommercialSection() {
         <p className="landing-plan-price"><span className="landing-plan-trial">7 dias grátis para testar</span><strong><small>R$</small> 67 <small>/mês</small></strong><span>por empresa · até 3 pessoas · cancele quando quiser</span></p>
         <ul>{planItems.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul>
         <a className="landing-primary landing-plan-cta" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Teste grátis por 7 dias <ArrowRight size={17} /></a>
-        <small>Garantia de 7 dias · acesso já liberado? <a href="/login">Entrar no ambiente</a></small>
+        <small>Teste de 7 dias · acesso já liberado? <a href="/login">Entrar no ambiente</a></small>
       </article>
     </section>
   );

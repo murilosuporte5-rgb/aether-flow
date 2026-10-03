@@ -150,7 +150,7 @@ export default function LandingPage() {
       </section>
 
       <section className="landing-stat-strip" aria-label="Resultados acompanhados pelo Aether Flow">
-        <div><strong>Fila de prioridades</strong><span>retornos ordenados por urgência</span></div><div><strong>Responsável definido</strong><span>em cada contato e oportunidade</span></div><div><strong>Histórico completo</strong><span>para entender cada atendimento</span></div><div><strong>Métricas e CSV</strong><span>para medir e mover sua base</span></div>
+        <div><strong>Fila de prioridades</strong><span>retornos ordenados por urgência</span></div><div><strong>Responsável definido</strong><span>em cada contato e oportunidade</span></div><div><strong>Histórico da operação</strong><span>para entender cada atendimento</span></div><div><strong>Métricas e CSV</strong><span>para medir e mover sua base</span></div>
       </section>
 
       <section className="landing-section landing-before-after" id="antes-depois">
@@ -169,7 +169,7 @@ export default function LandingPage() {
       </section>
 
       <section className="landing-product-section" id="produto">
-        <div className="landing-section-heading light"><span className="landing-eyebrow">O SISTEMA POR DENTRO</span><h2>Não é maquete. É a operação rodando.</h2><p>Veja como o radar transforma cada conversa em uma ação que alguém consegue concluir.</p></div>
+        <div className="landing-section-heading light"><span className="landing-eyebrow">O SISTEMA POR DENTRO</span><h2>Veja a operação por dentro.</h2><p>Conheça como o radar transforma cada conversa em uma ação que alguém consegue concluir.</p></div>
         <LandingProductGallery />
       </section>
 
