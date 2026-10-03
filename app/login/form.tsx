@@ -21,7 +21,7 @@ export default function LoginForm(){
    // Keep the sign-in flow available if a disposable Auth runtime has not
    // loaded the optional acceptance RPC yet; production still records it when
    // the migration is available.
-   await supabase.rpc('accept_terms',{p_version:TERMS_VERSION}).catch(()=>undefined);
+   try { await supabase.rpc('accept_terms',{p_version:TERMS_VERSION}); } catch { /* optional in disposable runtimes */ }
    // The terms RPC is the authoritative acceptance record. Profile metadata is
    // only a convenience marker and must not turn a valid login into a generic
    // credential error when an isolated Auth runtime rejects metadata updates.
