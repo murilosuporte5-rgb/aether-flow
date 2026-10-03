@@ -24,6 +24,7 @@
 - Reta final Focus Mode/WhatsApp: alteração pequena em `app/workspace.tsx`, validada com testes, typecheck e build.
 - Matriz do aceite visual ampliada para 320, 360, 390, 412, 430, 768, 1024, 1366 e 1440 px; o arquivo passou em validação sintática. A execução completa continua dependendo do ambiente local descartável do Supabase.
 - `npm test`: 33/33 após o acabamento; `npm run check`, `npm run build`, `node --check tests/mobile-acceptance.mjs` e `git diff --check`: PASS.
+- Produção após `06e4a32`: `/landing/telas` passou a expor `landing-sub-gallery-first`, health retornou `200` com banco `protected`, e `tests/public-release-smoke.mjs` retornou `PASS` para login, Capture, recuperação, termos, privacidade e redirecionamento autenticado.
 - CSP aplicada e mantida em Report-Only para diagnóstico: removido `unsafe-eval`; build e login local sob a política aplicada carregaram sem erros de console. Headers públicos confirmados após o deploy `2fe80f7`.
 
 ## Pendências reais
