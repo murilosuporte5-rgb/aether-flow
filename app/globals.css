@@ -487,3 +487,68 @@
   .landing-actions{margin-top:21px;gap:9px}
   .landing-primary,.landing-secondary{min-height:42px;padding:10px 12px;font-size:12px}
 }
+
+/* Review pass from production mobile feedback: compact navigation and balanced surfaces. */
+@media(max-width:760px){
+  .sidebar{padding-bottom:11px}
+  .company-sidebar-name,.select-wrap{margin-bottom:10px!important}
+  .mobile-nav-toggle{margin-top:2px}
+  .sidebar nav.mobile-nav-open{top:10px;bottom:auto;inset-inline-start:0;height:auto;max-height:calc(100dvh - 20px);align-content:start;border-radius:0 16px 16px 0;box-shadow:18px 0 45px #07142566}
+  .sidebar nav.mobile-nav-open button,.sidebar nav.mobile-nav-open a{min-height:34px;padding:7px 9px}
+  .page-body{padding-bottom:34px}
+}
+
+/* Keep every pipeline status aligned with the card content, away from its edge. */
+.kanban-card>.stale-indicator,.kanban-card>.stage-elapsed{margin-left:26px;margin-right:26px}
+.card-footer{padding-left:26px;padding-right:26px}
+
+/* A quieter premium feedback prompt. */
+.product-feedback{width:max-content;max-width:100%;margin:24px auto 0;padding:6px 7px 6px 12px;border:1px solid #dce6f0;border-radius:999px;background:#fff;box-shadow:0 8px 24px #173f6310;color:#6a7d92;font-size:11px}
+.product-feedback button{min-height:32px!important;padding:5px 11px!important;border-radius:999px!important;font-size:11px;background:#f5f9fd!important}
+.product-feedback form{max-width:460px;padding:10px}
+.product-feedback p{margin:0 8px}
+@media(max-width:430px){.product-feedback{width:100%;justify-content:center}.product-feedback form{flex-basis:100%}}
+
+/* Operation header actions share one compact rhythm. */
+.operations-page .heading-actions button{min-height:42px;padding:9px 13px;font-size:12px}
+@media(max-width:540px){.operations-page .heading-actions button{flex:0 1 auto}.operations-page .heading-actions .secondary{padding-inline:11px}}
+
+/* Make the existing login mark readable on white without changing the approved typography. */
+.mobile-auth-brand .aether-mark{display:block;flex:none;filter:drop-shadow(0 7px 12px #17385f2d)}
+.aether-mark{display:block;object-fit:contain;object-position:center;filter:drop-shadow(0 5px 10px #00bde42e)}
+.mobile-auth-brand strong{color:#17385f}
+.terms-label small{display:block;margin-top:5px;color:#8a98aa;font-size:9px;line-height:1.45;font-weight:500}
+
+/* Desktop Capture explains the actual extension path and keeps manual capture available. */
+.capture-desktop-guide{display:grid;gap:10px;margin:22px 0 18px;padding:16px;border:1px solid #cfe0f2;border-radius:15px;background:linear-gradient(145deg,#f4f9ff,#eefaf7)}
+.capture-desktop-guide>strong{color:#173e76;font:800 14px Manrope}
+.capture-desktop-guide p{font-size:12px!important;line-height:1.5!important}
+.capture-desktop-guide>a{justify-self:start;display:inline-flex;font-size:12px}
+.capture-desktop-guide details{border-top:1px solid #d9e6f1;padding-top:10px;color:#4b6888;font-size:11px}
+.capture-desktop-guide summary{cursor:pointer;font-weight:800}
+.capture-desktop-guide ol{margin:9px 0 0;padding-left:19px;line-height:1.6}
+.capture-form-divider{display:flex;align-items:center;gap:9px;color:#7890aa;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.capture-form-divider:after{content:"";height:1px;flex:1;background:#dbe6f1}
+
+/* Landing interaction polish requested from the live page review. */
+.landing-step-grid>a,.landing-audience-grid>a{display:block;min-width:0;color:inherit}
+.landing-step-grid>a article,.landing-audience-grid>a article{height:100%}
+.landing-step-grid>a article{position:relative;overflow:hidden;background:linear-gradient(145deg,#fff 0%,#f7fbff 100%)}
+.landing-step-grid>a article:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#24a7ff,#36d6aa)}
+.card-learn-more{display:flex;align-items:center;gap:5px;margin-top:19px;color:#2470b6;font-size:11px;font-weight:800}
+.landing-audience-grid article>span{min-height:48px;border-radius:13px;background:linear-gradient(130deg,#d8efff,#d7faed);box-shadow:inset 0 0 0 1px #b9e1ef,0 8px 18px #1d6a9412}
+.landing-audience-grid article>span svg{filter:drop-shadow(0 3px 5px #1673b833)}
+.landing-plan-card{border-color:#69c9db;background:linear-gradient(145deg,#f7fdff 0%,#e6f3ff 48%,#dffaf0 100%);box-shadow:0 28px 74px #145c8b30}
+.landing-plan-card:after{content:"";position:absolute;inset:0 0 auto;height:5px;background:linear-gradient(90deg,#1d79e8,#24c7c9,#35c77d)}
+.landing-plan-price{border-color:#9fd9e4;background:linear-gradient(135deg,#fff,#edfbf7);box-shadow:0 16px 34px #14728d18}
+.landing-faq-list details[open]>p{animation:faq-answer-in .24s ease both}
+@keyframes faq-answer-in{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
+.landing-mobile-stage{width:min(100%,310px);padding:13px;border-radius:36px;transform:none;background:linear-gradient(145deg,#f9fdff,#eaf7f4)}
+.landing-mobile-stage:hover{transform:translateY(-4px)}
+.landing-proof-device{aspect-ratio:9/16;min-height:0;border-width:8px;border-radius:30px;background:#10253d}
+.landing-phone-speaker{position:absolute;z-index:2;top:8px;left:50%;width:52px;height:5px;border-radius:999px;background:#071525;transform:translateX(-50%)}
+.landing-mobile-shot,.landing-mobile-shot img{height:100%}
+.landing-mobile-shot img{min-height:0;object-fit:cover;object-position:top left}
+.landing-mobile-dots{justify-content:center;margin-left:0}
+@media(max-width:700px){.landing-mobile-stage{width:min(86vw,290px)}.landing-proof-device{min-height:0}.landing-mobile-copy h2{font-size:31px}}
+@media(prefers-reduced-motion:reduce){.landing-faq-list details[open]>p{animation:none}.landing-mobile-stage:hover{transform:none}}

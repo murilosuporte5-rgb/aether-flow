@@ -160,12 +160,12 @@ export default function LandingPage() {
 
       <section className="landing-section landing-how" id="como-funciona" aria-labelledby="how-title">
         <div className="landing-section-heading"><span className="landing-eyebrow">COMO FUNCIONA</span><h2 id="how-title">É simples assim: 1, 2, 3.</h2><p>Do primeiro cadastro ao próximo retorno, sem transformar a operação em mais uma tarefa.</p></div>
-        <div className="landing-step-grid">{steps.map(([number, title, text]) => <article key={number}><span className="step-number">{number}</span><h3>{title}</h3><p>{text}</p></article>)}</div>
+        <div className="landing-step-grid">{steps.map(([number, title, text]) => <a href="/landing/como-funciona" key={number}><article><span className="step-number">{number}</span><h3>{title}</h3><p>{text}</p><span className="card-learn-more">Entender esta etapa <ArrowRight size={14}/></span></article></a>)}</div>
       </section>
 
       <section className="landing-section landing-audience" id="para-quem">
         <div className="landing-section-heading"><span className="landing-eyebrow">PARA QUEM É</span><h2>Serve para a sua empresa. Seja qual for o ramo.</h2><p>Cada equipe perde uma oportunidade de um jeito. O Aether Flow deixa o próximo passo visível para todos.</p></div>
-        <div className="landing-niche-groups">{nicheGroups.map((group) => <section className="landing-niche-group" key={group.title}><h3>{group.title}</h3><div className="landing-audience-grid">{group.items.map(({ icon: Icon, title, text }, index) => <article key={title}><span><Icon size={20} aria-hidden="true" /> <small>{String(index + 1).padStart(2, "0")}</small></span><h4>{title}</h4><p>{text}</p></article>)}</div></section>)}</div>
+        <div className="landing-niche-groups">{nicheGroups.map((group) => <section className="landing-niche-group" key={group.title}><h3>{group.title}</h3><div className="landing-audience-grid">{group.items.map(({ icon: Icon, title, text }, index) => <a href="/landing/para-quem" key={title}><article><span><Icon size={23} aria-hidden="true" /> <small>{String(index + 1).padStart(2, "0")}</small></span><h4>{title}</h4><p>{text}</p></article></a>)}</div></section>)}</div>
       </section>
 
       <section className="landing-product-section" id="produto">
@@ -177,7 +177,7 @@ export default function LandingPage() {
 
       <section className="landing-section" id="recursos">
         <div className="landing-section-heading"><span className="landing-eyebrow">RECURSOS PARA VENDER MELHOR</span><h2>Menos cliques para agir. Mais clareza para decidir.</h2><p>As ferramentas aparecem juntas porque fazem parte do mesmo fluxo comercial.</p></div>
-        <div className="landing-feature-grid">{featureCards.map(({icon: Icon, tone, title, text}) => <article key={title} className={`landing-feature-card ${tone}`}><span className="feature-icon"><Icon size={20} /></span><h3>{title}</h3><p>{text}</p><span className="feature-check"><Check size={14} /> pronto para usar</span></article>)}</div>
+        <div className="landing-feature-grid">{featureCards.map(({icon: Icon, tone, title, text}, index) => <a href={`/landing/recursos#recurso-${index + 1}`} key={title} className={`landing-feature-card ${tone}`}><span className="feature-icon"><Icon size={20} /></span><h3>{title}</h3><p>{text}</p><span className="feature-check"><Check size={14} /> pronto para usar <ArrowRight size={13}/></span></a>)}</div>
       </section>
 
       <section className="landing-team-section" id="equipe">

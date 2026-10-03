@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, Check, Monitor } from "lucide-react";
+import { ArrowRight, Check, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const shots = [
@@ -36,8 +36,8 @@ export default function LandingMobileProof() {
         <a className="landing-secondary" href="/demo?view=panel#demo-screen">Abrir demonstração <ArrowRight size={16} /></a>
       </div>
       <div className="landing-mobile-stage" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false); }}>
-        <div className="landing-proof-device"><div key={shot.src} className="landing-mobile-shot"><Image src={shot.src} alt={`${shot.label} do Aether Flow`} width={1440} height={980} sizes="(max-width: 700px) 100vw, 500px" /></div></div>
-        <div className="landing-mobile-caption"><span className="mobile-caption-icon"><Monitor size={15} /></span><div><strong>{shot.label}</strong><small>{shot.text}</small></div><span className="mobile-caption-count">{active + 1}/{shots.length}</span></div>
+        <div className="landing-proof-device"><span className="landing-phone-speaker" aria-hidden="true"/><div key={shot.src} className="landing-mobile-shot"><Image src={shot.src} alt={`${shot.label} do Aether Flow`} width={1440} height={980} sizes="(max-width: 700px) 82vw, 300px" /></div></div>
+        <div className="landing-mobile-caption"><span className="mobile-caption-icon"><Smartphone size={15} /></span><div><strong>{shot.label}</strong><small>{shot.text}</small></div></div>
         <div className="landing-mobile-dots" role="tablist" aria-label="Capturas do celular">{shots.map((item, index) => <button key={item.src} type="button" role="tab" aria-selected={index === active} aria-label={item.label} className={index === active ? "active" : ""} onClick={() => { setActive(index); setPaused(true); }} />)}</div>
       </div>
     </section>

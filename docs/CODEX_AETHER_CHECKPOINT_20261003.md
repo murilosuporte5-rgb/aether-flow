@@ -12,6 +12,10 @@
 - Acabamento do app: `Resolver pendências` voltou a preceder painéis secundários; o skeleton agora descreve e dimensiona a aba carregada.
 - Landing: a galeria aparece antes dos cards em `Telas reais`; a rotação automática pausa durante leitura/interação e respeita movimento reduzido.
 - Performance e segurança: INP usa interações únicas, CLS usa janelas de sessão, e ativação administrativa, onboarding e mutações da equipe receberam limite server-side.
+- Revisão visual baseada nos 21 apontamentos de produção: drawer mobile passou a ter altura do conteúdo, textos do pipeline receberam margens consistentes, feedback ficou compacto, ações da Operação foram equilibradas e a saída duplicada foi removida do cabeçalho.
+- Capture no computador agora explica o fluxo real da extensão e abre o WhatsApp Web, mantendo o formulário manual para celular.
+- Landing: galeria principal avança automaticamente com pausa por interação e movimento reduzido; prova mobile usa moldura vertical sem contador; cartões e rodapé levam às páginas temáticas existentes.
+- Identidade: o símbolo em fita ciano/azul enviado e aprovado pelo usuário substituiu a marca provisória no app, login, landing e favicon. O arquivo foi otimizado localmente de 540 KB para 28 KB sem nova geração.
 
 ## Evidências
 
@@ -26,9 +30,10 @@
 - `npm test`: 33/33 após o acabamento; `npm run check`, `npm run build`, `node --check tests/mobile-acceptance.mjs` e `git diff --check`: PASS.
 - Produção após `06e4a32`: `/landing/telas` passou a expor `landing-sub-gallery-first`, health retornou `200` com banco `protected`, e `tests/public-release-smoke.mjs` retornou `PASS` para login, Capture, recuperação, termos, privacidade e redirecionamento autenticado.
 - CSP aplicada e mantida em Report-Only para diagnóstico: removido `unsafe-eval`; build e login local sob a política aplicada carregaram sem erros de console. Headers públicos confirmados após o deploy `2fe80f7`.
+- Lote visual de 03/10: `npm test` 33/33, `npm run check`, `npm run build` e `git diff --check` passaram. Landing e login foram revisados no navegador local; a nova marca aparece com contraste correto em fundo claro e escuro.
 
 ## Pendências reais
 
-- A seção `Também no celular` ainda depende dos sete PNGs horizontais atuais; gerar novas capturas verticais reais continua pendente porque não existe navegador de captura gravável disponível neste ambiente e não será simulada uma imagem falsa.
+- A seção `Também no celular` agora tem moldura vertical, mas ainda depende dos sete PNGs horizontais atuais; gerar capturas verticais reais continua pendente e não será simulada uma imagem falsa.
 - Proteção contra senhas vazadas permanece fora deste ciclo por decisão explícita do usuário; não é bloqueio de execução agora.
 - Advisors Supabase mantêm avisos sobre funções `SECURITY DEFINER` intencionais e índices ainda sem uso observado; não há alteração especulativa.

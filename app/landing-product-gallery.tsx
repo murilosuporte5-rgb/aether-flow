@@ -2,7 +2,7 @@
 
 import { BarChart3, Bell, Check, FileSpreadsheet, MessageCircle, Users, Workflow } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const screens = [
   { label: "O painel", view: "panel", imageHeight: 980, icon: BarChart3, title: "O que merece atenção agora", tone: "blue" },
@@ -26,12 +26,18 @@ const liveStats: Record<string, [string, string, string]> = {
 
 export default function LandingProductGallery() {
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  useEffect(() => {
+    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => { if (!document.hidden) setActive((current) => (current + 1) % screens.length); }, 6500);
+    return () => window.clearInterval(timer);
+  }, [paused]);
   const screen = screens[active];
   const Icon = screen.icon;
   return (
-    <div className="landing-gallery" aria-label="Telas do Aether Flow">
+    <div className="landing-gallery" aria-label="Telas do Aether Flow" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false); }}>
       <div className="landing-gallery-tabs" role="tablist" aria-label="Telas do produto">
-        {screens.map((item, index) => { const TabIcon = item.icon; return <button key={item.label} id={`landing-gallery-tab-${item.view}`} type="button" role="tab" aria-controls="landing-gallery-panel" aria-selected={index === active} className={index === active ? "active" : ""} onClick={() => setActive(index)}><TabIcon size={14} />{item.label}</button>; })}
+        {screens.map((item, index) => { const TabIcon = item.icon; return <button key={item.label} id={`landing-gallery-tab-${item.view}`} type="button" role="tab" aria-controls="landing-gallery-panel" aria-selected={index === active} className={index === active ? "active" : ""} onClick={() => { setActive(index); setPaused(true); }}><TabIcon size={14} />{item.label}</button>; })}
       </div>
       <div key={screen.view} id="landing-gallery-panel" role="tabpanel" aria-labelledby={`landing-gallery-tab-${screen.view}`} className={`landing-gallery-screen ${screen.tone}`}>
         <div className="gallery-screen-head"><div><span>Aether Flow · visão real</span><h3>{screen.title}</h3></div><span className="gallery-screen-icon"><Icon size={18} /></span></div>
