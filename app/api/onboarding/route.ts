@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { templates, stageKind, type TemplateKey } from "@/lib/templates";
 import { isRequestOriginAllowed } from "@/lib/request-origin";
+import { consumeRateLimit } from "@/lib/rate-limit";
 export const dynamic = "force-dynamic";
 const fail = (error: string, status = 400) =>
   Response.json({ error }, { status });
@@ -23,6 +24,12 @@ export async function POST(request: Request) {
     } = await supabase.auth.getUser();
     if (userError || !user)
       return fail("Entre na sua conta para continuar.", 401);
+    const rate = consumeRateLimit(`onboarding:${user.id}`, 5, 10 * 60 * 1000);
+    if (!rate.allowed)
+      return Response.json(
+        { error: "Muitas tentativas. Aguarde antes de tentar novamente." },
+        { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } },
+      );
     const body = (await request.json()) as Record<string, unknown>;
     const name =
       typeof body.companyName === "string" ? body.companyName.trim() : "";
