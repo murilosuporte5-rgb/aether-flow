@@ -568,3 +568,8 @@
 .landing-mobile-dots{justify-content:center;margin-left:0}
 @media(max-width:700px){.landing-mobile-stage{width:min(86vw,290px)}.landing-proof-device{min-height:0}.landing-mobile-copy h2{font-size:31px}}
 @media(prefers-reduced-motion:reduce){.landing-faq-list details[open]>p{animation:none}.landing-mobile-stage:hover{transform:none}}
+
+/* Portrait captures are authored at phone size, so the frame never crops the UI. */
+.landing-proof-device{aspect-ratio:390/844}
+.landing-mobile-shot img{object-fit:contain;object-position:top center;background:#f8fbff}
+
