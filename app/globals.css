@@ -456,12 +456,14 @@
 /* Final mobile drawer sizing: compact, readable, and never wider than needed. */
 @media(max-width:760px){
   .mobile-nav-toggle{min-height:40px;padding:8px 10px;margin-bottom:6px;font-size:11px}
-  .sidebar nav.mobile-nav-open{width:min(250px,calc(100vw - 64px));max-width:calc(100vw - 64px);padding:15px 12px 18px;gap:3px}
+  .sidebar nav.mobile-nav-open{width:min(228px,calc(100vw - 48px));max-width:calc(100vw - 48px);padding:13px 11px 17px;gap:2px}
   .sidebar nav.mobile-nav-open button,.sidebar nav.mobile-nav-open a{min-height:37px;padding:8px 10px;font-size:12px;line-height:1.2;gap:9px}
   .sidebar nav.mobile-nav-open button svg,.sidebar nav.mobile-nav-open a svg{width:17px;height:17px}
   .sidebar nav.mobile-nav-open button>span:not(.sidebar-alert-count),.sidebar nav.mobile-nav-open a>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
 @media(max-width:430px){
-  .sidebar nav.mobile-nav-open{width:min(238px,calc(100vw - 54px));max-width:calc(100vw - 54px)}
+  .sidebar nav.mobile-nav-open{width:min(216px,calc(100vw - 42px));max-width:calc(100vw - 42px);padding:12px 10px 16px}
+  .sidebar nav.mobile-nav-open button,.sidebar nav.mobile-nav-open a{min-height:36px;padding:7px 9px;font-size:12px;gap:8px}
+  .sidebar nav.mobile-nav-open button svg,.sidebar nav.mobile-nav-open a svg{width:16px;height:16px}
 }
 .alert.success .notice-undo{border:1px solid #9fd5bd;border-radius:6px;background:#fff;color:#216a4d;padding:5px 8px;font-size:11px;font-weight:800}
