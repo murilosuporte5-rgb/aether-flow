@@ -441,3 +441,5 @@
 .column header{padding-left:22px;padding-right:22px}
 .column-content{padding-left:16px;padding-right:16px}
 .card-open{padding:17px 21px}
+
+.capture-follow-up{display:grid;gap:10px;margin-top:14px;padding:14px;border:1px solid #cfe0f5;border-radius:14px;background:#f7fbff}.capture-follow-up strong{color:#173b70}.capture-follow-up label{display:grid;gap:5px;font-size:12px;color:#5d7698}.capture-follow-up input{min-height:42px;padding:9px 11px;border:1px solid #c4d6eb;border-radius:9px;background:#fff;color:#16365f}.capture-follow-up .capture-actions{margin:0}.capture-follow-up .capture-actions button{min-height:36px}.capture-follow-up .capture-link{width:100%;margin:0}

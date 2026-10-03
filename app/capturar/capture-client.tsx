@@ -26,7 +26,36 @@ export default function CaptureClient() {
   const [selected, setSelected] = useState("");
   const [recording, setRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
+  const [nextDue, setNextDue] = useState("");
+  const [scheduling, setScheduling] = useState(false);
+  const [scheduled, setScheduled] = useState(false);
   const captureStarted = useRef(false);
+
+  function suggestedDue(offset: number) {
+    const value = new Date();
+    if (offset === 0) value.setHours(value.getHours() + 1, 0, 0, 0);
+    else {
+      value.setDate(value.getDate() + offset);
+      if (offset === 2 && value.getDay() === 0) value.setDate(value.getDate() + 1);
+      if (offset === 2 && value.getDay() === 6) value.setDate(value.getDate() + 2);
+      value.setHours(10, 0, 0, 0);
+    }
+    const local = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+  }
+
+  async function scheduleNextAction() {
+    if (!result?.id || !companyId || !nextDue || scheduling || scheduled) return;
+    setScheduling(true);
+    try {
+      const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, requestId: crypto.randomUUID(), kind: "schedule", id: result.id, actionType: "Follow-up", dueAt: new Date(nextDue).toISOString(), note: `Próximo passo após: ${selected}` }) });
+      const payload = (await response.json()) as Result;
+      if (!response.ok || !payload.ok) throw new Error(payload.error || "Não foi possível agendar a próxima ação.");
+      setScheduled(true);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Não foi possível agendar a próxima ação.");
+    } finally { setScheduling(false); }
+  }
 
   useEffect(() => {
     if (!started) return;
@@ -74,7 +103,7 @@ export default function CaptureClient() {
     {status === "idle" && <form className="capture-manual-form" onSubmit={startManual}><label>Nome do contato<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Ex.: Ana da Silva" autoComplete="name" /></label><label>Telefone<input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Ex.: (71) 99999-9999" inputMode="tel" autoComplete="tel" /></label><button className="primary capture-link" type="submit">Adicionar ao Aether</button><small>No celular, use esta opção quando o WhatsApp não permitir extensão.</small></form>}
     {name && status !== "idle" && <div className="capture-contact"><strong>{name}</strong><span>{phone}</span><small>Origem: WhatsApp Web ou captura manual</small></div>}
     {status === "loading" && <div className="capture-loader" aria-label="Carregando" />}
-    {status === "done" && <div className="capture-next"><span>Resultado do contato</span><div className="capture-actions">{quickResults.map((item) => <button key={item} type="button" disabled={recording || recorded} className={selected === item ? "selected" : ""} onClick={async () => { if (!result?.id || !companyId || recording || recorded) return; setSelected(item); setRecording(true); try { const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, requestId: crypto.randomUUID(), kind: "comment", id: result.id, comment: `Resultado do contato: ${item}` }) }); const payload = (await response.json()) as Result; if (!response.ok || !payload.ok) throw new Error(payload.error || "Não foi possível registrar o resultado."); setRecorded(true); } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível registrar o resultado."); setSelected(""); } finally { setRecording(false); } }}>{item}</button>)}</div><small>{recorded ? "Resultado registrado no histórico. Abra a oportunidade para definir a próxima ação." : selected ? (recording ? "Registrando…" : `Registrar “${selected}” no histórico.`) : "Escolha uma opção para registrar o resultado sem redigitar a conversa."}</small></div>}
+    {status === "done" && <div className="capture-next"><span>Resultado do contato</span><div className="capture-actions">{quickResults.map((item) => <button key={item} type="button" disabled={recording || recorded} className={selected === item ? "selected" : ""} onClick={async () => { if (!result?.id || !companyId || recording || recorded) return; setSelected(item); setRecording(true); try { const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, requestId: crypto.randomUUID(), kind: "comment", id: result.id, comment: `Resultado do contato: ${item}` }) }); const payload = (await response.json()) as Result; if (!response.ok || !payload.ok) throw new Error(payload.error || "Não foi possível registrar o resultado."); setRecorded(true); setNextDue(suggestedDue(1)); } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível registrar o resultado."); setSelected(""); } finally { setRecording(false); } }}>{item}</button>)}</div><small>{recorded ? "Resultado registrado. Agora escolha quando o próximo passo deve acontecer." : selected ? (recording ? "Registrando…" : `Registrar “${selected}” no histórico.`) : "Escolha uma opção para registrar o resultado sem redigitar a conversa."}</small>{recorded && <div className="capture-follow-up" aria-live="polite"><strong>Próxima ação</strong><div className="capture-actions"><button type="button" onClick={() => setNextDue(suggestedDue(0))}>Hoje</button><button type="button" onClick={() => setNextDue(suggestedDue(1))}>Amanhã</button><button type="button" onClick={() => setNextDue(suggestedDue(2))}>Próximo dia útil</button></div><label>Escolher data e hora<input type="datetime-local" value={nextDue} min={suggestedDue(0)} onChange={(event) => setNextDue(event.target.value)} /></label><button className="primary capture-link" type="button" disabled={!nextDue || scheduling || scheduled} onClick={() => void scheduleNextAction()}>{scheduled ? "Próxima ação confirmada" : scheduling ? "Agendando…" : "Confirmar próximo passo"}</button><small>{scheduled ? "Lead acompanhado: o follow-up já está no radar." : "Você pode ajustar depois na oportunidade."}</small></div>}</div>}
     {result?.id && <a className="primary capture-link" href={`/?opportunity=${encodeURIComponent(result.id)}`}>Abrir no radar</a>}
     {status === "error" && <><a className="secondary capture-link" href="/login">Entrar no Aether Flow</a><button className="secondary capture-link" type="button" onClick={() => { captureStarted.current = false; setStarted(false); setStatus("idle"); setMessage("Corrija os dados e tente novamente."); }}>Tentar novamente</button></>}
   </section></main>;

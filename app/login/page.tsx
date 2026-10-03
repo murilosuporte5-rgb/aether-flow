@@ -1,8 +1,12 @@
 import {ArrowUpRight,CheckCircle2,Clock3,ShieldCheck,Target} from 'lucide-react';
 import LoginForm from './form';
 import { AetherMark } from '../aether-logo';
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
 
 export default async function LoginPage({searchParams}:{searchParams?:Promise<{reset?:string}>}){
+ const { data: { user } } = await createClient().auth.getUser();
+ if (user) redirect('/');
  const params=searchParams?await searchParams:{};
  return <main className="login login-v2">
   <div className="auth-shell">
