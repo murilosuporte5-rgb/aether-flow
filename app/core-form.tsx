@@ -11,6 +11,7 @@ import {
   phoneForStorage,
 } from "@/lib/execution";
 import type { Data, Row, Stage } from "./workspace";
+import { suggestFromNote } from "@/lib/note-extraction";
 
 export type CoreMode =
   | "create"
@@ -115,6 +116,7 @@ export default function CoreForm({
     mode === "reschedule" ? localInput(row?.next_action_at || null) : "",
   );
   const [note, setNote] = useState("");
+  const noteSuggestion = suggestFromNote(note);
   const [outcome, setOutcome] = useState(closingStage?.kind || "");
   const [lossReason, setLossReason] = useState("");
   const [lossNote, setLossNote] = useState("");
@@ -477,6 +479,7 @@ export default function CoreForm({
                     maxLength={500}
                     rows={2}
                   />
+                  {noteSuggestion && !close && <span className="note-suggestion" role="status"><strong>Sugestão encontrada</strong><span>{noteSuggestion.reason}</span><button type="button" onClick={() => { setType(noteSuggestion.actionType); setDue(localInput(noteSuggestion.dueAt)); }}>Usar Aguardar cliente e retorno sugerido</button></span>}
                 </label>
               </div>
             </details>}
@@ -580,6 +583,7 @@ export default function CoreForm({
                     maxLength={500}
                     rows={2}
                   />
+                  {noteSuggestion && <span className="note-suggestion" role="status"><strong>Sugestão encontrada</strong><span>{noteSuggestion.reason}</span><button type="button" onClick={() => { setType(noteSuggestion.actionType); setDue(localInput(noteSuggestion.dueAt)); }}>Usar Aguardar cliente e retorno sugerido</button></span>}
                 </label>
               </>
             )}
