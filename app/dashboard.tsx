@@ -70,6 +70,8 @@ export default function Dashboard({
       (r) => r.next_action_at && dateKey(r.next_action_at) > today,
     );
   const moneyFor = (items: Row[]) => items.reduce((sum, row) => sum + (row.estimated_value || 0), 0);
+  const covered = active.filter((r) => !!r.next_action_at).length;
+  const coverage = active.length ? Math.round((covered / active.length) * 100) : null;
   const stale = active.filter((r) => (daysSinceInteraction(r.last_interaction_at) ?? -1) >= STALE_THRESHOLDS.stale);
   const riskRows = Array.from(new Set([...overdue, ...missing, ...stale]));
   const proposalRows = active.filter((r) => /propost/i.test(r.stage_name) || r.next_action_type === "Aguardar cliente");
@@ -142,6 +144,7 @@ export default function Dashboard({
           <div><span>VALOR EM RISCO</span><strong>{money(moneyFor(riskRows))}</strong><small>{riskRows.length} oportunidades vencidas, paradas ou sem próximo passo</small></div>
           <div><span>RETORNOS VENCIDOS</span><strong>{money(moneyFor(overdue))}</strong><small>{overdue.length} oportunidades precisam de ação imediata</small></div>
           <div><span>AGUARDANDO DECISÃO</span><strong>{money(moneyFor(proposalRows))}</strong><small>{proposalRows.length} propostas aguardando resposta</small></div>
+          <div><span>COBERTURA OPERACIONAL</span><strong>{coverage === null ? "—" : `${coverage}%`}</strong><small>{covered} de {active.length} abertas têm próxima ação</small></div>
         </div>
         </div>
       </section>
