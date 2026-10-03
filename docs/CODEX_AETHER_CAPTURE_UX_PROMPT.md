@@ -323,3 +323,14 @@ O Aether deve fazer o cliente sentir:
 E visualmente deve transmitir:
 
 **produto confiável, rápido, moderno, profissional e prazeroso de usar — sem perder a identidade e a estrutura que já construímos.**
+
+
+## Pesquisa aprofundada e roadmap de checkpoints
+
+Antes de iniciar novos refinamentos visuais/UX, leia também:
+
+docs/AETHER_MARKET_UX_RESEARCH_2026.md
+
+Esse documento contém a pesquisa comparativa de mercado, evidência científica, regras de motion/psicologia e o roadmap de 30 subcheckpoints.
+
+Execute os subcheckpoints individualmente. Não tente implementar o documento inteiro de uma vez. Preserve a landing e o app existentes; use a pesquisa para refinar, não redesenhar.
