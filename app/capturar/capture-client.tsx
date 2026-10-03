@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Result = { id?: string; contact?: { id: string; name: string }; ok?: boolean; code?: string; error?: string };
 type Workspace = { company?: { id: string }; stages?: Array<{ id: string; kind: string }> };
@@ -26,9 +26,12 @@ export default function CaptureClient() {
   const [selected, setSelected] = useState("");
   const [recording, setRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
+  const captureStarted = useRef(false);
 
   useEffect(() => {
     if (!started) return;
+    if (captureStarted.current) return;
+    captureStarted.current = true;
     let cancelled = false;
     async function run() {
       setStatus("loading");
@@ -73,6 +76,6 @@ export default function CaptureClient() {
     {status === "loading" && <div className="capture-loader" aria-label="Carregando" />}
     {status === "done" && <div className="capture-next"><span>Resultado do contato</span><div className="capture-actions">{quickResults.map((item) => <button key={item} type="button" disabled={recording || recorded} className={selected === item ? "selected" : ""} onClick={async () => { if (!result?.id || !companyId || recording || recorded) return; setSelected(item); setRecording(true); try { const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, requestId: crypto.randomUUID(), kind: "comment", id: result.id, comment: `Resultado do contato: ${item}` }) }); const payload = (await response.json()) as Result; if (!response.ok || !payload.ok) throw new Error(payload.error || "Não foi possível registrar o resultado."); setRecorded(true); } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível registrar o resultado."); setSelected(""); } finally { setRecording(false); } }}>{item}</button>)}</div><small>{recorded ? "Resultado registrado no histórico. Abra a oportunidade para definir a próxima ação." : selected ? (recording ? "Registrando…" : `Registrar “${selected}” no histórico.`) : "Escolha uma opção para registrar o resultado sem redigitar a conversa."}</small></div>}
     {result?.id && <a className="primary capture-link" href={`/?opportunity=${encodeURIComponent(result.id)}`}>Abrir no radar</a>}
-    {status === "error" && <><a className="secondary capture-link" href="/login">Entrar no Aether Flow</a><button className="secondary capture-link" type="button" onClick={() => { setStarted(false); setStatus("idle"); setMessage("Corrija os dados e tente novamente."); }}>Tentar novamente</button></>}
+    {status === "error" && <><a className="secondary capture-link" href="/login">Entrar no Aether Flow</a><button className="secondary capture-link" type="button" onClick={() => { captureStarted.current = false; setStarted(false); setStatus("idle"); setMessage("Corrija os dados e tente novamente."); }}>Tentar novamente</button></>}
   </section></main>;
 }
