@@ -23,9 +23,11 @@ try {
   const operator = await makeUser("QA business operator"); users.push(operator);
   await checked(admin.from("aether_admins").insert({ user_id: operator.id }));
   const customer = await makeUser("QA business customer"); users.push(customer);
+  const operationAdmin = await makeUser("QA operation administrator"); users.push(operationAdmin);
   const company = await checked(admin.from("companies").insert({ name: "QA business operations", company_template: "generic" }).select("id").single());
   companies.push(company.id);
   await checked(admin.from("memberships").insert({ company_id: company.id, user_id: customer.id, role: "owner" }));
+  await checked(admin.from("memberships").insert({ company_id: company.id, user_id: operationAdmin.id, role: "admin" }));
   const stages = await checked(admin.from("pipeline_stages").insert([
     { company_id: company.id, name: "Novo", position: 0, kind: "open" },
     { company_id: company.id, name: "Ganho", position: 1, kind: "won" },
@@ -43,6 +45,12 @@ try {
 
   const customerClient = createClient(api, anon, options);
   assert.ok((await customerClient.auth.signInWithPassword({ email: customer.email, password: customer.password })).data.session);
+  const operationAdminClient = createClient(api, anon, options);
+  assert.ok((await operationAdminClient.auth.signInWithPassword({ email: operationAdmin.email, password: operationAdmin.password })).data.session);
+  const operationCategory = await checked(operationAdminClient.from("operation_categories").insert({ company_id: company.id, name: "Serviços QA" }).select("id").single());
+  const operationProduct = await checked(operationAdminClient.from("operation_products").insert({ company_id: company.id, name: "Produto QA", value: 100, quantity: 2, minimum_quantity: 1, status: "active", commercial_availability: "available", owner_id: operationAdmin.id, category_id: operationCategory.id }).select("id,quantity").single());
+  const operationMovement = await checked(operationAdminClient.rpc("apply_operation_movement", { p_company_id: company.id, p_product_id: operationProduct.id, p_type: "entry", p_quantity: 3, p_note: "admin operation acceptance" }));
+  assert.equal(operationMovement.quantity, 5);
   const employee = await makeUser("QA team employee"); users.push(employee);
   const extraUser = await makeUser("QA unauthorized employee"); users.push(extraUser);
   await checked(customerClient.rpc("team_add_member", { p_company_id: company.id, p_user_id: employee.id, p_display_name: "QA team employee", p_role: "member" }));
@@ -99,7 +107,7 @@ try {
   await checked(operatorClient.rpc("admin_update_company", { p_company_id: company.id, p_action: "suspend", p_value: "" }));
   assert.ok((await customerClient.rpc("import_opportunities", { p_company_id: company.id, p_request_id: randomUUID(), p_rows: rows })).error);
   await checked(operatorClient.rpc("admin_update_company", { p_company_id: company.id, p_action: "activate", p_value: "" }));
-  console.log(JSON.stringify({ status: "PASS", checks: ["admin_catalog", "trial_extension", "feedback_review", "team_owner_manage", "team_member_cannot_manage", "import", "import_retry", "commercial_availability_states", "suspended_write_denied", "reactivation"] }));
+  console.log(JSON.stringify({ status: "PASS", checks: ["admin_catalog", "trial_extension", "feedback_review", "team_owner_manage", "team_member_cannot_manage", "admin_operation_catalog_and_movement", "import", "import_retry", "commercial_availability_states", "suspended_write_denied", "reactivation"] }));
 } finally {
   for (const company of companies) await admin.from("companies").delete().eq("id", company);
   for (const user of users) await admin.auth.admin.deleteUser(user.id);
