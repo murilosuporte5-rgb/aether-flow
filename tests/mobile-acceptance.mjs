@@ -20,6 +20,7 @@ const dir = "qa-results";
 await fs.mkdir(dir, { recursive: true });
 let browser;
 let activePage;
+let lastExternal = [];
 const checked = async (promise) => {
   const r = await promise;
   if (r.error) throw new Error(r.error.message);
@@ -91,6 +92,7 @@ try {
     const other = await fixture("QA Isolation " + width);
     const context = await browser.newContext({ viewport: { width, height: width === 768 ? 1024 : width >= 1024 ? 900 : 844 } });
     const external = [];
+    lastExternal = external;
     const errors = [];
     const links = [];
     await context.route("**/*", async route => {
@@ -289,7 +291,7 @@ try {
     activePage = null;
   }
 } catch (error) {
-  results.push({ name: "failure", status: "FAIL", message: error.message });
+  results.push({ name: "failure", status: "FAIL", message: error.message, externalRequests: lastExternal });
   if (activePage) await activePage.screenshot({ path: dir + "/failure.png", fullPage: false }).catch(() => {});
   process.exitCode = 1;
 } finally {
