@@ -319,6 +319,9 @@ export default function Workspace({
   }, [template, companyId, fetchData, data.company?.id, data.template]);
   const run = async (kind: string, payload: Record<string, unknown> = {}) => {
     if (writeLock.current) return false;
+    const actionMark = `aether-action-${kind}-${crypto.randomUUID()}`;
+    const actionStarted = typeof performance !== "undefined" ? performance.now() : 0;
+    if (typeof performance !== "undefined") performance.mark(`${actionMark}-start`);
     writeLock.current = true;
     const fingerprint = JSON.stringify({ kind, id: selected, ...payload });
     const requestId =
@@ -380,6 +383,13 @@ export default function Workspace({
       setError(e instanceof Error ? e.message : "Falha ao salvar");
       return false;
     } finally {
+      if (typeof performance !== "undefined") {
+        const durationMs = Math.round(performance.now() - actionStarted);
+        performance.mark(`${actionMark}-end`);
+        document.documentElement.dataset.aetherAction = JSON.stringify({ kind, durationMs, at: Date.now() });
+        performance.clearMarks(`${actionMark}-start`);
+        performance.clearMarks(`${actionMark}-end`);
+      }
       writeLock.current = false;
       setBusy(false);
     }
