@@ -237,6 +237,7 @@ export default function Workspace({
     [notificationOpen, setNotificationOpen] = useState(false),
     [mobileMenuOpen, setMobileMenuOpen] = useState(false),
     [attentionFocused, setAttentionFocused] = useState(false),
+    [whatsappStarted, setWhatsappStarted] = useState(false),
     [guidanceIgnored, setGuidanceIgnored] = useState<string[]>([]);
   const writeLock = useRef(false),
     retries = useRef(new Map<string, string>()),
@@ -259,6 +260,9 @@ export default function Workspace({
     setDuplicate(null);
     setError("");
   }, [modal]);
+  useEffect(() => {
+    setWhatsappStarted(false);
+  }, [selected]);
   useEffect(() => {
     const id = data.company?.id;
     if (!id) return;
@@ -1366,7 +1370,8 @@ export default function Workspace({
                   <div><strong>{row.contact_name}</strong><span>{row.stage_name} · {money(row.estimated_value)}</span><span>Última interação: {formatDate(row.last_interaction_at)}</span>{(row.objections || row.negotiation_summary) && <span>{row.objections || row.negotiation_summary}</span>}<span>Próximo passo: {row.next_action_type || "definir depois da conversa"}</span></div>
                 </details>
               )}
-              {wa(row.phone) && <WhatsAppAction className="whatsapp-button" companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} compact={false} onRecorded={() => void fetchData(template, data.company!.id, true)} />}
+              {wa(row.phone) && <WhatsAppAction className="whatsapp-button" companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} compact={false} onRecorded={() => { setWhatsappStarted(true); void fetchData(template, data.company!.id, true); }} />}
+              {queue && whatsappStarted && <div className="queue-follow-up-prompt" role="status"><strong>Conversa registrada.</strong><span>Voltou do WhatsApp? Registre o resultado e defina o próximo passo.</span><button type="button" onClick={() => { setInitialAction("Follow-up"); setModal("complete"); }}>Registrar resultado</button></div>}
             </div>
             <div className="message-tools">
               <details>
