@@ -8,6 +8,7 @@
 - Datas usam `America/Bahia` e `TIME_ZONE_OFFSET` centralizado.
 - O prompt do GitHub foi atualizado para a reta final; o checkpoint ativo agora é Mobile Primeiro. A configuração anterior DM Sans/Manrope foi restaurada por solicitação do usuário.
 - O Focus Mode foi revisado e mantido: fila persistente, progresso, continuidade após WhatsApp e saída já estão presentes. O briefing recebeu apenas o refinamento para exibir o combinado e uma indicação curta do que resolver antes da conversa.
+- NBA/Momentum foram revisados contra os dados disponíveis: as regras continuam determinísticas, explicáveis e limitadas a responsável, próxima ação, atraso, interação recente e tempo na etapa. Não houve evidência para alterar o comportamento.
 
 ## Evidências
 
