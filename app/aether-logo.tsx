@@ -2,10 +2,13 @@ type AetherMarkProps = { size?: number; className?: string };
 
 export function AetherMark({ size = 36, className = "" }: AetherMarkProps) {
   return <svg className={`aether-mark ${className}`.trim()} width={size} height={size} viewBox="0 0 48 48" role="img" aria-label="Aether Flow" focusable="false">
-    <defs><linearGradient id="aether-mark-bg" x1="7" y1="5" x2="42" y2="44" gradientUnits="userSpaceOnUse"><stop stopColor="#173a68"/><stop offset="1" stopColor="#0b233f"/></linearGradient></defs>
-    <rect x="2" y="2" width="44" height="44" rx="13" fill="url(#aether-mark-bg)" />
-    <path d="M13 33.5 22.1 14h3.8L35 33.5M17.2 27h13.6" fill="none" stroke="#f4f8ff" strokeWidth="3.1" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M9.5 24c2.8-8.1 10.6-12.5 19.1-10.7 5.1 1.1 8.3 4.1 10 8.2" fill="none" stroke="#42d4b0" strokeWidth="2" strokeLinecap="round" opacity=".95" />
-    <circle cx="38.6" cy="21.5" r="2.4" fill="#ffd166" />
+    <defs>
+      <linearGradient id="aether-mark-bg" x1="8" y1="6" x2="40" y2="43" gradientUnits="userSpaceOnUse"><stop stopColor="#152943"/><stop offset="1" stopColor="#071421"/></linearGradient>
+      <linearGradient id="aether-mark-accent" x1="13" y1="35" x2="37" y2="13" gradientUnits="userSpaceOnUse"><stop stopColor="#57d6bd"/><stop offset="1" stopColor="#73b6ff"/></linearGradient>
+    </defs>
+    <rect x="2" y="2" width="44" height="44" rx="14" fill="url(#aether-mark-bg)" />
+    <path d="M12.5 34 21.7 14h4.5L35.5 34M16.5 27.1h14.8" fill="none" stroke="#f8fbff" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9.5 24.8c2.3-7.6 9.2-12.2 16.8-11.6 5.9.5 10.1 3.4 12.2 8.1" fill="none" stroke="url(#aether-mark-accent)" strokeWidth="2.4" strokeLinecap="round" />
+    <circle cx="38.2" cy="21.8" r="2.2" fill="#72e3ca" />
   </svg>;
 }
