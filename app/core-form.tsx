@@ -251,9 +251,15 @@ export default function CoreForm({
         </div>
         {mode === "complete" && (
           <div className="completion-context">
-            <strong>
-              {row?.contact_name} · {row?.next_action_type}
-            </strong>
+            <div className="completion-opportunity-context">
+              <strong>{row?.contact_name}</strong>
+              <span>{row?.title || "Oportunidade sem título"} · {row?.stage_name || "Etapa não informada"}</span>
+              <small>
+                {row?.next_action_type || "Próxima ação"}
+                {row?.next_action_at && <> · {new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium", timeStyle: "short", timeZone: TIME_ZONE }).format(new Date(row.next_action_at))}</>}
+              </small>
+              {row?.next_action_note && <em>Nota: {row.next_action_note}</em>}
+            </div>
             <label className="checkbox-label">
               <input
                 type="checkbox"
