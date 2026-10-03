@@ -889,7 +889,9 @@ export default function Workspace({
               </button>
             </div>
           ) : tab === "team" ? (
-            <Team companyId={data.company!.id} canManage={data.companies?.find((c) => c.id === data.company!.id)?.role === "owner"} />
+            <Team companyId={data.company!.id} canManage={["owner", "admin"].includes(
+                  data.companies?.find((c) => c.id === data.company!.id)?.role || "",
+                )} />
           ) : tab === "contacts" ? (
             <Contacts
               data={data}
@@ -1084,8 +1086,9 @@ export default function Workspace({
           ) : (
             <>
               {(adminAccess ||
-                data.companies?.find((c) => c.id === data.company!.id)?.role ===
-                  "owner") && (
+                ["owner", "admin"].includes(
+                  data.companies?.find((c) => c.id === data.company!.id)?.role || "",
+                )) && (
                 <button
                   className="text-button"
                   onClick={() => {

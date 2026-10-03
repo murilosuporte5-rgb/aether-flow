@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Aether Flow Capture",
+  "version": "0.1.0",
+  "description": "Capture o contato da conversa aberta no WhatsApp Web para o Aether Flow.",
+  "permissions": ["tabs", "storage"],
+  "host_permissions": ["https://web.whatsapp.com/*"],
+  "content_scripts": [{
+    "matches": ["https://web.whatsapp.com/*"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }],
+  "action": { "default_title": "Adicionar ao Aether" }
+}
