@@ -12,7 +12,9 @@ export async function updateSession(request:NextRequest){
  response.headers.set('X-Frame-Options','DENY');
  response.headers.set('Referrer-Policy','strict-origin-when-cross-origin');
  response.headers.set('Permissions-Policy','camera=(), microphone=(), geolocation=()');
- response.headers.set('Content-Security-Policy-Report-Only',"default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https://*.supabase.co wss://*.supabase.co");
+ const csp="default-src 'self'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co";
+ response.headers.set('Content-Security-Policy',csp);
+ response.headers.set('Content-Security-Policy-Report-Only',csp);
  if(request.nextUrl.protocol==='https:') response.headers.set('Strict-Transport-Security','max-age=31536000');
  return response;
 }
