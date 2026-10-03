@@ -16,10 +16,15 @@ const shots = [
 
 export default function LandingMobileProof() {
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
   useEffect(() => {
-    const timer = window.setInterval(() => setActive((current) => (current + 1) % shots.length), 3600);
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reducedMotion.matches || paused) return;
+    const timer = window.setInterval(() => {
+      if (!document.hidden) setActive((current) => (current + 1) % shots.length);
+    }, 6000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [paused]);
   const shot = shots[active];
   return (
     <section className="landing-mobile-proof" aria-labelledby="mobile-proof-title">
@@ -30,10 +35,10 @@ export default function LandingMobileProof() {
         <div className="landing-mobile-signals"><span><Check size={15} /> Alertas e prioridades em primeiro plano</span><span><Check size={15} /> Tutorial rápido no primeiro acesso</span><span><Check size={15} /> Layout que se adapta ao toque</span></div>
         <a className="landing-secondary" href="/demo?view=panel#demo-screen">Abrir demonstração <ArrowRight size={16} /></a>
       </div>
-      <div className="landing-mobile-stage">
+      <div className="landing-mobile-stage" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false); }}>
         <div className="landing-proof-device"><div key={shot.src} className="landing-mobile-shot"><Image src={shot.src} alt={`${shot.label} do Aether Flow`} width={1440} height={980} sizes="(max-width: 700px) 100vw, 500px" /></div></div>
         <div className="landing-mobile-caption"><span className="mobile-caption-icon"><Monitor size={15} /></span><div><strong>{shot.label}</strong><small>{shot.text}</small></div><span className="mobile-caption-count">{active + 1}/{shots.length}</span></div>
-        <div className="landing-mobile-dots" role="tablist" aria-label="Capturas do celular">{shots.map((item, index) => <button key={item.src} type="button" role="tab" aria-selected={index === active} aria-label={item.label} className={index === active ? "active" : ""} onClick={() => setActive(index)} />)}</div>
+        <div className="landing-mobile-dots" role="tablist" aria-label="Capturas do celular">{shots.map((item, index) => <button key={item.src} type="button" role="tab" aria-selected={index === active} aria-label={item.label} className={index === active ? "active" : ""} onClick={() => { setActive(index); setPaused(true); }} />)}</div>
       </div>
     </section>
   );
