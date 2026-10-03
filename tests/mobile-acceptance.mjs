@@ -230,6 +230,7 @@ try {
     const second = (await checked(admin.from("opportunities").select("*").eq("company_id", tenant.company).eq("status", "open")))[0];
     await page.locator(".detail-section select").selectOption(tenant.stages.find(s => s.kind === "won").id);
     await core(page).getByRole("heading", { name: "Encerrar oportunidade", exact: true }).waitFor();
+    await core(page).getByLabel("Motivo do ganho", { exact: false }).selectOption("Preço e condição");
     await submit(page);
     await poll("won", async () => (await opp(second.id)).status === "won");
     assert.equal((await opp(second.id)).next_action_at, null);
