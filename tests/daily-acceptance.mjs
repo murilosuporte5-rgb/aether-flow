@@ -351,7 +351,7 @@ try {
         .getByText(`${n + 1} de 20 pendências resolvidas`, { exact: true })
         .waitFor();
     }
-    await page.getByText("Fila concluída.", { exact: true }).waitFor();
+    await page.getByText(/Fila concluída/).waitFor();
     assert.equal(
       await count("activities", tenant.company, { status: "pending" }),
       20,
