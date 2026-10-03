@@ -5,7 +5,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 export default async function LoginPage({searchParams}:{searchParams?:Promise<{reset?:string}>}){
- const { data: { user } } = await createClient().auth.getUser();
+ const supabase = await createClient();
+ const { data: { user } } = await supabase.auth.getUser();
  if (user) redirect('/');
  const params=searchParams?await searchParams:{};
  return <main className="login login-v2">
