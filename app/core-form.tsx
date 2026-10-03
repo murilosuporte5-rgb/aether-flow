@@ -553,9 +553,9 @@ export default function CoreForm({
                 )}
                 {outcome === "won" && (
                   <label>
-                    Motivo do ganho (opcional)
-                    <select value={winReason} onChange={(e) => setWinReason(e.target.value)}>
-                      <option value="" disabled>Selecione</option>
+                    Motivo do ganho *
+                    <select required value={winReason} onChange={(e) => setWinReason(e.target.value)}>
+                      <option value="" disabled>Selecione um motivo</option>
                       {['Preço e condição','Urgência do cliente','Indicação','Relacionamento','Necessidade clara','Outro'].map((reason) => <option key={reason}>{reason}</option>)}
                     </select>
                   </label>
