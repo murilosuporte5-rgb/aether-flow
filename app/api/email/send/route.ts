@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { isRequestOriginAllowed } from "@/lib/request-origin";
+import { consumeRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,6 +34,13 @@ export async function POST(request: Request) {
       .eq("user_id", user.id)
       .maybeSingle();
     if (!membership) return fail("Empresa não autorizada.", 403);
+    const rate = consumeRateLimit(`email:${user.id}:${companyId}`, 5, 10 * 60 * 1000);
+    if (!rate.allowed) {
+      return new Response(JSON.stringify({ error: "Limite de envios atingido. Tente novamente em alguns minutos." }), {
+        status: 429,
+        headers: { "Content-Type": "application/json", "Retry-After": String(rate.retryAfterSeconds) },
+      });
+    }
     const { data: contact, error: contactError } = await supabase
       .from("contacts")
       .select("id,name,email")
