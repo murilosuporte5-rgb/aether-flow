@@ -6,6 +6,7 @@ import Dashboard from "../dashboard";
 import Contacts from "../contacts";
 import type { Data, Row } from "../workspace";
 import { AetherMark } from "../aether-logo";
+import { TIME_ZONE_OFFSET } from "@/lib/execution";
 import "./demo-workspace.css";
 
 export type DemoView = "panel" | "alerts" | "contacts" | "pipeline" | "messages" | "data" | "team";
@@ -40,7 +41,7 @@ const stages = [
 
 // Keep the public capture deterministic so server and browser render the same
 // timestamps and the landing images do not change from one build to another.
-const today = new Date("2026-10-01T12:00:00-03:00");
+const today = new Date(`2026-10-01T12:00:00${TIME_ZONE_OFFSET}`);
 const iso = (offsetHours: number) => new Date(today.getTime() + offsetHours * 3600000).toISOString();
 const dayKey = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bahia" }).format(today);
 const demoBusinessNames = ["Moreira Suporte", "Clínica Vida", "Oficina Central", "Pet Vila", "Studio Bella", "Norte Consultoria", "SolarTech", "Casa Lima", "Alpha Serviços", "Grupo Salvador"];

@@ -1,4 +1,6 @@
 export const TIME_ZONE = "America/Bahia";
+/** Bahia is UTC-03:00 without seasonal clock changes. */
+export const TIME_ZONE_OFFSET = "-03:00";
 export const STALE_THRESHOLDS = { attention: 3, stale: 7 } as const;
 export const LEAD_SOURCES = ["WhatsApp", "Instagram", "Google", "Site", "Indicação", "Ligação", "Evento", "Outro"] as const;
 export const STAGE_STALE_DAYS = 7;

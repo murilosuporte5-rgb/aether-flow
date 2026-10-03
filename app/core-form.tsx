@@ -5,6 +5,7 @@ import {
   ACTION_TYPES,
   LOSS_REASONS,
   TIME_ZONE,
+  TIME_ZONE_OFFSET,
   LEAD_SOURCES,
   formatPhone,
   normalizePhone,
@@ -37,7 +38,7 @@ function localInput(value: string | null) {
     : "";
 }
 function isoInput(value: string) {
-  return value ? new Date(`${value}:00-03:00`).toISOString() : "";
+  return value ? new Date(`${value}:00${TIME_ZONE_OFFSET}`).toISOString() : "";
 }
 
 export default function CoreForm({

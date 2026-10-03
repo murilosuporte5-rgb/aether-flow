@@ -1,12 +1,12 @@
-import { TIME_ZONE } from './execution.ts';
+import { TIME_ZONE, TIME_ZONE_OFFSET } from './execution.ts';
 type Opportunity = { status:string; estimated_value:number|null; created_at:string; closed_at?:string|null; next_action_at:string|null; last_interaction_at:string|null; source:string|null };
 type Activity = { status:string; due_at:string };
 export function operationalMetrics(opps:Opportunity[], activities:Activity[], month:string, now=new Date()) {
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) throw new Error('Mês inválido.');
   const [year,m] = month.split('-').map(Number);
-  const start = Date.parse(`${month}-01T00:00:00-03:00`);
+  const start = Date.parse(`${month}-01T00:00:00${TIME_ZONE_OFFSET}`);
   const next = m===12 ? `${year+1}-01` : `${year}-${String(m+1).padStart(2,'0')}`;
-  const end = Date.parse(`${next}-01T00:00:00-03:00`);
+  const end = Date.parse(`${next}-01T00:00:00${TIME_ZONE_OFFSET}`);
   const open = opps.filter(o=>o.status==='open');
   const closed = opps.filter(o=>o.status!=='open' && o.closed_at && Date.parse(o.closed_at)>=start && Date.parse(o.closed_at)<end);
   const won = closed.filter(o=>o.status==='won'), lost=closed.filter(o=>o.status==='lost');

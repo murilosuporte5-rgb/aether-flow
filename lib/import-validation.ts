@@ -1,4 +1,4 @@
-import { ACTION_TYPES, normalizePhone } from './execution.ts';
+import { ACTION_TYPES, TIME_ZONE_OFFSET, normalizePhone } from './execution.ts';
 import { parseCsv } from './csv.ts';
 export const CSV_COLUMNS = ['nome','telefone','empresa','oportunidade','valor','estágio','origem','próxima_acao','data_proxima_acao'];
 type Stage = { id: string; name: string; kind: string };
@@ -27,7 +27,7 @@ export function validateImport(text: string, stages: Stage[], mapping?: Record<s
     if (date) {
       const calendar = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(date);
       if(calendar){const [,y,m,d,h,min]=calendar;const check=new Date(Date.UTC(Number(y),Number(m)-1,Number(d)));if(check.getUTCFullYear()!==Number(y)||check.getUTCMonth()!==Number(m)-1||check.getUTCDate()!==Number(d)||Number(h)>23||Number(min)>59)error('data ou hora inexistente.');}
-      const iso = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(date) ? date + '-03:00' : date;
+      const iso = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(date) ? date + TIME_ZONE_OFFSET : date;
       if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/.test(iso) || !Number.isFinite(Date.parse(iso))) error('data deve ser ISO com hora, ex.: 2026-10-01T10:00 (Bahia).');
       else dueAt = new Date(iso).toISOString();
     }
