@@ -40,8 +40,10 @@
         setTimeout(() => { button.textContent = "Adicionar ao Aether"; }, 2200);
         return;
       }
-      const query = new URLSearchParams({ ...data, capture: "1" });
-      window.open(`${APP_URL}?${query.toString()}`, "_blank", "noopener");
+      const payload = new URLSearchParams({ ...data, capture: "1" });
+      // Keep contact PII in the fragment so it is not sent in HTTP requests,
+      // referrers or ordinary server access logs.
+      window.open(`${APP_URL}#${payload.toString()}`, "_blank", "noopener");
     });
     target.appendChild(button);
   }

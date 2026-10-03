@@ -412,3 +412,5 @@
 
 /* Keep the mobile drawer usable without covering the workspace. */
 @media (max-width:760px){.sidebar nav.mobile-nav-open{width:min(240px,calc(100vw - 48px));max-width:calc(100vw - 48px)}.sidebar nav.mobile-nav-open:after{inset:0 0 0 min(240px,calc(100vw - 48px))}}
+
+.capture-manual-form{display:grid;gap:13px;margin-top:22px}.capture-manual-form label{display:grid;gap:6px;color:#365a82;font-size:12px;font-weight:800}.capture-manual-form input{width:100%;min-height:44px;border:1px solid #cbdced;border-radius:10px;padding:10px 12px;background:#fff;color:#1c3d64;font:inherit}.capture-manual-form input:focus{outline:3px solid #b9d7f8;border-color:#4389d8}.capture-manual-form small{color:#7187a0;line-height:1.45}
