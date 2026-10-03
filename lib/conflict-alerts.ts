@@ -7,7 +7,7 @@ type PendingOpportunity = {
 
 function localDay(value: string) {
   const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Sao_Paulo",
+    timeZone: "America/Bahia",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

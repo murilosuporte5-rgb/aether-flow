@@ -151,7 +151,7 @@ const initial: Data = {
 };
 const day = (s: string) => {
   const p = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Sao_Paulo",
+    timeZone: "America/Bahia",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -165,7 +165,7 @@ const formatDate = (s: string | null) =>
     ? new Intl.DateTimeFormat("pt-BR", {
         dateStyle: "short",
         timeStyle: "short",
-        timeZone: "America/Sao_Paulo",
+        timeZone: "America/Bahia",
       }).format(new Date(s))
     : "—";
 const money = (v: number | null) =>
@@ -238,7 +238,8 @@ export default function Workspace({
     [attentionFocused, setAttentionFocused] = useState(false);
   const writeLock = useRef(false),
     retries = useRef(new Map<string, string>()),
-    fetchSequence = useRef(0);
+    fetchSequence = useRef(0),
+    queueStorageReady = useRef(false);
   const snapshotReady =
     !!data.company &&
     data.company.id === companyId &&
@@ -256,6 +257,26 @@ export default function Workspace({
     setDuplicate(null);
     setError("");
   }, [modal]);
+  useEffect(() => {
+    const id = data.company?.id;
+    if (!id) return;
+    const key = `aether-flow:resolver-queue:${id}`;
+    if (!queueStorageReady.current) {
+      queueStorageReady.current = true;
+      try {
+        const stored = JSON.parse(window.localStorage.getItem(key) || "null") as { ids?: string[]; resolved?: string[] } | null;
+        if (stored?.ids?.length) {
+          const available = new Set(data.opportunities.map((item) => item.id));
+          const ids = stored.ids.filter((item) => available.has(item));
+          const resolved = (stored.resolved || []).filter((item) => ids.includes(item));
+          if (ids.length && resolved.length < ids.length) setQueue({ ids, resolved });
+        }
+      } catch { /* localStorage is optional continuity support */ }
+      return;
+    }
+    if (queue) window.localStorage.setItem(key, JSON.stringify(queue));
+    else window.localStorage.removeItem(key);
+  }, [data.company?.id, data.opportunities, queue]);
   useEffect(() => {
     const key = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !modal && !busy) { setSelected(null); setMobileMenuOpen(false); }
@@ -716,7 +737,7 @@ export default function Workspace({
             <span className="today-date">
               {new Intl.DateTimeFormat("pt-BR", {
                 dateStyle: "medium",
-                timeZone: "America/Sao_Paulo",
+                timeZone: "America/Bahia",
               }).format(new Date())}
             </span>
           </div>
@@ -864,10 +885,13 @@ export default function Workspace({
                 resolvidas
               </strong>
               {queue.resolved.length === queue.ids.length && (
-                <span>
-                  {queue.ids.length
-                    ? "Fila concluída."
-                    : "Não há pendências para resolver."}
+                <span className="queue-summary">
+                  {queue.ids.length ? (() => {
+                    const resolvedRows = data.opportunities.filter((item) => queue.ids.includes(item.id) && queue.resolved.includes(item.id));
+                    const withNext = resolvedRows.filter((item) => item.next_action_at).length;
+                    const value = resolvedRows.reduce((sum, item) => sum + (item.estimated_value || 0), 0);
+                    return `Fila concluída · ${resolvedRows.length} resolvidos · ${withNext} próximos passos criados · ${money(value)} acompanhados.`;
+                  })() : "Não há pendências para resolver."}
                 </span>
               )}
               <button

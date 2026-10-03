@@ -30,7 +30,7 @@ export async function isAetherAdmin(client: SupabaseClient, userId: string) {
 }
 const dueDate = (days: number, hour: number) => {
   const local = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "America/Sao_Paulo" }),
+    new Date().toLocaleString("en-US", { timeZone: "America/Bahia" }),
   );
   return new Date(
     local.getTime() +
