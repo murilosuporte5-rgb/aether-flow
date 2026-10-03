@@ -121,10 +121,11 @@ try {
     await page.getByLabel("Senha", { exact: true }).fill(tenant.password);
     await page.getByRole("checkbox", { name: /Termos de uso/ }).check();
     await page.getByRole("button", { name: "Entrar no Aether Flow", exact: true }).click();
+    const loginError = page.locator("p.form-error");
     await Promise.race([
       page.waitForURL(base + "/"),
-      page.getByRole("alert").waitFor().then(async () => {
-        throw new Error("Login alert: " + await page.getByRole("alert").innerText());
+      loginError.waitFor().then(async () => {
+        throw new Error("Login alert: " + await loginError.innerText());
       }),
     ]);
     await page.getByRole("button", { name: "Nova oportunidade", exact: true }).waitFor();
