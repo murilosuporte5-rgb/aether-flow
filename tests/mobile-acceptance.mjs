@@ -86,10 +86,10 @@ async function noOverflow(page, scope = "document") {
 }
 try {
   browser = await chromium.launch({ headless: true });
-  for (const width of [360, 390, 412, 768]) {
+  for (const width of [320, 360, 390, 412, 430, 768, 1024, 1366, 1440]) {
     const tenant = await fixture("QA Mobile " + width);
     const other = await fixture("QA Isolation " + width);
-    const context = await browser.newContext({ viewport: { width, height: width === 768 ? 1024 : 844 } });
+    const context = await browser.newContext({ viewport: { width, height: width === 768 ? 1024 : width >= 1024 ? 900 : 844 } });
     const external = [];
     const errors = [];
     const links = [];

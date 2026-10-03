@@ -885,10 +885,6 @@ export default function Workspace({
             </button>}
           </div>
           {tab === "today" && snapshotReady && !loading && (
-            <FeatureGuide canManageTeam={data.companies?.some((company) => company.id === data.company?.id && company.role === "owner") === true} />
-          )}
-          {snapshotReady && !loading && tab !== "team" && <BusinessOperations data={data} reload={()=>void fetchData(template,companyId)}/>}
-          {tab === "today" && snapshotReady && !loading && (
             <button
               className="primary resolve-queue"
               onClick={() => {
@@ -900,6 +896,10 @@ export default function Workspace({
               Resolver pendências
             </button>
           )}
+          {tab === "today" && snapshotReady && !loading && (
+            <FeatureGuide canManageTeam={data.companies?.some((company) => company.id === data.company?.id && company.role === "owner") === true} />
+          )}
+          {snapshotReady && !loading && tab !== "team" && <BusinessOperations data={data} reload={()=>void fetchData(template,companyId)}/>}
           {queue && (
             <section
               className="queue-progress"
@@ -930,9 +930,9 @@ export default function Workspace({
             </section>
           )}
           {loading ? (
-            <div className={`workspace-skeleton skeleton-${tab}`} role="status" aria-label="Carregando oportunidades">
+            <div className={`workspace-skeleton skeleton-${tab}`} role="status" aria-label={tab === "team" ? "Carregando equipe" : tab === "contacts" ? "Carregando contatos" : tab === "pipeline" ? "Carregando pipeline" : tab === "today" ? "Carregando prioridades" : "Carregando oportunidades"}>
               <span className="skeleton-line skeleton-title" />
-              <div className="skeleton-grid">{Array.from({ length: tab === "pipeline" ? 4 : 3 }, (_, index) => <span className="skeleton-card" key={index} />)}</div>
+              <div className="skeleton-grid">{Array.from({ length: tab === "pipeline" ? 4 : tab === "today" ? 4 : tab === "team" ? 2 : 3 }, (_, index) => <span className="skeleton-card" key={index} />)}</div>
               <span className="skeleton-line skeleton-wide" />
             </div>
           ) : !snapshotReady ? (
