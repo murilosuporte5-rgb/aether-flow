@@ -539,7 +539,7 @@ export default function Workspace({
             <CalendarDays size={18} /><span>Hoje</span>
           </button>
           <button
-            className={`alert-nav ${attentionFocused ? "active" : ""}`}
+            className={`alert-nav ${tab === "today" && attentionFocused ? "active" : ""}`}
             onClick={() => {
               setTab("today");
               setAttentionFocused(true);
