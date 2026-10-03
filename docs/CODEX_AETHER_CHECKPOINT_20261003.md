@@ -17,6 +17,7 @@
 - Landing: galeria principal avança automaticamente com pausa por interação e movimento reduzido; prova mobile usa moldura vertical sem contador; cartões e rodapé levam às páginas temáticas existentes.
 - A página dedicada de recursos foi alinhada aos nove cartões da landing; cada cartão agora abre diretamente a explicação correspondente em vez de terminar em uma âncora sem destino.
 - Identidade: o símbolo em fita ciano/azul enviado e aprovado pelo usuário substituiu a marca provisória no app, login, landing e favicon. O arquivo foi otimizado localmente de 540 KB para 28 KB sem nova geração.
+- Segurança complementar: o Capture remove o fragmento PII da URL após a leitura, e mutações autenticadas do workspace têm limite server-side com resposta `429` e `Retry-After`.
 
 ## Evidências
 
@@ -32,9 +33,11 @@
 - Produção após `06e4a32`: `/landing/telas` passou a expor `landing-sub-gallery-first`, health retornou `200` com banco `protected`, e `tests/public-release-smoke.mjs` retornou `PASS` para login, Capture, recuperação, termos, privacidade e redirecionamento autenticado.
 - CSP aplicada e mantida em Report-Only para diagnóstico: removido `unsafe-eval`; build e login local sob a política aplicada carregaram sem erros de console. Headers públicos confirmados após o deploy `2fe80f7`.
 - Lote visual de 03/10: `npm test` 33/33, `npm run check`, `npm run build` e `git diff --check` passaram. Landing e login foram revisados no navegador local; a nova marca aparece com contraste correto em fundo claro e escuro.
+- Auditoria de segurança: produção retorna CSP efetiva, HSTS, `nosniff`, `X-Frame-Options: DENY` e Permissions-Policy restritiva; a extensão mantém `permissions: []` e só acessa `web.whatsapp.com`. O acceptance autenticado do SHA atual segue sem execução por ausência do runtime Supabase local.
 
 ## Pendências reais
 
 - A seção `Também no celular` agora tem moldura vertical, mas ainda depende dos sete PNGs horizontais atuais; gerar capturas verticais reais continua pendente e não será simulada uma imagem falsa.
 - Proteção contra senhas vazadas permanece fora deste ciclo por decisão explícita do usuário; não é bloqueio de execução agora.
 - Advisors Supabase mantêm avisos sobre funções `SECURITY DEFINER` intencionais e índices ainda sem uso observado; não há alteração especulativa.
+- QA final ainda não pode ser declarado completo: faltam screenshots/revisão visual autenticada do SHA atual nas nove larguras, logout/login autenticado e execução do fluxo Capture pela UI. Os scripts existem, mas dependem do Supabase descartável local.

@@ -59,6 +59,7 @@ export default function CaptureClient() {
   useEffect(() => {
     if (!started) return;
     if (captureStarted.current) return;
+    if (window.location.hash) window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
     captureStarted.current = true;
     let cancelled = false;
     async function run() {

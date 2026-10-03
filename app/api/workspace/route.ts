@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { templates, type TemplateKey } from "@/lib/templates";
 import { seedDemo } from "@/lib/provision";
 import { isRequestOriginAllowed } from "@/lib/request-origin";
+import { consumeRateLimit } from "@/lib/rate-limit";
 import type { SupabaseClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 const fail = (error: string, status = 400) =>
@@ -201,6 +202,8 @@ export async function POST(request: Request) {
     const body = (await request.json()) as Record<string, unknown>;
     const ctx = await context(body.companyId, body.template);
     if (!ctx) return fail("Sua sessão expirou. Entre novamente.", 401);
+    const rate = consumeRateLimit(`workspace-mutation:${ctx.user.id}`, 60, 10 * 60 * 1000);
+    if (!rate.allowed) return Response.json({ error: "Muitas ações em pouco tempo. Aguarde e tente novamente." }, { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } });
     if (!ctx.company) return fail("Empresa não vinculada à sua conta.", 403);
     const { requestId, companyId, template, ...command } = body;
     if (companyId !== ctx.company.id)
