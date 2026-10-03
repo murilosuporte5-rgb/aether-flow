@@ -402,7 +402,7 @@ export default function Workspace({
         .filter((x) => {
           if (search && !matchesSearch(x, search)) return false;
           if (stageFilter !== "all" && x.stage_id !== stageFilter) return false;
-          if (ownerFilter !== "all" && x.owner_id !== ownerFilter) return false;
+          if (ownerFilter !== "all" && (ownerFilter === "unassigned" ? !!x.owner_id : x.owner_id !== ownerFilter)) return false;
           if (filter === "overdue")
             return (
               x.status === "open" &&
@@ -999,6 +999,7 @@ export default function Workspace({
                     onChange={(e) => setOwnerFilter(e.target.value)}
                   >
                     <option value="all">Todos os responsáveis</option>
+                    <option value="unassigned">Sem responsável</option>
                     {data.owners.map((o) => (
                       <option key={o.id} value={o.id}>
                         {o.display_name}
@@ -1118,6 +1119,7 @@ export default function Workspace({
                     onChange={(e) => setOwnerFilter(e.target.value)}
                   >
                     <option value="all">Todos</option>
+                    <option value="unassigned">Sem responsável</option>
                     {data.owners.map((o) => (
                       <option key={o.id} value={o.id}>
                         {o.display_name}
