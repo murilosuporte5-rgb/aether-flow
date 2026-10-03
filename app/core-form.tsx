@@ -269,12 +269,12 @@ export default function CoreForm({
               Houve contato com o cliente
             </label>
             <label>
-              Resultado {confirmed ? "*" : "(opcional)"}
+              Resultado do retorno *
               <input
                 value={result}
                 onChange={(e) => setResult(e.target.value)}
                 maxLength={500}
-                required={confirmed}
+                required
               />
             </label>
           </div>
