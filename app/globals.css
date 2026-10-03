@@ -449,3 +449,15 @@
 .workspace-skeleton{display:grid;gap:16px;padding:24px 0}.skeleton-line,.skeleton-card{display:block;border-radius:10px;background:linear-gradient(100deg,#edf2f7 20%,#f8fafc 40%,#edf2f7 60%);background-size:200% 100%;animation:skeleton-shimmer 1.35s ease-in-out infinite}.skeleton-title{width:35%;height:25px}.skeleton-wide{width:100%;height:170px}.skeleton-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.skeleton-pipeline .skeleton-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.skeleton-card{height:130px}@keyframes skeleton-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}@media(max-width:760px){.skeleton-grid,.skeleton-pipeline .skeleton-grid{grid-template-columns:1fr 1fr}.skeleton-title{width:60%}.skeleton-wide{height:120px}}@media(prefers-reduced-motion:reduce){.skeleton-line,.skeleton-card{animation:none;background:#edf2f7}}
 :root{--motion-fast:140ms;--motion-standard:220ms;--motion-emphasis:360ms;--ease-standard:cubic-bezier(.2,.8,.2,1);--ease-emphasis:cubic-bezier(.22,.8,.35,1)}.sidebar nav button,.sidebar nav a{transition-duration:var(--motion-standard);transition-timing-function:var(--ease-standard)}.modal,.quick-modal,.mobile-nav-open{transition:transform var(--motion-emphasis) var(--ease-emphasis),opacity var(--motion-standard) ease}
 .note-suggestion{display:grid;gap:5px;margin-top:7px;padding:9px 10px;border:1px solid #cfe5d9;border-radius:8px;background:#f0fbf5;color:#386451;font-size:11px}.note-suggestion strong{font-size:11px;color:#246b4d}.note-suggestion button{justify-self:start;border:0;border-radius:6px;background:#d5f2e3;color:#216a4d;padding:7px 9px;font-size:11px;font-weight:800}
+
+/* Final mobile drawer sizing: compact, readable, and never wider than needed. */
+@media(max-width:760px){
+  .mobile-nav-toggle{min-height:40px;padding:8px 10px;margin-bottom:6px;font-size:11px}
+  .sidebar nav.mobile-nav-open{width:min(250px,calc(100vw - 64px));max-width:calc(100vw - 64px);padding:15px 12px 18px;gap:3px}
+  .sidebar nav.mobile-nav-open button,.sidebar nav.mobile-nav-open a{min-height:37px;padding:8px 10px;font-size:12px;line-height:1.2;gap:9px}
+  .sidebar nav.mobile-nav-open button svg,.sidebar nav.mobile-nav-open a svg{width:17px;height:17px}
+  .sidebar nav.mobile-nav-open button>span:not(.sidebar-alert-count),.sidebar nav.mobile-nav-open a>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+@media(max-width:430px){
+  .sidebar nav.mobile-nav-open{width:min(238px,calc(100vw - 54px));max-width:calc(100vw - 54px)}
+}
