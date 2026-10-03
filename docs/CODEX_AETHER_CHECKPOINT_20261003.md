@@ -6,6 +6,7 @@
 - Undo limitado a mudanças entre etapas abertas, com verificação server-side do estágio atual.
 - Menu mobile usa drawer compacto; seleção de Alertas exige a aba Hoje ativa e o fundo fecha o drawer.
 - Datas usam `America/Bahia` e `TIME_ZONE_OFFSET` centralizado.
+- O prompt do GitHub foi atualizado para a reta final; o checkpoint ativo agora é Mobile Primeiro. A configuração anterior DM Sans/Manrope foi restaurada por solicitação do usuário.
 
 ## Evidências
 
@@ -14,6 +15,7 @@
 - Smoke público: `PASS` em health, login, Capture, recuperação, termos, privacidade e redirecionamento protegido de contatos.
 - `npm test`: 33/33; `npm run check`: PASS; `npm run build`: PASS.
 - QA autenticado de produção: sem overflow horizontal em 360, 390, 768, 1024, 1366 e 1440 px; drawer em 360/390 px mede 200 px, sem overflow interno; Alertas fica como único item ativo; toque fora fecha.
+- Reta final Mobile Primeiro: ajuste concreto em 320–430 px para reduzir hero, cabeçalho, tutorial e espaçamento sem alterar desktop; landing local medida sem overflow em 320 px.
 - CSP aplicada e mantida em Report-Only para diagnóstico: removido `unsafe-eval`; build e login local sob a política aplicada carregaram sem erros de console. Headers públicos confirmados após o deploy `2fe80f7`.
 
 ## Pendências reais
