@@ -385,13 +385,14 @@ export default function Workspace({
     : user.name;
   const firstName = rawDisplayName.trim().split(/\s+/)[0] || "cliente";
   const attentionRows = [...new Map(
-    [...conflictRows, ...open.filter((r) => priorityRank(r) <= 3)]
+    [...conflictRows, ...open.filter((r) => priorityRank(r) <= 3), ...open.filter((r) => !r.owner_id)]
       .sort((a, b) => (conflictIds.has(a.id) === conflictIds.has(b.id) ? comparePriority(a, b) : conflictIds.has(a.id) ? -1 : 1))
       .map((opportunity) => [opportunity.id, opportunity]),
   ).values()].slice(0, 4);
   const attentionCount = new Set([
     ...conflictRows.map((opportunity) => opportunity.id),
     ...open.filter((opportunity) => priorityRank(opportunity) <= 3).map((opportunity) => opportunity.id),
+    ...open.filter((opportunity) => !opportunity.owner_id).map((opportunity) => opportunity.id),
   ]).size;
   const currentRole = data.companies?.find((company) => company.id === data.company?.id)?.role;
   const greeting = greetingForNow(),
@@ -438,6 +439,8 @@ export default function Workspace({
   const statusText = (r: Row) =>
     conflictIds.has(r.id)
       ? "Conflito de agenda"
+      : !r.owner_id
+      ? "Sem responsável"
       : r.status === "won"
       ? "Ganho"
       : r.status === "lost"
