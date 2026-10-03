@@ -32,6 +32,7 @@ jobs:
           node --check scripts/local-qa-env.mjs
           node --check tests/mobile-acceptance.mjs
           node --check tests/daily-acceptance.mjs
+          node --check extension/content.js
       - name: Local Supabase and browser tools
         run: |
           set -euo pipefail
