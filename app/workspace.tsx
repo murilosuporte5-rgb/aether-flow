@@ -373,7 +373,8 @@ export default function Workspace({
         setSelected(next || null);
       }
       if (kind === "pipeline_configure") setSettings(false);
-      setNotice("Alteração salva.");
+      const targetStage = kind === "stage" ? data.stages.find((stage) => stage.id === payload.stageId) : null;
+      setNotice(kind === "stage" && targetStage ? `Movido para ${targetStage.name}.` : kind === "schedule" || kind === "reschedule" ? "Próxima ação agendada." : kind === "complete" ? "Ação concluída e próximo passo registrado." : kind === "create" ? "Oportunidade criada." : "Dados atualizados.");
       return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha ao salvar");
@@ -907,8 +908,10 @@ export default function Workspace({
             </section>
           )}
           {loading ? (
-            <div className="loading" role="status">
-              Carregando oportunidades…
+            <div className={`workspace-skeleton skeleton-${tab}`} role="status" aria-label="Carregando oportunidades">
+              <span className="skeleton-line skeleton-title" />
+              <div className="skeleton-grid">{Array.from({ length: tab === "pipeline" ? 4 : 3 }, (_, index) => <span className="skeleton-card" key={index} />)}</div>
+              <span className="skeleton-line skeleton-wide" />
             </div>
           ) : !snapshotReady ? (
             <div className="empty-line" role="status">
