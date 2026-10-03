@@ -79,19 +79,19 @@ async function snapshot(s: SupabaseClient, c: string) {
     await Promise.all([
       s
         .from("pipeline_stages")
-        .select("*")
+        .select("id,name,position,kind")
         .eq("company_id", c)
         .order("position"),
       s
         .from("opportunities")
-        .select("*")
+        .select("id,company_id,contact_id,title,stage_id,owner_id,estimated_value,status,source,details,commercial_availability,next_action_type,next_action_at,next_action_note,last_interaction_at,created_at,updated_at,stage_entered_at,waiting_started_at,closed_at,tags,proposal_url,contract_url,drive_url,competitor,negotiation_summary,objections,win_reason")
         .eq("company_id", c)
         .order("updated_at", { ascending: false }),
-      s.from("contacts").select("*").eq("company_id", c),
-      s.from("activities").select("*").eq("company_id", c).order("due_at"),
+      s.from("contacts").select("id,company_id,name,phone,email,organization,created_at").eq("company_id", c),
+      s.from("activities").select("id,company_id,opportunity_id,owner_id,status,due_at,type,note,created_at").eq("company_id", c).order("due_at"),
       s
         .from("opportunity_history")
-        .select("*")
+        .select("id,company_id,opportunity_id,event,description,created_at,actor_id,payload")
         .eq("company_id", c)
         .order("created_at", { ascending: false }),
       s.from("profiles").select("id,display_name"),
