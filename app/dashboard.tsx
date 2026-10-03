@@ -142,12 +142,12 @@ export default function Dashboard({
           <button onClick={() => viewList("today")}><span>Ações para hoje</span><strong>{due.length}</strong><small>Compromissos do dia</small></button>
           <button onClick={() => viewList("none")}><span>Sem próximo passo</span><strong>{missing.length}</strong><small>Evite oportunidades paradas</small></button>
           <div className="radar-cash"><span>VALOR EM ABERTO</span><strong>{money(moneyFor(active))}</strong><small>{active.length} oportunidades acompanhadas</small></div>
+        </div>
         <div className="risk-strip" aria-label="Valores que pedem atenção">
           <div><span>VALOR EM RISCO</span><strong>{money(moneyFor(riskRows))}</strong><small>{riskRows.length} oportunidades vencidas, paradas ou sem próximo passo</small></div>
           <div><span>RETORNOS VENCIDOS</span><strong>{money(moneyFor(overdue))}</strong><small>{overdue.length} oportunidades precisam de ação imediata</small></div>
           <div><span>AGUARDANDO DECISÃO</span><strong>{money(moneyFor(proposalRows))}</strong><small>{proposalRows.length} propostas aguardando resposta</small></div>
           <div><span>COBERTURA OPERACIONAL</span><strong>{coverage === null ? "—" : `${coverage}%`}</strong><small>{covered} de {active.length} abertas têm próxima ação</small></div>
-        </div>
         </div>
       </section>
       <WeeklySummary data={data} rows={rows} open={open} />

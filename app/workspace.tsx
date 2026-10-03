@@ -504,14 +504,6 @@ export default function Workspace({
         </button>
         <nav id="workspace-navigation" className={mobileMenuOpen ? "mobile-nav-open" : ""} aria-label="Navegação principal">
           <button
-            type="button"
-            className="mobile-nav-close"
-            aria-label="Fechar menu"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <X size={18} /> <span>Menu</span>
-          </button>
-          <button
             className={tab === "today" && !attentionFocused ? "active" : ""}
             onClick={() => {
               setTab("today");
@@ -595,6 +587,14 @@ export default function Workspace({
             </a>
           )}
         </nav>
+        {mobileMenuOpen && (
+          <button
+            type="button"
+            className="mobile-nav-backdrop"
+            aria-label="Fechar menu"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
         <div className="sidebar-bottom">
           {data.company?.demo && (
             <div className="demo-note">

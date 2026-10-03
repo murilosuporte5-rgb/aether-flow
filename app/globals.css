@@ -433,3 +433,11 @@
   .sidebar nav.mobile-nav-open{width:min(220px,78vw);max-width:78vw}
   .sidebar nav.mobile-nav-open:after{inset:0 0 0 min(220px,78vw)}
 }
+.mobile-nav-backdrop{display:none}
+@media(max-width:760px){
+  .mobile-nav-backdrop{display:block;position:fixed;z-index:60;inset:0;border:0;background:#091a2a66;cursor:pointer}
+  .sidebar nav.mobile-nav-open:after{display:none}
+}
+.column header{padding-left:18px;padding-right:18px}
+.column-content{padding-left:12px;padding-right:12px}
+.card-open{padding:15px 16px}
