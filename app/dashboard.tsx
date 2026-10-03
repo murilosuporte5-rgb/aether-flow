@@ -66,6 +66,7 @@ export default function Dashboard({
         dateKey(r.next_action_at) === today,
     ),
     missing = active.filter((r) => !r.next_action_at),
+    unassigned = active.filter((r) => !r.owner_id),
     future = active.filter(
       (r) => r.next_action_at && dateKey(r.next_action_at) > today,
     );
@@ -73,12 +74,13 @@ export default function Dashboard({
   const covered = active.filter((r) => !!r.next_action_at).length;
   const coverage = active.length ? Math.round((covered / active.length) * 100) : null;
   const stale = active.filter((r) => (daysSinceInteraction(r.last_interaction_at) ?? -1) >= STALE_THRESHOLDS.stale);
-  const riskRows = Array.from(new Set([...overdue, ...missing, ...stale]));
+  const riskRows = Array.from(new Set([...overdue, ...missing, ...stale, ...unassigned]));
   const proposalRows = active.filter((r) => /propost/i.test(r.stage_name) || r.next_action_type === "Aguardar cliente");
   const urgent = active
     .filter(
       (r) =>
         !r.next_action_at ||
+        !r.owner_id ||
         Date.parse(r.next_action_at) < Date.now() ||
         dateKey(r.next_action_at) === today ||
         (daysSinceInteraction(r.last_interaction_at) ?? -1) >=
@@ -166,14 +168,18 @@ export default function Dashboard({
                 const activity = data.activities.find(
                   (a) => a.opportunity_id === r.id && a.status === "pending",
                 );
-                const status = !r.next_action_at
+                const status = !r.owner_id
+                  ? "Sem responsável"
+                  : !r.next_action_at
                   ? "Definir ação"
                   : Date.parse(r.next_action_at) < Date.now()
                     ? "Vencido"
                     : dateKey(r.next_action_at) === today
                       ? "Hoje"
                       : "Parado";
-                const reason = !r.next_action_at
+                const reason = !r.owner_id
+                  ? "Nenhum responsável vinculado"
+                  : !r.next_action_at
                   ? "Sem próximo passo definido"
                   : Date.parse(r.next_action_at) < Date.now()
                     ? "Retorno vencido"
