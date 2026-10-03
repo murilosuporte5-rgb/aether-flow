@@ -1375,7 +1375,15 @@ export default function Workspace({
               {wa(row.phone) && (
                 <details className="whatsapp-briefing">
                   <summary>Ver briefing antes de abrir WhatsApp</summary>
-                  <div><strong>{row.contact_name}</strong><span>{row.stage_name} · {money(row.estimated_value)}</span><span>Última interação: {formatDate(row.last_interaction_at)}</span>{(row.objections || row.negotiation_summary) && <span>{row.objections || row.negotiation_summary}</span>}<span>Próximo passo: {row.next_action_type || "definir depois da conversa"}</span></div>
+                  <div>
+                    <strong>{row.contact_name}</strong>
+                    <span>{row.stage_name} · {money(row.estimated_value)}</span>
+                    <span>Última interação: {formatDate(row.last_interaction_at)}</span>
+                    {(row.objections || row.negotiation_summary) && <span>{row.objections || row.negotiation_summary}</span>}
+                    <span>Próximo passo: {row.next_action_type || "definir depois da conversa"}</span>
+                    {row.next_action_note && <span>Combinado: {row.next_action_note}</span>}
+                    {(row.objections || row.negotiation_summary || row.next_action_note) && <span className="whatsapp-briefing-focus">Resolver agora: confirme o combinado antes de abrir a conversa.</span>}
+                  </div>
                 </details>
               )}
               {wa(row.phone) && <WhatsAppAction className="whatsapp-button" companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} compact={false} onRecorded={() => { setWhatsappStarted(true); void fetchData(template, data.company!.id, true); }} />}
