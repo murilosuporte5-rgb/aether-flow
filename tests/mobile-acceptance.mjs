@@ -108,12 +108,23 @@ try {
     const page = await context.newPage();
     activePage = page;
     page.on("pageerror", error => errors.push(error.message));
+    page.on("response", async response => {
+      if (!response.url().includes("/auth/v1/token") || response.ok()) return;
+      let body = "";
+      try { body = await response.text(); } catch {}
+      console.log(JSON.stringify({ authTokenStatus: response.status(), authTokenBody: body.slice(0, 300) }));
+    });
     await page.goto(base + "/login");
     await page.getByLabel("E-mail", { exact: true }).fill(tenant.email);
     await page.getByLabel("Senha", { exact: true }).fill(tenant.password);
     await page.getByRole("checkbox", { name: /Termos de uso/ }).check();
     await page.getByRole("button", { name: "Entrar no Aether Flow", exact: true }).click();
-    await page.waitForURL(base + "/");
+    await Promise.race([
+      page.waitForURL(base + "/"),
+      page.getByRole("alert").waitFor().then(async () => {
+        throw new Error("Login alert: " + await page.getByRole("alert").innerText());
+      }),
+    ]);
     await page.getByRole("button", { name: "Nova oportunidade", exact: true }).waitFor();
     await poll("workspace ready", () => page.getByRole("button", { name: "Nova oportunidade", exact: true }).isEnabled());
     await noOverflow(page, "authenticated workspace");
