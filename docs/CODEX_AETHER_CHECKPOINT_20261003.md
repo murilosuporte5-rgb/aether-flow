@@ -34,6 +34,7 @@
 - CSP aplicada e mantida em Report-Only para diagnóstico: removido `unsafe-eval`; build e login local sob a política aplicada carregaram sem erros de console. Headers públicos confirmados após o deploy `2fe80f7`.
 - Lote visual de 03/10: `npm test` 33/33, `npm run check`, `npm run build` e `git diff --check` passaram. Landing e login foram revisados no navegador local; a nova marca aparece com contraste correto em fundo claro e escuro.
 - Auditoria de segurança: produção retorna CSP efetiva, HSTS, `nosniff`, `X-Frame-Options: DENY` e Permissions-Policy restritiva; a extensão mantém `permissions: []` e só acessa `web.whatsapp.com`. O acceptance autenticado do SHA atual segue sem execução por ausência do runtime Supabase local.
+- Após `d5341c2`, Railway respondeu health `200`, o asset da marca retornou `200` e `tests/public-release-smoke.mjs` voltou a `PASS`. A API pública do GitHub ainda não mostra run de CI para este SHA; o último Core acceptance disponível é `69b7eb9`.
 
 ## Pendências reais
 
