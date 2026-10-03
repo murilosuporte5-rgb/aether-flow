@@ -7,12 +7,14 @@ create table if not exists public.terms_acceptances (
 );
 alter table public.terms_acceptances enable row level security;
 revoke all on public.terms_acceptances from public, anon, authenticated;
-grant select on public.terms_acceptances to authenticated;
+grant select, insert on public.terms_acceptances to authenticated;
 create policy terms_acceptances_read_own on public.terms_acceptances
   for select to authenticated using (user_id = (select auth.uid()));
+create policy terms_acceptances_insert_own on public.terms_acceptances
+  for insert to authenticated with check (user_id = (select auth.uid()));
 
 create or replace function public.accept_terms(p_version text)
-returns jsonb language plpgsql security definer set search_path = '' as $$
+returns jsonb language plpgsql security invoker set search_path = '' as $$
 declare actor uuid := (select auth.uid());
 begin
   if actor is null then raise exception using errcode='42501', message='Sessão necessária.'; end if;
