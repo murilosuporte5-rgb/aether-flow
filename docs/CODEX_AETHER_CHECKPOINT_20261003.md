@@ -15,6 +15,7 @@
 - Revisão visual baseada nos 21 apontamentos de produção: drawer mobile passou a ter altura do conteúdo, textos do pipeline receberam margens consistentes, feedback ficou compacto, ações da Operação foram equilibradas e a saída duplicada foi removida do cabeçalho.
 - Capture no computador agora explica o fluxo real da extensão e abre o WhatsApp Web, mantendo o formulário manual para celular.
 - Landing: galeria principal avança automaticamente com pausa por interação e movimento reduzido; prova mobile usa moldura vertical sem contador; cartões e rodapé levam às páginas temáticas existentes.
+- A página dedicada de recursos foi alinhada aos nove cartões da landing; cada cartão agora abre diretamente a explicação correspondente em vez de terminar em uma âncora sem destino.
 - Identidade: o símbolo em fita ciano/azul enviado e aprovado pelo usuário substituiu a marca provisória no app, login, landing e favicon. O arquivo foi otimizado localmente de 540 KB para 28 KB sem nova geração.
 
 ## Evidências

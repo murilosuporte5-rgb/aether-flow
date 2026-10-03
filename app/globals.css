@@ -532,6 +532,7 @@
 
 /* Landing interaction polish requested from the live page review. */
 .landing-step-grid>a,.landing-audience-grid>a{display:block;min-width:0;color:inherit}
+.landing-subgrid article[id]{scroll-margin-top:24px}
 .landing-step-grid>a article,.landing-audience-grid>a article{height:100%}
 .landing-step-grid>a article{position:relative;overflow:hidden;background:linear-gradient(145deg,#fff 0%,#f7fbff 100%)}
 .landing-step-grid>a article:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#24a7ff,#36d6aa)}
