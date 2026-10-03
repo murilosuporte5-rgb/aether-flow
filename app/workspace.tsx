@@ -520,7 +520,7 @@ export default function Workspace({
               setMobileMenuOpen(false);
             }}
           >
-            <CalendarDays size={18} /> Hoje
+            <CalendarDays size={18} /><span>Hoje</span>
           </button>
           <button
             className={`alert-nav ${attentionFocused ? "active" : ""}`}
@@ -533,7 +533,7 @@ export default function Workspace({
             }}
             title="Abrir alertas de atenção"
           >
-            <Bell size={18} /> Alertas {attentionCount > 0 && <span className="sidebar-alert-count">{attentionCount}</span>}
+            <Bell size={18} /><span>Alertas</span> {attentionCount > 0 && <span className="sidebar-alert-count">{attentionCount}</span>}
           </button>
           <button
             className={tab === "list" ? "active" : ""}
@@ -544,7 +544,7 @@ export default function Workspace({
               setMobileMenuOpen(false);
             }}
           >
-            <LayoutList size={18} /> Oportunidades
+            <LayoutList size={18} /><span>Oportunidades</span>
           </button>
           <button
             className={tab === "pipeline" ? "active" : ""}
@@ -555,24 +555,24 @@ export default function Workspace({
               setMobileMenuOpen(false);
             }}
           >
-            <Columns3 size={18} /> Pipeline
+            <Columns3 size={18} /><span>Pipeline</span>
           </button>
           <a href="/operacao" onClick={() => setMobileMenuOpen(false)}>
-            <Boxes size={18} /> Operação
+            <Boxes size={18} /><span>Operação</span>
           </a>
           <a className={tab === "contacts" ? "active" : ""} href="/contatos" onClick={() => setMobileMenuOpen(false)}>
-            <Users size={18} /> Contatos
+            <Users size={18} /><span>Contatos</span>
           </a>
           {data.companies?.find((c) => c.id === data.company?.id)?.role === "owner" && (
             <button className={tab === "team" ? "active" : ""} onClick={() => { setTab("team"); setAttentionFocused(false); setSelected(null); setMobileMenuOpen(false); }}>
-              <Users size={18} /> Equipe
+              <Users size={18} /><span>Equipe</span>
             </button>
           )}
           <a href="/mensagens" onClick={() => setMobileMenuOpen(false)}>
-            <MessageCircle size={18} /> Mensagens
+            <MessageCircle size={18} /><span>Mensagens</span>
           </a>
           <a href="/capturar" onClick={() => setMobileMenuOpen(false)}>
-            <ArrowUpRight size={18} /> Capturar WhatsApp
+            <ArrowUpRight size={18} /><span>Capturar WhatsApp</span>
           </a>
           <button type="button" onClick={() => {
             setTab("today");
@@ -587,7 +587,7 @@ export default function Workspace({
               }
             }, 0);
           }}>
-            <BarChart3 size={18} /> Métricas e CSV
+            <BarChart3 size={18} /><span>Métricas e CSV</span>
           </button>
           {adminAccess && (
             <a className="admin-nav" href="/admin">
