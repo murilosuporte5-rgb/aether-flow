@@ -1,316 +1,450 @@
-# AETHER FLOW — SOMENTE O QUE AINDA FALTA
+# AETHER FLOW — RETA FINAL
 
-O Aether já recebeu muitas melhorias. Antes de implementar qualquer item abaixo, confira o estado atual do `main` para não repetir trabalho.
+O produto já recebeu a maior parte das melhorias planejadas. Não repita trabalho já concluído.
 
-Não refaça funcionalidades que já existem. Trabalhe apenas nas pendências abaixo, em etapas pequenas.
+## Regra principal de execução
 
-Quando uma decisão importante envolver UX, animação, psicologia, conversão, tipografia ou comportamento, pesquise referências atuais e evidência em HCI/design systems antes de escolher a solução.
+ANTES DE CADA CHECKPOINT:
 
-## 1. Fechar o fluxo do Capture
+1. releia este arquivo inteiro;
+2. confira o `main` atual e os commits recentes;
+3. confirme se o checkpoint ainda não foi resolvido;
+4. se já estiver resolvido, pule;
+5. só então implemente.
 
-O Capture básico, deduplicação, reutilização de contato, captura manual/mobile e registro rápido de resultado já existem.
+Ao terminar o checkpoint:
 
-Agora falta transformar:
+1. teste;
+2. revise visualmente;
+3. corrija;
+4. faça commit;
+5. releia este arquivo inteiro novamente antes de começar o próximo.
 
-**capturar → resultado → próxima ação**
+Não siga uma lista antiga de memória. O `main` atual é a fonte da verdade.
 
-em um fluxo único.
+Quando houver decisão relevante de UX, responsividade, motion, conversão, tipografia ou comportamento, pesquise referências atuais e evidência de HCI/design systems antes de escolher.
 
-Faça:
-- depois de “Respondeu”, “Não respondeu”, “Pediu retorno”, “Proposta enviada” ou “Vai decidir”, sugerir imediatamente o próximo passo;
-- oferecer opções rápidas como Hoje, Amanhã, próximo dia útil e escolher data;
-- permitir confirmar sem precisar abrir outra tela;
-- ao terminar, mostrar claramente que o lead está acompanhado;
-- manter opção de abrir a oportunidade se o usuário quiser editar mais detalhes.
+---
 
-Por quê:
-o Capture só fica realmente valioso quando o usuário termina a conversa e o Aether já sabe o que deve acontecer depois.
+# CHECKPOINT 1 — MOBILE PRIMEIRO
 
-## 2. Refinar a fila “Resolver pendências”
+## Situação
 
-A fila, progresso e avanço para o próximo item já existem.
+O mobile ainda não está bom o suficiente.
 
-Não recrie isso.
+Já houve correções de drawer, overflow e breakpoints, mas isso não significa que a experiência visual esteja boa.
 
-Melhore o que existe:
-- deixar a experiência mais parecida com um modo de foco;
-- mostrar uma oportunidade por vez com contexto essencial;
-- facilitar WhatsApp → resultado → próxima ação → próximo item;
-- preservar o progresso se houver refresh ou saída acidental, quando isso puder ser feito de forma simples e segura;
-- no fim, mostrar um resumo curto do que foi resolvido;
-- permitir sair a qualquer momento.
-
-Evidência:
-pesquisa sobre flow favorece objetivo claro, feedback imediato e continuidade da tarefa.
-
-## 3. Remover a fricção restante do login
-
-Ainda existe aceite obrigatório de Termos/Privacidade em todo login.
-
-Melhore:
-- registrar a versão aceita;
-- pedir novo aceite apenas quando necessário;
-- se o usuário já estiver autenticado e abrir `/login`, levar direto ao produto;
-- preservar o comportamento seguro atual de autenticação.
-
-Não adicione novas telas de login sem necessidade.
-
-## 4. Feedback instantâneo e Undo
-
-Hoje várias ações ainda esperam servidor + reload do snapshot antes de parecer concluídas.
-
-Melhore primeiro as ações frequentes e reversíveis:
-- mudança de estágio;
-- reagendamento;
-- conclusão de ação;
-- pequenas alterações seguras.
-
-Faça:
-- feedback visual imediato;
-- mensagem específica, por exemplo “Movido para Proposta” em vez de apenas “Alteração salva”;
-- Undo quando a operação for realmente reversível e segura;
-- reverter a interface corretamente em caso de erro.
-
-Não transforme ações críticas em optimistic update sem proteção.
-
-## 5. Skeletons e percepção de carregamento
-
-O app já tem loaders e animações, mas ainda não possui um sistema consistente de skeletons.
-
-Crie skeletons para as áreas em que há espera perceptível:
-- Hoje/Radar;
-- cards de oportunidade;
-- listas principais;
-- painéis relevantes.
-
-O skeleton deve imitar a geometria real da interface para reduzir layout shift.
-
-Evidência:
-feedback visual durante espera reduz incerteza; estudos sobre percepção de espera mostram que timing e movimento precisam ser calibrados, não simplesmente acelerados.
-
-## 6. Organizar o motion system existente
-
-O app já possui várias animações, transições e `prefers-reduced-motion`.
-
-Não adicione animação em tudo.
-
-Agora:
-- padronize durations e easings;
-- crie poucos tokens reutilizáveis de motion;
-- use tempos curtos para hover/press;
-- use tempos um pouco maiores para modal/drawer/reordenação;
-- deixe animação expressiva apenas para momentos realmente importantes;
-- preserve reduced motion;
-- procure animações duplicadas ou inconsistentes e simplifique.
-
-Use como referência Atlassian Motion, Microsoft Fluent e IBM Carbon.
-
-## 7. Melhorar o encerramento de uma sessão de trabalho
-
-A fila já mostra progresso e “Fila concluída”.
-
-Melhore o fim:
-- mostrar quantidade de retornos resolvidos;
-- quantidade de próximas ações criadas;
-- valor acompanhado, somente quando os dados permitirem afirmar isso corretamente;
-- usar uma microcelebração discreta e rara;
-- não inventar pontuação, XP ou recompensa artificial.
-
-Evidência:
-Progress Principle e goal-gradient favorecem progresso real e pequenas vitórias perceptíveis.
-
-## 8. Next Best Action explicável
-
-Ainda não existe uma camada clara de Next Best Action.
-
-Comece simples e determinístico antes de usar IA complexa.
-
-Exemplos:
-- proposta enviada + vários dias sem interação + sem próxima ação → sugerir follow-up;
-- aguardando cliente além do período esperado → sugerir revisão;
-- oportunidade sem responsável → sugerir atribuição;
-- oportunidade sem próximo passo → sugerir definição.
-
-Sempre mostrar:
-- a sugestão;
-- o motivo;
-- botão para aceitar, alterar ou ignorar.
-
-Não usar score mágico.
-
-## 9. Momentum explicável
-
-Ainda não existe Momentum.
-
-Adicionar de forma simples:
-- Esquentando;
-- Estável;
-- Esfriando.
-
-Basear apenas em sinais disponíveis e explicáveis:
-- recência de interação;
-- próxima ação;
-- atraso;
-- avanço de etapa;
-- tempo parado.
-
-Sempre permitir ver “Por que?”.
-
-Não inventar precisão ou probabilidade de fechamento.
-
-## 10. Briefing antes do WhatsApp
-
-Antes de abrir o WhatsApp, quando houver contexto suficiente, mostrar de forma compacta:
-- cliente;
-- valor;
-- etapa;
-- última interação;
-- objeção/contexto comercial;
-- combinado anterior;
-- próxima ação.
-
-Objetivo:
-o vendedor não precisar reconstruir mentalmente a conversa.
-
-Não criar uma tela pesada. Deve ser rápido de ignorar ou abrir.
-
-## 11. Extração estruturada com confirmação
-
-Quando houver texto/anotação como:
-
-“vou falar com meu sócio e respondo sexta”
-
-o Aether pode sugerir:
-- aguardando decisão;
-- retorno sexta;
-- decisor adicional/contexto;
-- observação.
-
-Mas:
-- nunca alterar campos importantes silenciosamente;
-- mostrar o que será alterado;
-- usuário confirma ou corrige.
-
-## 12. Tipografia e performance de fontes
-
-O projeto ainda usa Google Fonts por `@import`.
-
-Avalie migrar DM Sans/Manrope para `next/font` ou equivalente self-hosted do Next, preservando a aparência se ela já estiver boa.
-
-Objetivo:
-- reduzir dependência externa;
-- melhorar estabilidade visual;
-- evitar layout shift;
-- manter legibilidade de dashboard, números e tabelas.
-
-Não troque a identidade tipográfica sem motivo.
-
-## 13. Segurança que ainda falta revisar
-
-Já existem headers básicos de segurança e rate limiting em partes do sistema.
-
-Não repita isso.
-
-Agora revise apenas lacunas reais:
-- avaliar CSP compatível com Next/Supabase e testar antes de endurecer;
-- tratar o cooldown em `localStorage` apenas como UX, não como defesa real;
-- verificar rate limiting server-side dos pontos realmente sensíveis;
-- revisar permissões da extensão e remover qualquer permissão não usada;
-- revisar exposição desnecessária de PII.
-
-Não quebrar Capture, autenticação ou integrações em nome de hardening.
-
-## 14. Performance mensurável
-
-Adicionar/usar medição para:
-- INP;
-- LCP;
-- CLS;
-- tempo das ações críticas.
-
-Só otimizar onde houver evidência de gargalo.
-
-Também:
-- garantir que animações usem propriedades baratas quando possível;
-- evitar animação fora de viewport;
-- revisar imagens grandes;
-- observar o tamanho do bundle antes de adicionar dependências.
-
-## 15. QA visual final — sem redesign
-
-A landing e o app já receberam bastante trabalho visual.
-
-Não redesenhe.
-
-Faça apenas uma revisão de qualidade em:
-- 360 px;
-- 390 px;
-- 768 px;
-- 1024 px;
-- 1366 px;
-- 1440 px ou maior.
-
-Corrigir somente problemas concretos:
-- overflow;
-- modal cortado;
-- botão difícil de tocar;
-- sidebar/menu desproporcional;
-- card comprimido;
-- espaço vazio estranho;
-- screenshot deformado;
-- título exagerado;
-- quebra de grid;
-- texto pouco legível.
-
-## 16. Padronizar detalhes técnicos pequenos
-
-Revise pequenas inconsistências que diminuem a sensação de produto maduro:
-- timezone usado pelo app;
-- mensagens genéricas de sucesso;
-- nomes de ações;
-- labels duplicadas;
-- estados vazios;
-- feedback de erro;
-- comportamento depois de refresh.
-
-Exemplo atual a revisar:
-há uso misto de `America/Sao_Paulo` e `America/Bahia`. Escolha uma estratégia consistente para datas do produto.
-
-## Ordem sugerida
-
-Faça nesta ordem:
-
-1. Capture → resultado → próxima ação;
-2. Focus/Resolver pendências;
-3. login sem aceite repetitivo;
-4. feedback instantâneo + Undo;
-5. skeletons + motion system;
-6. encerramento satisfatório da sessão;
-7. Next Best Action;
-8. Momentum;
-9. briefing WhatsApp;
-10. extração estruturada;
-11. fontes/performance;
-12. segurança restante;
-13. métricas de performance;
-14. QA visual final;
-15. pequenos detalhes técnicos.
-
-Em cada etapa:
-
-1. confira se já não foi implementada;
-2. pesquise quando houver decisão de UX relevante;
-3. implemente uma mudança pequena;
-4. teste;
-5. confira mobile e desktop quando houver impacto visual;
-6. corrija;
-7. faça commit;
-8. siga.
+Não considere “sem overflow” como sinônimo de “mobile bem resolvido”.
 
 ## Objetivo
 
-**Não adicionar funcionalidades por quantidade. Fazer o fluxo atual do Aether exigir menos pensamento e menos cliques, responder mais rápido e aproveitar melhor os dados que ele já possui.**
+Fazer o Aether parecer um produto realmente pensado para celular, não uma interface desktop comprimida.
 
-O usuário deve sentir:
+## Revisar visualmente
 
-**“Joguei a oportunidade no Aether, fiz o contato, registrei o resultado em segundos e o sistema já deixou claro o que acontece depois.”**
+Testar pelo menos:
+
+- 320 px;
+- 360 px;
+- 390 px;
+- 412 px;
+- 430 px;
+- 768 px.
+
+Revisar app autenticado e landing.
+
+## Corrigir principalmente
+
+- header grande demais;
+- drawer/menu ocupando espaço demais;
+- cards altos ou largos demais;
+- excesso de informação ao mesmo tempo;
+- textos muito pequenos;
+- textos quebrando de forma feia;
+- botões pequenos ou apertados;
+- botões ocupando largura excessiva;
+- modais maiores que a viewport;
+- formulários cansativos;
+- campos apertados;
+- pipeline difícil de navegar;
+- Radar/Hoje com densidade ruim;
+- detalhes da oportunidade com informação demais;
+- espaços vazios estranhos;
+- scroll horizontal;
+- elementos fixos cobrindo conteúdo;
+- CTA fora da área confortável do polegar;
+- inconsistência entre 360 e 390 px;
+- landing com hero, screenshots ou cards desproporcionais.
+
+## Como validar
+
+Não validar apenas via DOM.
+
+Para cada largura importante:
+- abrir a interface;
+- observar a tela real;
+- tirar screenshot quando possível;
+- verificar hierarquia visual;
+- verificar se a ação principal está óbvia;
+- conferir toque, scroll e modal;
+- corrigir até a interface parecer natural naquela largura.
+
+Preserve desktop enquanto melhora mobile.
+
+---
+
+# CHECKPOINT 2 — FOCUS MODE / RESOLVER PENDÊNCIAS
+
+A fila, persistência, progresso, WhatsApp, resultado e resumo final já existem.
+
+Não recrie.
+
+Refine somente se a experiência ainda estiver pesada.
+
+Objetivo:
+**uma oportunidade por vez, uma decisão por vez.**
+
+Melhorar se necessário:
+- reduzir elementos secundários durante a fila;
+- deixar contexto essencial visível;
+- WhatsApp → resultado → próxima ação → próximo item;
+- diminuir necessidade de voltar para outras telas;
+- mostrar progresso sem poluir;
+- permitir sair facilmente;
+- manter continuidade após refresh;
+- fazer o final da sessão parecer realmente concluído.
+
+Pesquise padrões de foco de Linear, Superhuman, Todoist e apps de processamento de fila antes de alterar.
+
+---
+
+# CHECKPOINT 3 — LOGIN SEM ATRITO REPETITIVO
+
+O aceite de termos já possui versão e persistência, mas o checkbox ainda aparece no login.
+
+Revise o fluxo real.
+
+Se juridicamente e tecnicamente possível:
+- não exigir nova ação de aceite em todo login;
+- pedir aceite apenas no primeiro uso ou quando a versão mudar;
+- usuário autenticado deve ir direto para o produto;
+- não adicionar novas telas.
+
+Preserve registro de aceite e segurança.
+
+---
+
+# CHECKPOINT 4 — REFINAR NEXT BEST ACTION E MOMENTUM
+
+Next Best Action e Momentum já existem.
+
+Não recrie.
+
+Agora apenas refine se os dados reais justificarem.
+
+Revisar:
+- se as sugestões são realmente úteis;
+- se aparecem no momento certo;
+- se o motivo é claro;
+- se “Esquentando / Estável / Esfriando” não está simplista demais;
+- se existe alguma sugestão óbvia errada;
+- se o usuário consegue aceitar, alterar ou ignorar sem esforço.
+
+Pode considerar:
+- etapa atual;
+- última interação;
+- próxima ação;
+- atraso;
+- tempo na etapa;
+- responsável;
+- estado “aguardando cliente”;
+- histórico recente.
+
+Não criar score opaco.
+Não mostrar probabilidade de fechamento inventada.
+
+---
+
+# CHECKPOINT 5 — BRIEFING ANTES DO WHATSAPP
+
+O briefing já existe.
+
+Não recrie.
+
+Refine somente o que realmente ajuda antes do contato.
+
+Idealmente mostrar, quando disponível:
+- quem é;
+- etapa;
+- valor;
+- última interação;
+- o que foi combinado;
+- objeção/contexto;
+- próxima ação;
+- uma indicação curta do que precisa ser resolvido agora.
+
+O briefing deve ser lido em poucos segundos.
+
+Evite:
+- texto longo;
+- informação repetida;
+- nova tela pesada;
+- IA inventando contexto.
+
+---
+
+# CHECKPOINT 6 — ACABAMENTO VISUAL DO APP
+
+Não redesenhe.
+
+Faça uma revisão de acabamento do produto atual.
+
+Olhar:
+- hierarquia;
+- alinhamento;
+- tipografia;
+- densidade;
+- contraste;
+- proporções;
+- cards;
+- botões;
+- ícones;
+- modais;
+- tabelas/listas;
+- estados vazios;
+- feedback de sucesso/erro;
+- loading;
+- skeleton;
+- animações;
+- consistência entre telas.
+
+Pergunta para cada tela:
+
+**“Isso parece um software acabado ou ainda parece uma tela em construção?”**
+
+Corrigir apenas problemas concretos.
+
+---
+
+# CHECKPOINT 7 — LANDING FINAL
+
+A landing já existe e não deve ser redesenhada.
+
+Faça apenas refinamento final.
+
+Revisar:
+- hero;
+- CTA principal;
+- prova visual do produto;
+- screenshots;
+- proporção mobile;
+- legibilidade;
+- espaçamento;
+- confiança;
+- demonstração clara do fluxo Capture → Radar → próxima ação.
+
+No mobile, verificar principalmente:
+- altura do hero;
+- CTA visível cedo;
+- screenshot legível;
+- cards sem empilhamento estranho;
+- textos sem largura excessiva;
+- navegação simples.
+
+Não usar:
+- urgência falsa;
+- prova social inventada;
+- animação excessiva;
+- CTA piscando.
+
+---
+
+# CHECKPOINT 8 — LOGO E IDENTIDADE
+
+A marca atual ainda é provisória.
+
+Não faça apenas pequenas alterações aleatórias no mesmo símbolo.
+
+Antes de substituir:
+- analisar identidade atual;
+- comparar marcas SaaS modernas;
+- pensar em legibilidade pequena;
+- favicon;
+- sidebar;
+- mobile;
+- fundo claro e escuro;
+- versão símbolo;
+- versão símbolo + Aether Flow.
+
+A identidade deve transmitir:
+- fluxo;
+- organização;
+- atenção;
+- velocidade;
+- tecnologia;
+- confiança.
+
+Se ainda não houver conceito aprovado pelo usuário, não force uma troca definitiva.
+Pode preparar opções vetoriais para comparação.
+
+---
+
+# CHECKPOINT 9 — PERFORMANCE REAL
+
+Já existem métricas e medição de ações.
+
+Não recrie instrumentation sem necessidade.
+
+Agora:
+- observar INP, LCP e CLS reais;
+- observar ações lentas;
+- revisar bundle;
+- revisar imagens;
+- verificar fontes;
+- evitar motion pesado;
+- otimizar apenas gargalos comprovados.
+
+Não sacrificar UX por micro-otimização sem impacto.
+
+---
+
+# CHECKPOINT 10 — SEGURANÇA: SOMENTE VERIFICAÇÃO RESTANTE
+
+Headers básicos e CSP já foram trabalhados.
+
+Não refaça segurança do zero.
+
+Verificar apenas:
+- CSP funcionando em produção;
+- ausência de regressões de login/Capture/Supabase;
+- rate limit server-side nos pontos realmente sensíveis;
+- permissões mínimas da extensão;
+- exposição de PII;
+- proteção disponível no plano atual do Supabase.
+
+Se algo já estiver comprovado, não mexer.
+
+---
+
+# CHECKPOINT 11 — QA FINAL COMPLETO
+
+Antes de declarar terminado:
+
+## Visual
+
+Testar:
+- 320;
+- 360;
+- 390;
+- 412;
+- 430;
+- 768;
+- 1024;
+- 1366;
+- 1440+.
+
+## Fluxos
+
+Testar:
+- login;
+- Capture;
+- resultado;
+- próxima ação;
+- Radar;
+- Resolver pendências;
+- WhatsApp;
+- mudança de etapa;
+- Undo;
+- criação/edição de oportunidade;
+- contatos;
+- pipeline;
+- landing;
+- logout/login novamente.
+
+## Qualidade
+
+Rodar:
+- typecheck;
+- testes;
+- build;
+- smoke de produção.
+
+Verificar console do browser.
+
+Corrigir regressões antes de encerrar.
+
+---
+
+# O QUE JÁ ESTÁ FEITO — NÃO REFAZER
+
+Considere já existente e apenas corrija se encontrar bug real:
+
+- Capture básico;
+- deduplicação;
+- captura manual/mobile;
+- resultado rápido;
+- próxima ação no Capture;
+- fila Resolver pendências;
+- persistência da fila;
+- progresso da fila;
+- resumo final;
+- skeletons;
+- motion tokens;
+- reduced motion;
+- Undo de etapa;
+- Next Best Action inicial;
+- Momentum;
+- briefing WhatsApp;
+- extração de anotação com confirmação;
+- `next/font`;
+- timezone centralizado;
+- medição de ações críticas;
+- QA técnico de overflow em vários breakpoints;
+- menu mobile/drawer inicial;
+- headers básicos;
+- CSP;
+- índices/migrations recentes;
+- testes/build já existentes.
+
+Não gaste tempo recriando esses itens.
+
+---
+
+# ORDEM
+
+1. Mobile;
+2. Focus Mode;
+3. Login;
+4. Next Best Action / Momentum;
+5. Briefing WhatsApp;
+6. acabamento visual do app;
+7. landing;
+8. logo/identidade;
+9. performance;
+10. segurança restante;
+11. QA final.
+
+Depois de CADA item:
+**releia este prompt inteiro antes de continuar.**
+
+---
+
+# OBJETIVO FINAL
+
+Não aumentar a quantidade de funcionalidades.
+
+Terminar o produto.
+
+O Aether deve:
+- parecer profissional;
+- funcionar muito bem no celular;
+- continuar bom em tablet e desktop;
+- exigir poucos cliques;
+- deixar claro o que fazer;
+- reduzir trabalho manual;
+- responder rápido;
+- transmitir confiança.
+
+A sensação final deve ser:
+
+**“Eu abro o Aether, vejo o que importa, resolvo em poucos minutos e saio com tudo sob controle.”**
