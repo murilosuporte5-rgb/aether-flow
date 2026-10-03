@@ -20,6 +20,7 @@ const dir = "qa-results";
 await fs.mkdir(dir, { recursive: true });
 let browser;
 let activePage;
+let lastExternal = [];
 const checked = async (promise) => {
   const r = await promise;
   if (r.error) throw new Error(r.error.message);
@@ -91,6 +92,7 @@ try {
     const other = await fixture("QA Isolation " + width);
     const context = await browser.newContext({ viewport: { width, height: width === 768 ? 1024 : width >= 1024 ? 900 : 844 } });
     const external = [];
+    lastExternal = external;
     const errors = [];
     const links = [];
     await context.route("**/*", async route => {
@@ -108,12 +110,24 @@ try {
     const page = await context.newPage();
     activePage = page;
     page.on("pageerror", error => errors.push(error.message));
+    page.on("response", async response => {
+      if (!response.url().includes("/auth/v1/token") || response.ok()) return;
+      let body = "";
+      try { body = await response.text(); } catch {}
+      console.log(JSON.stringify({ authTokenStatus: response.status(), authTokenBody: body.slice(0, 300) }));
+    });
     await page.goto(base + "/login");
     await page.getByLabel("E-mail", { exact: true }).fill(tenant.email);
     await page.getByLabel("Senha", { exact: true }).fill(tenant.password);
     await page.getByRole("checkbox", { name: /Termos de uso/ }).check();
     await page.getByRole("button", { name: "Entrar no Aether Flow", exact: true }).click();
-    await page.waitForURL(base + "/");
+    const loginError = page.locator("p.form-error");
+    await Promise.race([
+      page.waitForURL(base + "/"),
+      loginError.waitFor().then(async () => {
+        throw new Error("Login alert: " + await loginError.innerText());
+      }),
+    ]);
     await page.getByRole("button", { name: "Nova oportunidade", exact: true }).waitFor();
     await poll("workspace ready", () => page.getByRole("button", { name: "Nova oportunidade", exact: true }).isEnabled());
     await noOverflow(page, "authenticated workspace");
@@ -121,7 +135,7 @@ try {
       const menuToggle = page.getByRole("button", { name: "Abrir menu", exact: true });
       await menuToggle.click();
       const navigation = page.locator("#workspace-navigation");
-      await navigation.getByRole("button", { name: "Fechar menu", exact: false }).waitFor();
+      await page.locator("button.mobile-nav-toggle").filter({ hasText: "Fechar menu" }).waitFor();
       await noOverflow(page, "mobile side drawer");
       const alertButton = navigation.locator("button.alert-nav");
       await alertButton.waitFor();
@@ -278,7 +292,7 @@ try {
     activePage = null;
   }
 } catch (error) {
-  results.push({ name: "failure", status: "FAIL", message: error.message });
+  results.push({ name: "failure", status: "FAIL", message: error.message, externalRequests: lastExternal });
   if (activePage) await activePage.screenshot({ path: dir + "/failure.png", fullPage: false }).catch(() => {});
   process.exitCode = 1;
 } finally {

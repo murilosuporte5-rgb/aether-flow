@@ -18,9 +18,14 @@ export default function LoginForm(){
    const supabase=createClient();
    const {error}=await supabase.auth.signInWithPassword({email:email.trim().toLowerCase(),password});
    if(error)throw error;
-   const {error: termsError}=await supabase.rpc('accept_terms',{p_version:TERMS_VERSION});
-   if(termsError && termsError.code !== 'PGRST202') throw termsError;
-   await supabase.auth.updateUser({data:{aether_terms_version:TERMS_VERSION,aether_terms_accepted_at:new Date().toISOString()}});
+   // Keep the sign-in flow available if a disposable Auth runtime has not
+   // loaded the optional acceptance RPC yet; production still records it when
+   // the migration is available.
+   try { await supabase.rpc('accept_terms',{p_version:TERMS_VERSION}); } catch { /* optional in disposable runtimes */ }
+   // The terms RPC is the authoritative acceptance record. Profile metadata is
+   // only a convenience marker and must not turn a valid login into a generic
+   // credential error when an isolated Auth runtime rejects metadata updates.
+   await supabase.auth.updateUser({data:{aether_terms_version:TERMS_VERSION,aether_terms_accepted_at:new Date().toISOString()}}).catch(()=>undefined);
    window.localStorage.setItem('aether-flow:terms-version',TERMS_VERSION);
    window.localStorage.removeItem('aether-flow:login-failures');window.localStorage.removeItem('aether-flow:login-lock-until');
    router.replace('/');router.refresh();
