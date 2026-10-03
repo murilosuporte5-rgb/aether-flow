@@ -438,6 +438,6 @@
   .mobile-nav-backdrop{display:block;position:fixed;z-index:60;inset:0;border:0;background:#091a2a66;cursor:pointer}
   .sidebar nav.mobile-nav-open:after{display:none}
 }
-.column header{padding-left:18px;padding-right:18px}
-.column-content{padding-left:12px;padding-right:12px}
-.card-open{padding:15px 16px}
+.column header{padding-left:22px;padding-right:22px}
+.column-content{padding-left:16px;padding-right:16px}
+.card-open{padding:17px 21px}
