@@ -15,9 +15,13 @@ export default function LoginForm(){
   e.preventDefault();if(cooldown>0)return;setBusy(true);setError('');
   try{
    if(remember)window.localStorage.setItem('aether-flow:remember-email',email.trim().toLowerCase());else window.localStorage.removeItem('aether-flow:remember-email');
-   window.localStorage.setItem('aether-flow:terms-version',TERMS_VERSION);
-   const {error}=await createClient().auth.signInWithPassword({email:email.trim().toLowerCase(),password});
+   const supabase=createClient();
+   const {error}=await supabase.auth.signInWithPassword({email:email.trim().toLowerCase(),password});
    if(error)throw error;
+   const {error: termsError}=await supabase.rpc('accept_terms',{p_version:TERMS_VERSION});
+   if(termsError && termsError.code !== 'PGRST202') throw termsError;
+   await supabase.auth.updateUser({data:{aether_terms_version:TERMS_VERSION,aether_terms_accepted_at:new Date().toISOString()}});
+   window.localStorage.setItem('aether-flow:terms-version',TERMS_VERSION);
    window.localStorage.removeItem('aether-flow:login-failures');window.localStorage.removeItem('aether-flow:login-lock-until');
    router.replace('/');router.refresh();
   }catch{const failures=Number(window.localStorage.getItem('aether-flow:login-failures')||0)+1;window.localStorage.setItem('aether-flow:login-failures',String(failures));if(failures>=3){const seconds=Math.min(120,15*2**Math.min(failures-3,3));const until=Date.now()+seconds*1000;window.localStorage.setItem('aether-flow:login-lock-until',String(until));setCooldown(until-Date.now());setError(`Muitas tentativas. Aguarde ${seconds} segundos e tente novamente.`)}else setError('E-mail ou senha inválidos. Confira os dados enviados pelo administrador.')}
