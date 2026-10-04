@@ -574,3 +574,4 @@
 .landing-mobile-shot img{object-fit:contain;object-position:top center;background:#f8fbff}
 
 .landing-mobile-preload{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}.landing-mobile-preload img{width:1px;height:1px}
+.legal-card .legal-lede{font-size:15px;line-height:1.7;color:#536a82}.legal-card a{color:#1f63a5;text-decoration:underline;text-underline-offset:3px}.legal-actions{display:flex;flex-wrap:wrap;gap:10px}.legal-actions .secondary{text-decoration:none}
