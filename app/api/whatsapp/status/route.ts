@@ -18,6 +18,8 @@ export async function GET(request: Request) {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) return NextResponse.json({ state: "close", error: payload?.message || "Não foi possível consultar a sessão." }, { status: 502 });
     const state = String(payload?.instance?.state || payload?.state || "connecting").toLowerCase();
-    return NextResponse.json({ state: state === "open" || state === "connected" ? "open" : state === "close" || state === "closed" ? "close" : "connecting" });
+    const normalized = state === "open" || state === "connected" ? "open" : state === "close" || state === "closed" ? "close" : "connecting";
+    await supabase.from("whatsapp_connections").update({ status: normalized, updated_at: new Date().toISOString() }).eq("instance_name", instance);
+    return NextResponse.json({ state: normalized });
   } catch { return NextResponse.json({ state: "connecting", error: "Conector indisponível." }, { status: 502 }); }
 }

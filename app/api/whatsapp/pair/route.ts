@@ -16,9 +16,11 @@ export async function POST(request: Request) {
   if (!phone || !phone.startsWith("55")) return NextResponse.json({ error: "Informe um celular brasileiro válido com DDD e código do país. Ex.: 5571999999999" }, { status: 400 });
   const instance = `aether_${user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 18)}_${Date.now().toString(36)}`;
   const headers = { "Content-Type": "application/json", apikey: apiKey };
+  const webhookSecret = process.env.EVOLUTION_WEBHOOK_SECRET?.trim() || apiKey;
+  const webhook = { url: `${new URL(request.url).origin}/api/webhooks/evolution`, byEvents: false, base64: false, headers: [{ name: "x-aether-webhook-secret", value: webhookSecret }], events: ["MESSAGES_UPSERT", "CONNECTION_UPDATE"] };
   try {
     const signal = AbortSignal.timeout(12000);
-    const create = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }), signal });
+    const create = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false, webhook }), signal });
     // Evolution returns 403 when the account instance already exists; that is
     // safe to continue with because the next call reconnects that instance.
     if (!create.ok && create.status !== 409 && create.status !== 403) {
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
     let payload = await connect.json().catch(() => ({}));
     if (!connect.ok || typeof payload.pairingCode !== "string") {
       await fetch(`${base}/instance/delete/${encodeURIComponent(instance)}`, { method: "DELETE", headers }).catch(() => undefined);
-      const recreate = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }), signal });
+      const recreate = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false, webhook }), signal });
       if (recreate.ok || recreate.status === 409) {
         connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store", signal });
         payload = await connect.json().catch(() => ({}));
@@ -39,6 +41,8 @@ export async function POST(request: Request) {
       console.error("Evolution instance/connect failed", connect.status, JSON.stringify(payload));
       return NextResponse.json({ error: "O servidor não retornou um código de pareamento. Tente gerar novamente." }, { status: 502 });
     }
+    const { data: membership } = await supabase.from("memberships").select("company_id").eq("user_id", user.id).limit(1).maybeSingle();
+    if (membership?.company_id) await supabase.from("whatsapp_connections").insert({ company_id: membership.company_id, user_id: user.id, instance_name: instance, phone: `+${phone}`, status: "connecting" });
     return NextResponse.json({ ok: true, pairingCode: payload.pairingCode, instance });
   } catch { return NextResponse.json({ error: "Não foi possível alcançar o conector WhatsApp." }, { status: 502 }); }
 }
