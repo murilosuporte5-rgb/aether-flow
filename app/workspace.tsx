@@ -608,8 +608,8 @@ export default function Workspace({
           <a href="/mensagens" onClick={() => setMobileMenuOpen(false)}>
             <MessageCircle size={18} /><span>Mensagens</span>
           </a>
-          <a href="/capturar" onClick={() => setMobileMenuOpen(false)}>
-            <ArrowUpRight size={18} /><span>Capturar WhatsApp</span>
+          <a href="/integracoes/whatsapp" onClick={() => setMobileMenuOpen(false)}>
+            <ArrowUpRight size={18} /><span>WhatsApp Business</span>
           </a>
           <button type="button" onClick={() => {
             setTab("today");
