@@ -584,3 +584,14 @@
 .capture-paste-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.capture-paste-actions button{min-height:42px}.capture-share-help{position:fixed;z-index:40;inset:50% auto auto 50%;transform:translate(-50%,-50%);width:min(410px,calc(100vw - 32px));background:#fff;border:1px solid #d9e5f0;border-radius:15px;padding:25px;box-shadow:0 24px 80px #0d27424d}.capture-share-help h2{font:800 23px Manrope;color:#162b45;margin:10px 0 18px}.capture-share-help ol{display:grid;gap:14px;margin:0 0 20px;padding-left:23px}.capture-share-help li{padding-left:5px;color:#25496c}.capture-share-help li::marker{font-weight:800;color:#2c76bb}.capture-share-help li small{display:block;color:#7b8da0;font-size:12px;margin-top:3px}.capture-share-close{position:absolute;right:13px;top:10px;border:0;background:none;color:#70859a;font-size:24px;line-height:1}
 .whatsapp-qr-box{display:grid;justify-items:center;gap:10px;background:#fff;border:1px solid #cfe2ea;border-radius:14px;padding:15px;margin-top:18px;max-width:260px}.whatsapp-qr-box img{width:220px;height:220px;image-rendering:auto}.whatsapp-qr-box strong{font-size:11px;text-align:center;color:#42647d;line-height:1.4}
 .whatsapp-pair-card{display:grid;gap:12px;background:#fff;border:1px solid #dce7f0;border-radius:14px;padding:18px;margin-top:26px;max-width:520px;box-shadow:0 10px 30px #153f5c0c}.whatsapp-pair-card label{display:grid;gap:6px;font-size:12px;font-weight:700;color:#38536f}.whatsapp-pair-card input{border:1px solid #ccdbe8;border-radius:8px;padding:12px;font-size:14px;color:#193b5c;outline-color:#3a87bb}.whatsapp-pair-code{display:grid;justify-items:center;gap:5px;border:1px dashed #3aaf87;background:#effaf5;border-radius:10px;padding:15px}.whatsapp-pair-code span{font-size:10px;letter-spacing:.14em;color:#3b806c;font-weight:800}.whatsapp-pair-code strong{font:800 30px/1 Manrope;letter-spacing:.16em;color:#126d56}.whatsapp-pair-code small{text-align:center;color:#5c7c79;font-size:11px;line-height:1.45}
+/* WhatsApp integration visual hierarchy */
+.whatsapp-hero-copy h1{color:#081b35}
+.whatsapp-hero-copy>p{color:#3f5875;line-height:1.55}
+.whatsapp-hero-actions{gap:10px;margin-top:24px}
+.whatsapp-connect-button{background:linear-gradient(135deg,#1769f5,#0b47c6)!important;box-shadow:0 12px 24px #1258df33}
+.whatsapp-connect-button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.whatsapp-pair-card{border-color:#c7d8eb;box-shadow:0 14px 34px #153f5c18}
+.whatsapp-pair-card label{color:#203e60;font-weight:800}
+.whatsapp-pair-card input{border-color:#a9c2dc;color:#102e50}
+.whatsapp-pair-code-open{border-style:solid;background:#e9fbf2}
+.whatsapp-pair-code-close{border-color:#dc765f;background:#fff1ed}
