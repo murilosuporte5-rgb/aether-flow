@@ -30,6 +30,8 @@ export default function CaptureClient() {
   const [scheduling, setScheduling] = useState(false);
   const [scheduled, setScheduled] = useState(false);
   const [pasted, setPasted] = useState("");
+  const [clipboardBusy, setClipboardBusy] = useState(false);
+  const [showShareHelp, setShowShareHelp] = useState(false);
   const captureStarted = useRef(false);
 
   function suggestedDue(offset: number) {
@@ -97,9 +99,8 @@ export default function CaptureClient() {
     setStarted(true); setSelected(""); setRecorded(false);
   }
 
-  function readPasted(event: React.FormEvent) {
-    event.preventDefault();
-    const value = pasted.trim();
+  function processPasted(value: string) {
+    value = value.trim();
     const phoneMatch = value.match(/(?:\+?\d[\d\s().-]{7,}\d)/);
     const phoneValue = phoneMatch?.[0]?.trim() || "";
     const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
@@ -112,11 +113,30 @@ export default function CaptureClient() {
     setMessage("Dados encontrados. Salvando o contato no Aether Flow…");
   }
 
+  function readPasted(event: React.FormEvent) {
+    event.preventDefault();
+    processPasted(pasted);
+  }
+
+  async function readClipboard() {
+    if (!navigator.clipboard?.readText) { setStatus("error"); setMessage("Seu navegador não permite leitura automática. Cole o conteúdo no campo abaixo."); return; }
+    setClipboardBusy(true);
+    try {
+      const value = await navigator.clipboard.readText();
+      if (!value.trim()) throw new Error("A área de transferência está vazia.");
+      setPasted(value);
+      processPasted(value);
+    } catch (error) {
+      setStatus("error");
+      setMessage(error instanceof Error ? error.message : "Não foi possível ler a área de transferência.");
+    } finally { setClipboardBusy(false); }
+  }
+
   return <main className="capture-page"><section className="capture-card" aria-live="polite">
     <span className="eyebrow">AETHER CAPTURE</span>
     <h1>{status === "idle" ? "Capturar conversa" : status === "loading" ? "Capturando no Aether Flow" : status === "done" ? "Captura concluída" : "Não foi possível capturar"}</h1>
     <p>{message}</p>
-    {status === "idle" && <><div className="capture-paste-guide"><strong>Sem API, sem extensão e sem download</strong><p>Abra o WhatsApp Web ou o WhatsApp no celular, copie o nome e o telefone do contato e cole abaixo. O Aether identifica os dados e pede confirmação antes de criar o lead.</p><form onSubmit={readPasted}><textarea value={pasted} onChange={(event) => setPasted(event.target.value)} placeholder="Cole aqui o nome, telefone ou trecho da conversa…" rows={4} /><button className="primary capture-link" type="submit">Ler dados colados</button></form><small>O conteúdo fica no seu navegador até você enviar. Nada é lido automaticamente do WhatsApp.</small></div><div className="capture-mobile-guide"><strong>No celular · compartilhar com o Aether</strong><ol><li>Abra esta página no Chrome.</li><li>No WhatsApp, toque em Compartilhar e escolha <b>Aether Capture</b>.</li><li>Revise os dados e confirme.</li></ol><p>Se o Aether não aparecer, use o campo de colagem acima.</p></div><form className="capture-manual-form" onSubmit={startManual}><span className="capture-form-divider">Ou adicione manualmente</span><label>Nome do contato<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Ex.: Ana da Silva" autoComplete="name" /></label><label>Telefone<input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Ex.: (71) 99999-9999" inputMode="tel" autoComplete="tel" /></label><button className="primary capture-link" type="submit">Adicionar ao Aether</button><small>O fluxo de colagem e compartilhamento funciona sem credenciais externas.</small></form></>}
+    {status === "idle" && <><div className="capture-paste-guide"><strong>Capturar do WhatsApp em um toque</strong><p>Copie o contato ou um trecho da conversa no WhatsApp. O botão abaixo lê sua área de transferência e encontra o telefone automaticamente.</p><div className="capture-paste-actions"><button className="primary" type="button" onClick={() => void readClipboard()} disabled={clipboardBusy}>{clipboardBusy ? "Lendo…" : "Ler área de transferência"}</button><button className="secondary" type="button" onClick={() => setShowShareHelp(true)}>Como compartilhar</button></div><form onSubmit={readPasted}><textarea value={pasted} onChange={(event) => setPasted(event.target.value)} placeholder="Ou cole aqui o nome, telefone ou trecho da conversa…" rows={4} /><button className="secondary capture-link" type="submit">Ler conteúdo colado</button></form><small>O conteúdo fica no seu navegador até você enviar. Nada é lido automaticamente do WhatsApp.</small></div><div className="capture-mobile-guide"><strong>No celular · compartilhar com o Aether</strong><ol><li>No WhatsApp, abra a conversa e toque em <b>Compartilhar</b>.</li><li>Escolha <b>Aether Capture</b> ou “Adicionar à tela inicial” no Chrome.</li><li>Revise os dados e confirme.</li></ol><p>Se o Aether não aparecer na lista, copie o contato e use “Ler área de transferência”.</p></div><form className="capture-manual-form" onSubmit={startManual}><span className="capture-form-divider">Ou adicione manualmente</span><label>Nome do contato<input value={name} onChange={(event) => setName(event.target.value)} placeholder="Ex.: Ana da Silva" autoComplete="name" /></label><label>Telefone<input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Ex.: (71) 99999-9999" inputMode="tel" autoComplete="tel" /></label><button className="primary capture-link" type="submit">Adicionar ao Aether</button><small>O fluxo de colagem e compartilhamento funciona sem credenciais externas.</small></form>{showShareHelp && <div className="capture-share-help" role="dialog" aria-modal="true" aria-label="Como compartilhar uma conversa"><button type="button" className="capture-share-close" onClick={() => setShowShareHelp(false)} aria-label="Fechar">×</button><span className="eyebrow">COMPARTILHAMENTO NATIVO</span><h2>Do WhatsApp para o Aether</h2><ol><li><b>Abra a conversa</b><small>Entre no WhatsApp e selecione o contato.</small></li><li><b>Toque em compartilhar</b><small>Envie o texto para o Aether Capture.</small></li><li><b>Confirme o lead</b><small>Revise o telefone antes de salvar.</small></li></ol><button className="primary capture-link" type="button" onClick={() => setShowShareHelp(false)}>Entendi</button></div>}</>}
     {name && status !== "idle" && <div className="capture-contact"><strong>{name}</strong><span>{phone}</span><small>Origem: {initial.source || "WhatsApp"} · revise os dados antes de seguir</small></div>}
     {status === "loading" && <div className="capture-loader" aria-label="Carregando" />}
     {status === "done" && <div className="capture-next"><span>Resultado do contato</span><div className="capture-actions">{quickResults.map((item) => <button key={item} type="button" disabled={recording || recorded} className={selected === item ? "selected" : ""} onClick={async () => { if (!result?.id || !companyId || recording || recorded) return; setSelected(item); setRecording(true); try { const response = await fetch("/api/workspace", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId, requestId: crypto.randomUUID(), kind: "comment", id: result.id, comment: `Resultado do contato: ${item}` }) }); const payload = (await response.json()) as Result; if (!response.ok || !payload.ok) throw new Error(payload.error || "Não foi possível registrar o resultado."); setRecorded(true); setNextDue(suggestedDue(1)); } catch (error) { setMessage(error instanceof Error ? error.message : "Não foi possível registrar o resultado."); setSelected(""); } finally { setRecording(false); } }}>{item}</button>)}</div><small>{recorded ? "Resultado registrado. Agora escolha quando o próximo passo deve acontecer." : selected ? (recording ? "Registrando…" : `Registrar “${selected}” no histórico.`) : "Escolha uma opção para registrar o resultado sem redigitar a conversa."}</small>{recorded && <div className="capture-follow-up" aria-live="polite"><strong>Próxima ação</strong><div className="capture-actions"><button type="button" onClick={() => setNextDue(suggestedDue(0))}>Hoje</button><button type="button" onClick={() => setNextDue(suggestedDue(1))}>Amanhã</button><button type="button" onClick={() => setNextDue(suggestedDue(2))}>Próximo dia útil</button></div><label>Escolher data e hora<input type="datetime-local" value={nextDue} min={suggestedDue(0)} onChange={(event) => setNextDue(event.target.value)} /></label><button className="primary capture-link" type="button" disabled={!nextDue || scheduling || scheduled} onClick={() => void scheduleNextAction()}>{scheduled ? "Próxima ação confirmada" : scheduling ? "Agendando…" : "Confirmar próximo passo"}</button><small>{scheduled ? "Lead acompanhado: o follow-up já está no radar." : "Você pode ajustar depois na oportunidade."}</small></div>}</div>}
