@@ -17,20 +17,21 @@ export async function POST(request: Request) {
   const instance = `aether_${user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 18)}_${Date.now().toString(36)}`;
   const headers = { "Content-Type": "application/json", apikey: apiKey };
   try {
-    const create = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }) });
+    const signal = AbortSignal.timeout(12000);
+    const create = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }), signal });
     // Evolution returns 403 when the account instance already exists; that is
     // safe to continue with because the next call reconnects that instance.
     if (!create.ok && create.status !== 409 && create.status !== 403) {
       console.error("Evolution instance/create failed", create.status, await create.text().catch(() => ""));
       return NextResponse.json({ error: "Não foi possível preparar sua sessão WhatsApp." }, { status: 502 });
     }
-    let connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store" });
+    let connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store", signal });
     let payload = await connect.json().catch(() => ({}));
     if (!connect.ok || typeof payload.pairingCode !== "string") {
       await fetch(`${base}/instance/delete/${encodeURIComponent(instance)}`, { method: "DELETE", headers }).catch(() => undefined);
-      const recreate = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }) });
+      const recreate = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }), signal });
       if (recreate.ok || recreate.status === 409) {
-        connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store" });
+        connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store", signal });
         payload = await connect.json().catch(() => ({}));
       }
     }

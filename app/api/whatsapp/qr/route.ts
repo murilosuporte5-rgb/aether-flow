@@ -16,9 +16,10 @@ export async function POST(request: Request) {
     const instance = `aether_qr_${user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 18)}_${Date.now().toString(36)}`;
     const headers = { "Content-Type": "application/json", apikey: evolutionKey };
     try {
-      const create = await fetch(`${evolution}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: true }) });
+      const signal = AbortSignal.timeout(12000);
+      const create = await fetch(`${evolution}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: true }), signal });
       if (!create.ok && create.status !== 409 && create.status !== 403) return NextResponse.json({ error: "Não foi possível preparar o QR Code." }, { status: 502 });
-      const connect = await fetch(`${evolution}/instance/connect/${encodeURIComponent(instance)}`, { headers, cache: "no-store" });
+      const connect = await fetch(`${evolution}/instance/connect/${encodeURIComponent(instance)}`, { headers, cache: "no-store", signal });
       const payload = await connect.json().catch(() => ({}));
       if (!connect.ok) return NextResponse.json({ error: "A Evolution não retornou o QR Code.", details: payload?.message }, { status: 502 });
       return NextResponse.json({ ...payload, session: instance, qrCode: payload?.base64 || payload?.qrcode?.base64 || payload?.qrcode });
