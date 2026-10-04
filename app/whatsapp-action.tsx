@@ -47,9 +47,10 @@ export default function WhatsAppAction({
           // never prevent the customer from reaching WhatsApp.
           const target = window.open(url, "_blank");
           if (!target) {
-            setError("Permita abrir uma nova aba e tente novamente.");
-            locked.current = false;
-            setBusy(false);
+            // Mobile browsers and strict popup policies can refuse a new tab.
+            // Keep the action useful by navigating in the current tab instead
+            // of making the user try the same button repeatedly.
+            window.location.assign(url);
             return;
           }
           target.opener = null;
