@@ -43,8 +43,9 @@ export default function WhatsAppAction({
           locked.current = true;
           setBusy(true);
           setError("");
-          // Reserve a tab in the click gesture. A failed audit closes it and opens no WA.
-          const target = window.open("about:blank", "_blank");
+          // Open the conversation immediately from the user gesture. Logging must
+          // never prevent the customer from reaching WhatsApp.
+          const target = window.open(url, "_blank");
           if (!target) {
             setError("Permita abrir uma nova aba e tente novamente.");
             locked.current = false;
@@ -71,15 +72,13 @@ export default function WhatsAppAction({
                 result.error || "Não foi possível registrar a abertura.",
               );
             }
-            target.location.href = url;
             pending.current = null;
             onRecorded?.();
           } catch (cause) {
-            target.close();
             setError(
               cause instanceof Error
-                ? cause.message
-                : "Falha de conexão. Tente novamente.",
+                ? `WhatsApp aberto. ${cause.message}`
+                : "WhatsApp aberto, mas não foi possível registrar a atividade.",
             );
           } finally {
             locked.current = false;

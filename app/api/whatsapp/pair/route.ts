@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { normalizePhone } from "@/lib/execution";
 
 export const dynamic = "force-dynamic";
-
-function cleanPhone(value: unknown) {
-  return typeof value === "string" ? value.replace(/\D/g, "").slice(0, 15) : "";
-}
 
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -15,8 +12,8 @@ export async function POST(request: Request) {
   const apiKey = process.env.EVOLUTION_API_KEY?.trim();
   if (!base || !apiKey) return NextResponse.json({ error: "O conector móvel ainda não foi instalado no servidor." }, { status: 503 });
   const body = await request.json().catch(() => ({}));
-  const phone = cleanPhone(body.phone);
-  if (phone.length < 10 || phone.length > 15) return NextResponse.json({ error: "Informe o telefone com DDD e código do país. Ex.: 5571999999999" }, { status: 400 });
+  const phone = normalizePhone(typeof body.phone === "string" ? body.phone : null);
+  if (!phone || !phone.startsWith("55")) return NextResponse.json({ error: "Informe um celular brasileiro válido com DDD e código do país. Ex.: 5571999999999" }, { status: 400 });
   const instance = `aether_${user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 18)}_${Date.now().toString(36)}`;
   const headers = { "Content-Type": "application/json", apikey: apiKey };
   try {
