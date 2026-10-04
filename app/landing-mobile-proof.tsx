@@ -5,13 +5,13 @@ import { ArrowRight, Check, Smartphone } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const shots = [
-  { src: "/demo/mobile-panel-v2.png", label: "Painel real", text: "Veja primeiro o que pede atenção." },
-  { src: "/demo/mobile-alerts-v2.png", label: "Alertas reais", text: "Prioridades aparecem em ordem de urgência." },
-  { src: "/demo/mobile-contacts-v2.png", label: "Contatos reais", text: "Dados, histórico e responsável no mesmo lugar." },
-  { src: "/demo/mobile-pipeline-v2.png", label: "Pipeline real", text: "Acompanhe cada negociação até o resultado." },
-  { src: "/demo/mobile-messages-v2.png", label: "Mensagens reais", text: "Use contexto e modelos sem perder o ritmo." },
-  { src: "/demo/mobile-data-v2.png", label: "Dados reais", text: "Métricas e CSV prontos para acompanhar." },
-  { src: "/demo/mobile-team-v2.png", label: "Equipe real", text: "Funções e responsáveis ficam visíveis." },
+  { src: "/demo/mobile-panel-v3.png", label: "Painel real", text: "Veja primeiro o que pede atenção." },
+  { src: "/demo/mobile-alerts-v3.png", label: "Alertas reais", text: "Prioridades aparecem em ordem de urgência." },
+  { src: "/demo/mobile-contacts-v3.png", label: "Contatos reais", text: "Dados, histórico e responsável no mesmo lugar." },
+  { src: "/demo/mobile-pipeline-v3.png", label: "Pipeline real", text: "Acompanhe cada negociação até o resultado." },
+  { src: "/demo/mobile-messages-v3.png", label: "Mensagens reais", text: "Use contexto e modelos sem perder o ritmo." },
+  { src: "/demo/mobile-data-v3.png", label: "Dados reais", text: "Métricas e CSV prontos para acompanhar." },
+  { src: "/demo/mobile-team-v3.png", label: "Equipe real", text: "Funções e responsáveis ficam visíveis." },
 ];
 
 export default function LandingMobileProof() {
@@ -22,7 +22,7 @@ export default function LandingMobileProof() {
     if (reducedMotion.matches || paused) return;
     const timer = window.setInterval(() => {
       if (!document.hidden) setActive((current) => (current + 1) % shots.length);
-    }, 6000);
+    }, 3500);
     return () => window.clearInterval(timer);
   }, [paused]);
   const shot = shots[active];
@@ -36,7 +36,8 @@ export default function LandingMobileProof() {
         <a className="landing-secondary" href="/demo?view=panel#demo-screen">Abrir demonstração <ArrowRight size={16} /></a>
       </div>
       <div className="landing-mobile-stage" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false); }}>
-        <div className="landing-proof-device"><span className="landing-phone-speaker" aria-hidden="true"/><div key={shot.src} className="landing-mobile-shot"><Image src={shot.src} alt={`${shot.label} do Aether Flow`} width={390} height={844} sizes="(max-width: 700px) 82vw, 300px" /></div></div>
+        <div className="landing-mobile-preload" aria-hidden="true">{shots.map((item) => <img key={item.src} src={item.src} alt="" />)}</div>
+        <div className="landing-proof-device"><span className="landing-phone-speaker" aria-hidden="true"/><div key={shot.src} className="landing-mobile-shot"><Image src={shot.src} alt={`${shot.label} do Aether Flow`} width={780} height={1688} sizes="(max-width: 700px) 82vw, 300px" /></div></div>
         <div className="landing-mobile-caption"><span className="mobile-caption-icon"><Smartphone size={15} /></span><div><strong>{shot.label}</strong><small>{shot.text}</small></div></div>
         <div className="landing-mobile-dots" role="tablist" aria-label="Capturas do celular">{shots.map((item, index) => <button key={item.src} type="button" role="tab" aria-selected={index === active} aria-label={item.label} className={index === active ? "active" : ""} onClick={() => { setActive(index); setPaused(true); }} />)}</div>
       </div>

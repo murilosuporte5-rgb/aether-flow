@@ -573,3 +573,4 @@
 .landing-proof-device{aspect-ratio:390/844}
 .landing-mobile-shot img{object-fit:contain;object-position:top center;background:#f8fbff}
 
+.landing-mobile-preload{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}.landing-mobile-preload img{width:1px;height:1px}
