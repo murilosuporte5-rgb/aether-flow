@@ -1,0 +1,31 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
+
+function cleanPhone(value: unknown) {
+  return typeof value === "string" ? value.replace(/\D/g, "").slice(0, 15) : "";
+}
+
+export async function POST(request: Request) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Entre na sua conta para continuar." }, { status: 401 });
+  const base = process.env.EVOLUTION_API_URL?.trim().replace(/\/$/, "");
+  const apiKey = process.env.EVOLUTION_API_KEY?.trim();
+  if (!base || !apiKey) return NextResponse.json({ error: "O conector móvel ainda não foi instalado no servidor." }, { status: 503 });
+  const body = await request.json().catch(() => ({}));
+  const phone = cleanPhone(body.phone);
+  if (phone.length < 10 || phone.length > 15) return NextResponse.json({ error: "Informe o telefone com DDD e código do país. Ex.: 5571999999999" }, { status: 400 });
+  const instance = `aether_${user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 24)}`;
+  const headers = { "Content-Type": "application/json", apikey: apiKey };
+  try {
+    const create = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }) });
+    if (!create.ok && create.status !== 409) return NextResponse.json({ error: "Não foi possível preparar sua sessão WhatsApp." }, { status: 502 });
+    const connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store" });
+    const payload = await connect.json().catch(() => ({}));
+    if (!connect.ok || typeof payload.pairingCode !== "string") return NextResponse.json({ error: "O servidor não retornou um código de pareamento. Tente gerar novamente." }, { status: 502 });
+    return NextResponse.json({ ok: true, pairingCode: payload.pairingCode, instance });
+  } catch { return NextResponse.json({ error: "Não foi possível alcançar o conector WhatsApp." }, { status: 502 }); }
+}
+
