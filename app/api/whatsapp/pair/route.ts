@@ -17,7 +17,7 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
   const phone = cleanPhone(body.phone);
   if (phone.length < 10 || phone.length > 15) return NextResponse.json({ error: "Informe o telefone com DDD e código do país. Ex.: 5571999999999" }, { status: 400 });
-  const instance = `aether_${user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 24)}`;
+  const instance = `aether_${user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 18)}_${Date.now().toString(36)}`;
   const headers = { "Content-Type": "application/json", apikey: apiKey };
   try {
     const create = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }) });
