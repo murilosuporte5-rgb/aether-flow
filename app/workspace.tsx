@@ -500,13 +500,13 @@ export default function Workspace({
   return (
     <div className="app">
       <aside className="sidebar">
-        <div className="brand">
+        <a className="brand brand-link" href="/" aria-label="Aether Flow, atualizar o painel">
           <AetherMark size={36} />
           <div>
             <strong>Aether Flow</strong>
             <small>OPERAÇÃO</small>
           </div>
-        </div>
+        </a>
         <div className="workspace-label">
           {data.company?.demo ? "MODO DEMONSTRAÇÃO" : "SUA EMPRESA"}
         </div>

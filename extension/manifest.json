@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Aether Flow Capture",
-  "version": "0.1.0",
-  "description": "Capture o contato da conversa aberta no WhatsApp Web para o Aether Flow.",
+  "version": "0.2.0",
+  "description": "Puxe o lead da conversa aberta no WhatsApp Web para o Aether Flow.",
   "permissions": [],
   "host_permissions": ["https://web.whatsapp.com/*"],
   "content_scripts": [{
@@ -10,5 +10,6 @@
     "js": ["content.js"],
     "run_at": "document_idle"
   }],
-  "action": { "default_title": "Adicionar ao Aether" }
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Capturar lead no Aether Flow" }
 }
