@@ -37,6 +37,10 @@ export default function WhatsAppConnect() {
       const image = payload.qrCode || payload.base64Qr || payload.qrcode;
       if (typeof image === "string") setQr(image.startsWith("data:") ? image : `data:image/png;base64,${image}`);
       else setNotice("O conector iniciou, mas ainda não entregou o QR Code. Aguarde alguns segundos e tente novamente.");
+      if (typeof payload.session === "string") {
+        setInstance(payload.session);
+        setConnectionState("connecting");
+      }
     } catch (error) { setNotice(error instanceof Error ? error.message : "Não foi possível iniciar o conector."); }
     finally { setQrBusy(false); }
   }

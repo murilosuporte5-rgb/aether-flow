@@ -12,7 +12,8 @@ export async function GET(request: Request) {
   const instance = new URL(request.url).searchParams.get("instance")?.trim();
   if (!base || !apiKey) return NextResponse.json({ error: "Conector não configurado." }, { status: 503 });
   const userPrefix = user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 18);
-  if (!instance || !instance.startsWith(`aether_${userPrefix}_`) || !/^aether_[a-zA-Z0-9]+_[a-z0-9]+$/.test(instance)) return NextResponse.json({ error: "Sessão inválida." }, { status: 400 });
+  const validPrefix = instance?.startsWith(`aether_${userPrefix}_`) || instance?.startsWith(`aether_qr_${userPrefix}_`);
+  if (!instance || !validPrefix || !/^aether_(?:qr_)?[a-zA-Z0-9]+_[a-z0-9]+$/.test(instance)) return NextResponse.json({ error: "Sessão inválida." }, { status: 400 });
   try {
     const response = await fetch(`${base}/instance/connectionState/${encodeURIComponent(instance)}`, { headers: { apikey: apiKey }, cache: "no-store" });
     const payload = await response.json().catch(() => ({}));
