@@ -21,7 +21,9 @@ export async function POST(request: Request) {
   const headers = { "Content-Type": "application/json", apikey: apiKey };
   try {
     const create = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }) });
-    if (!create.ok && create.status !== 409) {
+    // Evolution returns 403 when the account instance already exists; that is
+    // safe to continue with because the next call reconnects that instance.
+    if (!create.ok && create.status !== 409 && create.status !== 403) {
       console.error("Evolution instance/create failed", create.status, await create.text().catch(() => ""));
       return NextResponse.json({ error: "Não foi possível preparar sua sessão WhatsApp." }, { status: 502 });
     }
