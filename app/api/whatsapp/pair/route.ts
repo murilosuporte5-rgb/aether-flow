@@ -30,16 +30,24 @@ export async function POST(request: Request) {
     let connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store", signal });
     let payload = await connect.json().catch(() => ({}));
     if (!connect.ok || typeof payload.pairingCode !== "string") {
+      // Evolution 2.3.x can fail to produce a phone pairing code. Keep the
+      // user moving by falling back to a QR session instead of ending here.
       await fetch(`${base}/instance/delete/${encodeURIComponent(instance)}`, { method: "DELETE", headers }).catch(() => undefined);
-      const recreate = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false, webhook }), signal });
+      const recreate = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: true, webhook }), signal });
       if (recreate.ok || recreate.status === 409) {
-        connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store", signal });
+        connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}`, { headers, cache: "no-store", signal });
         payload = await connect.json().catch(() => ({}));
+      }
+      const qrCode = payload?.base64 || payload?.qrcode?.base64 || payload?.qrcode;
+      if (connect.ok && typeof qrCode === "string" && qrCode.length > 20) {
+        const { data: membership } = await supabase.from("memberships").select("company_id").eq("user_id", user.id).limit(1).maybeSingle();
+        if (membership?.company_id) await supabase.from("whatsapp_connections").insert({ company_id: membership.company_id, user_id: user.id, instance_name: instance, phone: `+${phone}`, status: "connecting" });
+        return NextResponse.json({ ok: true, instance, mode: "qr", qrCode });
       }
     }
     if (!connect.ok || typeof payload.pairingCode !== "string") {
       console.error("Evolution instance/connect failed", connect.status, JSON.stringify(payload));
-      return NextResponse.json({ error: "O servidor não retornou um código de pareamento. Tente gerar novamente." }, { status: 502 });
+      return NextResponse.json({ error: "O servidor não retornou pareamento nem QR Code. Tente gerar novamente." }, { status: 502 });
     }
     const { data: membership } = await supabase.from("memberships").select("company_id").eq("user_id", user.id).limit(1).maybeSingle();
     if (membership?.company_id) await supabase.from("whatsapp_connections").insert({ company_id: membership.company_id, user_id: user.id, instance_name: instance, phone: `+${phone}`, status: "connecting" });
