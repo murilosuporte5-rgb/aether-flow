@@ -13,15 +13,22 @@ export async function POST(request: Request) {
   const payload = await request.json().catch(() => null) as Record<string, unknown> | null;
   if (!payload) return NextResponse.json({ error: "Payload inválido." }, { status: 400 });
   const event = text(payload.event, 80).toUpperCase();
-  if (!event.includes("MESSAGE")) return NextResponse.json({ ok: true, ignored: true });
-  const instance = text(payload.instance || (payload.data as Record<string, unknown> | null)?.instance, 120);
   const data = (payload.data || {}) as Record<string, unknown>;
+  const instance = text(payload.instance || data.instance, 120);
+  if (!event.includes("MESSAGE") && !event.includes("CONNECTION")) return NextResponse.json({ ok: true, ignored: true });
+  const admin = createAdminClient();
+  if (!admin) return NextResponse.json({ error: "SUPABASE_SERVICE_ROLE_KEY não configurada." }, { status: 503 });
+  if (event.includes("CONNECTION")) {
+    if (!instance) return NextResponse.json({ ok: true, ignored: true });
+    const rawState = text(data.state || data.status || (data.data as Record<string, unknown> | null)?.state, 40).toLowerCase();
+    const status = rawState === "open" || rawState === "connected" ? "open" : rawState === "close" || rawState === "closed" ? "close" : "connecting";
+    await admin.from("whatsapp_connections").update({ status, updated_at: new Date().toISOString() }).eq("instance_name", instance);
+    return NextResponse.json({ ok: true, status });
+  }
   const key = (data.key || {}) as Record<string, unknown>;
   const remoteJid = text(key.remoteJid || data.remoteJid, 120);
   const phone = digits(remoteJid.split("@")[0] || data.phone);
   if (!instance || !phone || remoteJid.endsWith("@g.us")) return NextResponse.json({ ok: true, ignored: true });
-  const admin = createAdminClient();
-  if (!admin) return NextResponse.json({ error: "SUPABASE_SERVICE_ROLE_KEY não configurada." }, { status: 503 });
   const { data: connection } = await admin.from("whatsapp_connections").select("company_id,user_id").eq("instance_name", instance).maybeSingle();
   if (!connection) return NextResponse.json({ error: "Instância não vinculada." }, { status: 404 });
   const message = (data.message || {}) as Record<string, unknown>;
