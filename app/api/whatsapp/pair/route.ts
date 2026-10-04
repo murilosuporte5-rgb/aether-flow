@@ -21,10 +21,24 @@ export async function POST(request: Request) {
   const headers = { "Content-Type": "application/json", apikey: apiKey };
   try {
     const create = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }) });
-    if (!create.ok && create.status !== 409) return NextResponse.json({ error: "Não foi possível preparar sua sessão WhatsApp." }, { status: 502 });
-    const connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store" });
-    const payload = await connect.json().catch(() => ({}));
-    if (!connect.ok || typeof payload.pairingCode !== "string") return NextResponse.json({ error: "O servidor não retornou um código de pareamento. Tente gerar novamente." }, { status: 502 });
+    if (!create.ok && create.status !== 409) {
+      console.error("Evolution instance/create failed", create.status, await create.text().catch(() => ""));
+      return NextResponse.json({ error: "Não foi possível preparar sua sessão WhatsApp." }, { status: 502 });
+    }
+    let connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store" });
+    let payload = await connect.json().catch(() => ({}));
+    if (!connect.ok || typeof payload.pairingCode !== "string") {
+      await fetch(`${base}/instance/delete/${encodeURIComponent(instance)}`, { method: "DELETE", headers }).catch(() => undefined);
+      const recreate = await fetch(`${base}/instance/create`, { method: "POST", headers, body: JSON.stringify({ instanceName: instance, integration: "WHATSAPP-BAILEYS", qrcode: false }) });
+      if (recreate.ok || recreate.status === 409) {
+        connect = await fetch(`${base}/instance/connect/${encodeURIComponent(instance)}?number=${encodeURIComponent(phone)}`, { headers, cache: "no-store" });
+        payload = await connect.json().catch(() => ({}));
+      }
+    }
+    if (!connect.ok || typeof payload.pairingCode !== "string") {
+      console.error("Evolution instance/connect failed", connect.status, JSON.stringify(payload));
+      return NextResponse.json({ error: "O servidor não retornou um código de pareamento. Tente gerar novamente." }, { status: 502 });
+    }
     return NextResponse.json({ ok: true, pairingCode: payload.pairingCode, instance });
   } catch { return NextResponse.json({ error: "Não foi possível alcançar o conector WhatsApp." }, { status: 502 }); }
 }
