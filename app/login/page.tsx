@@ -41,7 +41,6 @@ export default async function LoginPage({searchParams}:{searchParams?:Promise<{r
     <p>Use o e-mail e a senha liberados pela Aether Works.</p>
     {params.reset==='success'&&<p className="login-notice" role="status">Senha atualizada. Entre novamente para continuar.</p>}
     <LoginForm/>
-    <p className="login-signup-prompt">Ainda não tem acesso? <a href="/cadastro">Criar conta</a></p>
     <div className="login-help"><ShieldCheck size={15}/><span>Seu acesso é individual e protegido.</span></div>
     <a className="login-landing-link" href="/landing#produto">Conheça o Aether Flow <ArrowUpRight size={15}/></a>
    </section>
