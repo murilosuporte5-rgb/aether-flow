@@ -615,6 +615,7 @@
 .whatsapp-capture-card:hover{transform:translateY(-2px);border-color:#a9cce2;box-shadow:0 18px 38px #203b5b12}
 @media(prefers-reduced-motion:reduce){.landing-feature-grid article,.landing-step-grid article,.whatsapp-step-grid article,.whatsapp-capture-card{transition:none}.landing-feature-grid article:hover,.landing-step-grid article:hover,.whatsapp-step-grid article:hover,.whatsapp-capture-card:hover{transform:none}}
 /* MVP navigation and WhatsApp connection controls */
+#radar-de-atencao{scroll-margin-top:84px}
 .whatsapp-disconnect-row{max-width:1180px;margin:0 auto;padding:0 30px 34px;display:flex;align-items:center;gap:12px;color:#71839a;font-size:12px}
 .whatsapp-disconnect-button{border-color:#efc8c2;color:#a64c40;background:#fff8f6}
 .whatsapp-disconnect-button:hover{border-color:#df9d93;background:#fff1ed;color:#8c382e}
