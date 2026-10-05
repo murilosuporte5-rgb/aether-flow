@@ -26,30 +26,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, status });
   }
   const key = (data.key || {}) as Record<string, unknown>;
+  if (key.fromMe === true) return NextResponse.json({ ok: true, ignored: true });
   const remoteJid = text(key.remoteJid || data.remoteJid, 120);
   const phone = digits(remoteJid.split("@")[0] || data.phone);
   if (!instance || !phone || remoteJid.endsWith("@g.us")) return NextResponse.json({ ok: true, ignored: true });
-  const { data: connection } = await admin.from("whatsapp_connections").select("company_id,user_id").eq("instance_name", instance).maybeSingle();
+  const { data: connection } = await admin.from("whatsapp_connections").select("id,company_id,user_id").eq("instance_name", instance).maybeSingle();
   if (!connection) return NextResponse.json({ error: "Instância não vinculada." }, { status: 404 });
   const message = (data.message || {}) as Record<string, unknown>;
   const conversation = text(message.conversation || (message.extendedTextMessage as Record<string, unknown> | null)?.text || data.body, 500);
   const senderName = text(data.pushName || data.verifiedBizName || `WhatsApp ${phone.slice(-4)}`, 100);
   const normalized = phone.startsWith("55") ? `+${phone}` : `+55${phone}`;
-  const { data: existing } = await admin.from("contacts").select("id,name").eq("company_id", connection.company_id).eq("phone", normalized).maybeSingle();
-  let contactId = existing?.id;
-  if (!contactId) {
-    const inserted = await admin.from("contacts").insert({ company_id: connection.company_id, name: senderName, phone: normalized }).select("id").single();
-    if (inserted.error) return NextResponse.json({ error: "Não foi possível criar o contato." }, { status: 500 });
-    contactId = inserted.data.id;
+  const { data: pending } = await admin.from("whatsapp_captures").select("id").eq("company_id", connection.company_id).eq("phone", normalized).eq("status", "pending").maybeSingle();
+  if (pending?.id) {
+    const updated = await admin.from("whatsapp_captures").update({ name: senderName, conversation: conversation || undefined, created_at: new Date().toISOString() }).eq("id", pending.id);
+    if (updated.error) return NextResponse.json({ error: "Não foi possível atualizar a captura." }, { status: 500 });
+    return NextResponse.json({ ok: true, queued: true, captureId: pending.id });
   }
-  const { data: openOpportunity } = await admin.from("opportunities").select("id").eq("company_id", connection.company_id).eq("contact_id", contactId).eq("status", "open").maybeSingle();
-  if (openOpportunity?.id) {
-    await admin.from("opportunities").update({ last_interaction_at: new Date().toISOString(), details: conversation || undefined }).eq("id", openOpportunity.id).eq("company_id", connection.company_id);
-  } else {
-    const { data: stage } = await admin.from("pipeline_stages").select("id").eq("company_id", connection.company_id).eq("kind", "open").order("position", { ascending: true }).limit(1).maybeSingle();
-    if (!stage) return NextResponse.json({ error: "A empresa ainda não tem uma etapa aberta." }, { status: 409 });
-    const created = await admin.from("opportunities").insert({ company_id: connection.company_id, contact_id: contactId, title: `WhatsApp · ${senderName}`, stage_id: stage.id, owner_id: connection.user_id, status: "open", source: "WhatsApp", details: conversation || "Lead recebido automaticamente pela Evolution.", last_interaction_at: new Date().toISOString() }).select("id").single();
-    if (created.error) return NextResponse.json({ error: "Não foi possível criar a oportunidade." }, { status: 500 });
-  }
-  return NextResponse.json({ ok: true, contactId });
+  const created = await admin.from("whatsapp_captures").insert({ company_id: connection.company_id, connection_id: connection.id, name: senderName, phone: normalized, conversation, source: "WhatsApp automático", status: "pending" }).select("id").single();
+  if (created.error) return NextResponse.json({ error: "Não foi possível registrar a captura." }, { status: 500 });
+  return NextResponse.json({ ok: true, queued: true, captureId: created.data.id });
 }
