@@ -7,13 +7,13 @@ export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ status: "unauthenticated" }, { status: 401 });
-  const { data: connection } = await supabase
+  const { data: connections } = await supabase
     .from("whatsapp_connections")
     .select("instance_name,status,updated_at,created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(20);
+  const connection = connections?.find((item) => item.status === "open") || connections?.[0];
   if (!connection) return NextResponse.json({ status: "not_configured" });
   const base = process.env.EVOLUTION_API_URL?.trim().replace(/\/$/, "");
   const apiKey = process.env.EVOLUTION_API_KEY?.trim();
