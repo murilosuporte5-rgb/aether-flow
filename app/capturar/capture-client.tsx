@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 type Result = { id?: string; contact?: { id: string; name: string }; ok?: boolean; code?: string; error?: string };
 type Workspace = { company?: { id: string }; stages?: Array<{ id: string; kind: string }> };
 type Status = "idle" | "loading" | "done" | "error";
-const quickResults = ["Respondeu", "Não respondeu", "Pediu retorno", "Proposta enviada", "Vai decidir", "Fechou"];
+const quickResults = ["Respondeu", "Não respondeu", "Pediu retorno", "Proposta enviada", "Vai decidir", "Em teste de desenvolvimento · 7 dias", "Fechou"];
 
 function captureParams() {
   const search = new URLSearchParams(window.location.search);
