@@ -17,6 +17,7 @@ import {
   Plus,
   Search,
   Share2,
+  Settings,
   SlidersHorizontal,
   X,
   Users,
@@ -238,6 +239,7 @@ export default function Workspace({
     [mobileMenuOpen, setMobileMenuOpen] = useState(false),
     [attentionFocused, setAttentionFocused] = useState(false),
     [whatsappStarted, setWhatsappStarted] = useState(false),
+    [whatsappStatus, setWhatsappStatus] = useState<"loading" | "open" | "connecting" | "close" | "not_configured">("loading"),
     [undoAction, setUndoAction] = useState<{ id: string; expectedStageId: string; previousStageId: string } | null>(null),
     [guidanceIgnored, setGuidanceIgnored] = useState<string[]>([]);
   const writeLock = useRef(false),
@@ -264,6 +266,19 @@ export default function Workspace({
   useEffect(() => {
     setWhatsappStarted(false);
   }, [selected]);
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = async () => {
+      try {
+        const response = await fetch("/api/whatsapp/connection", { cache: "no-store" });
+        const payload = await response.json().catch(() => ({}));
+        if (!cancelled) setWhatsappStatus(payload.status || "not_configured");
+      } catch { if (!cancelled) setWhatsappStatus("not_configured"); }
+    };
+    void refresh();
+    const timer = window.setInterval(refresh, 30_000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, []);
   useEffect(() => {
     const id = data.company?.id;
     if (!id) return;
@@ -609,7 +624,10 @@ export default function Workspace({
             <MessageCircle size={18} /><span>Mensagens</span>
           </a>
           <a href="/integracoes/whatsapp" onClick={() => setMobileMenuOpen(false)}>
-            <ArrowUpRight size={18} /><span>WhatsApp Business</span>
+            <ArrowUpRight size={18} /><span>WhatsApp Business</span><span className={`sidebar-connection-state ${whatsappStatus}`} title={whatsappStatus === "open" ? "WhatsApp conectado" : "WhatsApp não conectado"}><i />{whatsappStatus === "open" ? "Conectado" : whatsappStatus === "loading" ? "Verificando" : "Conectar"}</span>
+          </a>
+          <a href="/configuracoes" onClick={() => setMobileMenuOpen(false)}>
+            <Settings size={18} /><span>Configurações</span>
           </a>
           <button type="button" onClick={() => {
             setTab("today");

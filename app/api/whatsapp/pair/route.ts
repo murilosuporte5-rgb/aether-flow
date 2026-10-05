@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { normalizePhone } from "@/lib/execution";
+import { consumeWhatsAppAttempt } from "@/lib/whatsapp-rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,8 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Entre na sua conta para continuar." }, { status: 401 });
+  const attempt = consumeWhatsAppAttempt(`pair:${user.id}`);
+  if (!attempt.allowed) return NextResponse.json({ error: `Aguarde ${attempt.retryAfter}s antes de gerar outro código.` }, { status: 429, headers: { "Retry-After": String(attempt.retryAfter) } });
   const base = process.env.EVOLUTION_API_URL?.trim().replace(/\/$/, "");
   const apiKey = process.env.EVOLUTION_API_KEY?.trim();
   if (!base || !apiKey) return NextResponse.json({ error: "O conector móvel ainda não foi instalado no servidor." }, { status: 503 });
