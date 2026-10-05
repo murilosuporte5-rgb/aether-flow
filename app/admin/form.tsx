@@ -43,7 +43,7 @@ export default function AdminForm(){
 
  async function copyAccess(){
   if(!created)return;
-  const message=`Aether Flow\nCliente: ${created.clientName}\nLogin: ${created.email}\nSenha: ${created.password}\nAcesso: ${window.location.origin}/entrar`;
+  const message=`Aether Flow\nCliente: ${created.clientName}\nLogin: ${created.email}\nSenha: ${created.password}\nAcesso: ${window.location.origin}/login`;
   try{
    await navigator.clipboard.writeText(message);
    setCopied(true);
@@ -152,7 +152,7 @@ export default function AdminForm(){
     <div className="credential-row"><small>Senha</small><strong>{created.password}</strong></div>
     <div className="success-actions">
      <button type="button" className="primary" onClick={()=>void copyAccess()}>{copied?<><Check size={16}/> Copiado</>:<><Copy size={16}/> Copiar acesso</>}</button>
-     <a className="secondary" href="/entrar" target="_blank" rel="noreferrer">Testar login</a>
+     <a className="secondary" href="/login" target="_blank" rel="noreferrer">Testar login</a>
     </div>
    </div>
   </section>}

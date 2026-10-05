@@ -49,7 +49,7 @@ export default async function AdminPage(){
      <li><span>2</span><div><strong>Crie o acesso</strong><small>O usuário já nasce confirmado.</small></div></li>
      <li><span>3</span><div><strong>Envie ao cliente</strong><small>Ele entra direto com e-mail + senha.</small></div></li>
     </ol>
-    <a className="client-login-link" href="/entrar" target="_blank" rel="noreferrer"><LogIn size={16}/> Abrir tela de login</a>
+    <a className="client-login-link" href="/login" target="_blank" rel="noreferrer"><LogIn size={16}/> Abrir tela de login</a>
    </aside>
   </div>
  </main>;
