@@ -18,9 +18,8 @@ export default function LoginForm(){
    const supabase=createClient();
    const {error}=await supabase.auth.signInWithPassword({email:email.trim().toLowerCase(),password});
    if(error)throw error;
-   const {error: termsError}=await supabase.rpc('accept_terms',{p_version:TERMS_VERSION});
-   if(termsError && termsError.code !== 'PGRST202') throw termsError;
-   await supabase.auth.updateUser({data:{aether_terms_version:TERMS_VERSION,aether_terms_accepted_at:new Date().toISOString()}});
+   try { await supabase.rpc('accept_terms',{p_version:TERMS_VERSION}); } catch { /* Keep login available while an optional migration is unavailable. */ }
+   await supabase.auth.updateUser({data:{aether_terms_version:TERMS_VERSION,aether_terms_accepted_at:new Date().toISOString()}}).catch(()=>undefined);
    window.localStorage.setItem('aether-flow:terms-version',TERMS_VERSION);
    window.localStorage.removeItem('aether-flow:login-failures');window.localStorage.removeItem('aether-flow:login-lock-until');
    router.replace('/');router.refresh();

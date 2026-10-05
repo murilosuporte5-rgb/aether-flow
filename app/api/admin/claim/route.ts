@@ -1,8 +1,10 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@/lib/supabase/server';
 import {consumeRateLimit} from '@/lib/rate-limit';
+import {isRequestOriginAllowed} from '@/lib/request-origin';
 
 export async function POST(request:Request){
+ if(!isRequestOriginAllowed(request.headers.get('origin'),request.url,process.env.RAILWAY_PUBLIC_DOMAIN))return NextResponse.json({error:'Origem não permitida.'},{status:403});
  const supabase=await createClient();
  const {data:{user}}=await supabase.auth.getUser();
  if(!user)return NextResponse.json({error:'Faça login antes de ativar o administrador.'},{status:401});

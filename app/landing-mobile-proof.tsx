@@ -30,7 +30,7 @@ export default function LandingMobileProof() {
     <section className="landing-mobile-proof" aria-labelledby="mobile-proof-title">
       <div className="landing-mobile-copy">
         <span className="landing-eyebrow">TAMBÉM NO CELULAR</span>
-        <h2 id="mobile-proof-title">A operação acompanha sua equipe onde ela estiver.</h2>
+        <h2 id="mobile-proof-title">O fluxo comercial acompanha sua equipe onde ela estiver.</h2>
         <p>Estas são capturas do próprio Aether Flow com dados de demonstração. O time pode agir, registrar e acompanhar sem apertar uma tela minúscula.</p>
         <div className="landing-mobile-signals"><span><Check size={15} /> Alertas e prioridades em primeiro plano</span><span><Check size={15} /> Tutorial rápido no primeiro acesso</span><span><Check size={15} /> Layout que se adapta ao toque</span></div>
         <a className="landing-secondary" href="/demo?view=panel#demo-screen">Abrir demonstração <ArrowRight size={16} /></a>

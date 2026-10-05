@@ -5,8 +5,7 @@ const planItems = [
   "Radar de retornos, compromissos e oportunidades paradas",
   "Contatos, pipeline, mensagens e histórico no mesmo fluxo",
   "Importação e exportação em CSV",
-  "Produtos, categorias, lotes, validade e histórico de movimentações no ambiente da empresa",
-  "Até 3 integrantes no ambiente da empresa, com responsável por atendimento",
+  "1 administrador + até 3 funcionários (4 pessoas) no ambiente da empresa",
   "Tutorial rápido para a primeira configuração",
 ];
 
@@ -17,7 +16,7 @@ export default function LandingCommercialSection() {
         <span className="landing-eyebrow">COMECE COM A OPERAÇÃO COMPLETA</span>
         <h2 id="plan-title">Um acesso simples para organizar a equipe desde o primeiro contato.</h2>
         <p>
-          Um plano simples para colocar o radar comercial e a operação da empresa em um só lugar. Sem taxa de implantação e sem fidelidade.
+          Um plano simples para colocar o radar comercial e o fluxo de atendimento da empresa em um só lugar. Sem taxa de implantação e sem fidelidade.
         </p>
         <div className="landing-commercial-signals" aria-label="O que facilita a implantação">
           <span><FileSpreadsheet size={17} /> Traga sua base por CSV</span>
@@ -29,12 +28,12 @@ export default function LandingCommercialSection() {
       <article className="landing-plan-card">
         <div className="landing-plan-head">
           <div><span>PLANO AETHER FLOW</span><h3>Acesso Aether Flow</h3></div>
-          <span className="landing-plan-badge"><Users size={15} /> até 3 pessoas</span>
+          <span className="landing-plan-badge"><Users size={15} /> 4 pessoas</span>
         </div>
-        <p className="landing-plan-price"><span className="landing-plan-trial">7 dias grátis para testar</span><strong><small>R$</small> 67 <small>/mês</small></strong><span>por empresa · até 3 pessoas · cancele quando quiser</span></p>
+        <p className="landing-plan-price"><span className="landing-plan-trial">7 dias grátis para testar</span><strong><small>R$</small> 67 <small>/mês</small></strong><span>por empresa · 1 administrador + até 3 funcionários (4 pessoas) · cancele quando quiser</span></p>
         <ul>{planItems.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul>
-        <a className="landing-primary landing-plan-cta" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Teste grátis por 7 dias <ArrowRight size={17} /></a>
-        <small>Teste de 7 dias · acesso já liberado? <a href="/login">Entrar no ambiente</a></small>
+        <a className="landing-primary landing-plan-cta" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Pedir teste grátis por 7 dias <ArrowRight size={17} /></a>
+        <small>Quer ver antes? <a href="/demo?view=panel#demo-screen">Conhecer a demonstração</a> · acesso já liberado? <a href="/login">Entrar no ambiente</a></small>
       </article>
     </section>
   );

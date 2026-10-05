@@ -4,7 +4,6 @@ import {
   ArrowUpRight,
   BarChart3,
   Bell,
-  Boxes,
   CalendarDays,
   Check,
   ChevronDown,
@@ -263,6 +262,14 @@ export default function Workspace({
     setDuplicate(null);
     setError("");
   }, [modal]);
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [mobileMenuOpen]);
   useEffect(() => {
     setWhatsappStarted(false);
   }, [selected]);
@@ -609,9 +616,6 @@ export default function Workspace({
           >
             <Columns3 size={18} /><span>Pipeline</span>
           </button>
-          <a href="/operacao" onClick={() => setMobileMenuOpen(false)}>
-            <Boxes size={18} /><span>Operação</span>
-          </a>
           <a className={tab === "contacts" ? "active" : ""} href="/contatos" onClick={() => setMobileMenuOpen(false)}>
             <Users size={18} /><span>Contatos</span>
           </a>

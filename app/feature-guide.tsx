@@ -17,9 +17,11 @@ const baseSteps: Step[] = [
 export default function FeatureGuide({ canManageTeam }: Props) {
   const steps = useMemo(() => canManageTeam ? [...baseSteps, { title: "Equipe", detail: "Adicione até três funcionários e acompanhe quem atende cada oportunidade.", icon: Users }] : baseSteps, [canManageTeam]);
   const [open, setOpen] = useState(false), [index, setIndex] = useState(0);
+  const activeIndex = Math.min(index, steps.length - 1);
+  const step = steps[activeIndex];
   useEffect(() => { if (window.localStorage.getItem("aether-flow:tutorial-seen") !== "1") setOpen(true); }, []);
+  useEffect(() => { setIndex((value) => Math.min(value, steps.length - 1)); }, [steps.length]);
   function close() { setOpen(false); window.localStorage.setItem("aether-flow:tutorial-seen", "1"); }
-  const step = steps[index];
   return (
     <section className={`feature-guide ${open ? "is-open" : ""}`} aria-label="Tutorial rápido do Aether Flow">
       <div className="feature-guide-head">
@@ -29,13 +31,13 @@ export default function FeatureGuide({ canManageTeam }: Props) {
         {open && <button type="button" className="feature-guide-close" onClick={close} aria-label="Fechar tutorial"><X size={16} /></button>}
       </div>
       {open && <div className="feature-guide-body">
-        <div className="feature-guide-progress" aria-label={`Passo ${index + 1} de ${steps.length}`}>
-          {steps.map((item, itemIndex) => <span key={item.title} className={itemIndex === index ? "active" : itemIndex < index ? "done" : ""} />)}
+        <div className="feature-guide-progress" aria-label={`Passo ${activeIndex + 1} de ${steps.length}`}>
+          {steps.map((item, itemIndex) => <span key={item.title} className={itemIndex === activeIndex ? "active" : itemIndex < activeIndex ? "done" : ""} />)}
         </div>
-        <div className="feature-guide-step"><div className="feature-guide-icon"><step.icon size={19} /></div><div><span className="eyebrow">PASSO {index + 1} DE {steps.length}</span><strong>{step.title}</strong><p>{step.detail}</p></div></div>
+        <div className="feature-guide-step"><div className="feature-guide-icon"><step.icon size={19} /></div><div><span className="eyebrow">PASSO {activeIndex + 1} DE {steps.length}</span><strong>{step.title}</strong><p>{step.detail}</p></div></div>
         <div className="feature-guide-actions">
-          <button type="button" className="feature-guide-secondary" onClick={() => setIndex((value) => Math.max(0, value - 1))} disabled={index === 0}><ChevronLeft size={15} /> Voltar</button>
-          {index < steps.length - 1 ? <button type="button" className="primary" onClick={() => setIndex((value) => value + 1)}>Próximo <ChevronRight size={15} /></button> : <button type="button" className="primary" onClick={close}><Check size={15} /> Concluir</button>}
+          <button type="button" className="feature-guide-secondary" onClick={() => setIndex((value) => Math.max(0, Math.min(value, steps.length - 1) - 1))} disabled={activeIndex === 0}><ChevronLeft size={15} /> Voltar</button>
+          {activeIndex < steps.length - 1 ? <button type="button" className="primary" onClick={() => setIndex((value) => Math.min(steps.length - 1, Math.min(value, steps.length - 1) + 1))}>Próximo <ChevronRight size={15} /></button> : <button type="button" className="primary" onClick={close}><Check size={15} /> Concluir</button>}
         </div>
       </div>}
     </section>

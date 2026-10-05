@@ -5,9 +5,6 @@ import {
   Check,
   ChevronDown,
   CircleCheck,
-  Bell,
-  ClipboardList,
-  Package,
   PawPrint,
   Scissors,
   Stethoscope,
@@ -64,24 +61,6 @@ const featureCards = [
     title: "Ambiente protegido",
     text: "Os dados ficam separados por empresa, com acesso individual e ações registradas no histórico.",
   },
-  {
-    icon: Package,
-    tone: "blue",
-    title: "Produtos e validade",
-    text: "Acompanhe saldo, lote, validade e estoque mínimo junto da rotina comercial da empresa.",
-  },
-  {
-    icon: Bell,
-    tone: "amber",
-    title: "Alertas de operação",
-    text: "Receba sinais quando um item estiver baixo, próximo da validade ou precisar de reposição.",
-  },
-  {
-    icon: ClipboardList,
-    tone: "green",
-    title: "Pedidos e avarias",
-    text: "Registre pedidos de reposição e avarias com responsável, quantidade e histórico auditável.",
-  },
 ];
 
 const beforeAfter = [
@@ -136,7 +115,7 @@ export default function LandingPage() {
           <p className="landing-lede">O Aether Flow organiza urgência, compromissos e oportunidades paradas em uma fila clara para sua equipe agir.</p>
           <div className="landing-actions">
             <a className="landing-primary" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Teste grátis por 7 dias <ArrowRight size={17} /></a>
-            <a className="landing-secondary" href="#produto">Ver telas reais</a>
+            <a className="landing-secondary" href="/login">Entrar no ambiente</a>
           </div>
           <div className="landing-proof"><CircleCheck size={17} /> Sem planilha perdida <span /> <ShieldCheck size={17} /> Dados separados por empresa</div>
         </div>
@@ -182,17 +161,17 @@ export default function LandingPage() {
 
       <section className="landing-team-section" id="equipe">
         <div className="landing-team-copy"><span className="landing-eyebrow">EQUIPE SEM DESENCONTRO</span><h2>Todo contato tem um dono. Todo dono sabe o que fazer.</h2><p>O administrador adiciona funcionários, define a função e acompanha quem ficou responsável por cada atendimento. Assim a conversa não some entre várias pessoas.</p><a className="landing-secondary light-button" href="/login">Ver o ambiente <ArrowRight size={16} /></a></div>
-        <div className="landing-team-card"><div className="team-card-head"><span>RESPONSÁVEIS</span><b>3 de 3 vagas usadas</b></div><div className="team-person"><span className="team-avatar blue-avatar">M</span><div><strong>Marina Alves</strong><small>Administrador · 4 oportunidades</small></div><span className="team-pill owner-pill">Admin</span></div><div className="team-person"><span className="team-avatar green-avatar">J</span><div><strong>João Oliveira</strong><small>Responsável · 2 oportunidades</small></div><span className="team-pill">Em dia</span></div><div className="team-person"><span className="team-avatar amber-avatar">A</span><div><strong>Ana Costa</strong><small>Responsável · 1 oportunidade</small></div><span className="team-pill">1 ação hoje</span></div><div className="team-owner-note"><ShieldCheck size={15} /> O administrador controla acessos e mantém cada empresa isolada.</div></div>
+        <div className="landing-team-card"><div className="team-card-head"><span>FUNCIONÁRIOS</span><b>2 de 3 vagas usadas</b></div><div className="team-person"><span className="team-avatar blue-avatar">M</span><div><strong>Marina Alves</strong><small>Administrador · 4 oportunidades</small></div><span className="team-pill owner-pill">Admin</span></div><div className="team-person"><span className="team-avatar green-avatar">J</span><div><strong>João Oliveira</strong><small>Responsável · 2 oportunidades</small></div><span className="team-pill">Em dia</span></div><div className="team-person"><span className="team-avatar amber-avatar">A</span><div><strong>Ana Costa</strong><small>Responsável · 1 oportunidade</small></div><span className="team-pill">1 ação hoje</span></div><div className="team-owner-note"><ShieldCheck size={15} /> 1 administrador + até 3 funcionários (4 pessoas no total).</div></div>
       </section>
 
       <LandingCommercialSection />
 
       <section className="landing-section landing-faq" id="duvidas">
         <div className="landing-section-heading"><span className="landing-eyebrow">DÚVIDAS</span><h2>O que você costuma querer saber antes de começar.</h2></div>
-        <div className="landing-faq-list"><details><summary>Minha equipe vai conseguir usar? <ChevronDown size={17} /></summary><p>Sim. O fluxo começa com poucos campos, mostra o próximo passo e permite abrir uma mensagem pronta sem procurar em outra ferramenta.</p></details><details><summary>O que acontece quando eu entro pela primeira vez? <ChevronDown size={17} /></summary><p>Você configura o ambiente da empresa, cadastra a primeira oportunidade e pode seguir pelo tutorial rápido dentro do painel.</p></details><details><summary>Consigo trazer os dados que já tenho? <ChevronDown size={17} /></summary><p>Sim. O Aether Flow importa oportunidades por CSV e exporta contatos e oportunidades para você manter a portabilidade da operação.</p></details><details><summary>Os dados de outras empresas aparecem para mim? <ChevronDown size={17} /></summary><p>Não. Cada usuário acessa apenas as empresas das quais participa, com permissões definidas pelo administrador.</p></details><details><summary>Quanto custa o acesso? <ChevronDown size={17} /></summary><p>R$ 67 por mês por empresa, com até três integrantes no plano atual. Cancele quando quiser, sem taxa de implantação e sem fidelidade.</p></details></div>
+        <div className="landing-faq-list"><details><summary>Minha equipe vai conseguir usar? <ChevronDown size={17} /></summary><p>Sim. O fluxo começa com poucos campos, mostra o próximo passo e permite abrir uma mensagem pronta sem procurar em outra ferramenta.</p></details><details><summary>O que acontece quando eu entro pela primeira vez? <ChevronDown size={17} /></summary><p>Você configura o ambiente da empresa, cadastra a primeira oportunidade e pode seguir pelo tutorial rápido dentro do painel.</p></details><details><summary>Consigo trazer os dados que já tenho? <ChevronDown size={17} /></summary><p>Sim. O Aether Flow importa oportunidades por CSV e exporta contatos e oportunidades para você manter a portabilidade da operação.</p></details><details><summary>Os dados de outras empresas aparecem para mim? <ChevronDown size={17} /></summary><p>Não. Cada usuário acessa apenas as empresas das quais participa, com permissões definidas pelo administrador.</p></details><details><summary>Quanto custa o acesso? <ChevronDown size={17} /></summary><p>R$ 67 por mês por empresa, com 1 administrador + até 3 funcionários (4 pessoas no total). Cancele quando quiser, sem taxa de implantação e sem fidelidade.</p></details></div>
       </section>
 
-      <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Teste o Aether Flow por 7 dias.</h2><p>Fale com a Aether Works e receba o acesso para experimentar a operação com sua equipe.</p></div><div className="landing-actions"><a className="landing-primary" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Teste grátis por 7 dias <ArrowRight size={17} /></a><a className="landing-secondary" href="#produto">Ver telas reais</a></div></section>
+      <section className="landing-final-cta"><div><span className="landing-eyebrow">PRÓXIMO PASSO</span><h2>Comece seu teste de 7 dias.</h2><p>Fale com a Aether pelo WhatsApp para receber o acesso e veja como o plano de R$ 67 organiza sua equipe.</p></div><div className="landing-actions"><a className="landing-primary" href={trialWhatsAppUrl} target="_blank" rel="noreferrer">Pedir teste grátis <ArrowRight size={17} /></a><a className="landing-secondary" href="/demo?view=panel#demo-screen">Conhecer a demonstração</a></div></section>
 
       <LandingFooter />
     </main>
