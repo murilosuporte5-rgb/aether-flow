@@ -5,6 +5,16 @@ export const dynamic = "force-dynamic";
 
 const digits = (value: unknown) => typeof value === "string" ? value.replace(/\D/g, "") : "";
 const text = (value: unknown, max = 160) => typeof value === "string" ? value.trim().slice(0, max) : "";
+const appendConversation = (previous: unknown, next: string) => {
+  const oldValue = typeof previous === "string" ? previous.trim() : "";
+  if (!next) return oldValue.slice(-4000);
+  const stamp = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Bahia",
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date());
+  return `${oldValue ? `${oldValue}\n` : ""}[${stamp}] ${next}`.slice(-4000);
+};
 
 export async function POST(request: Request) {
   const expected = process.env.EVOLUTION_WEBHOOK_SECRET?.trim() || process.env.EVOLUTION_API_KEY?.trim();
@@ -36,9 +46,9 @@ export async function POST(request: Request) {
   const conversation = text(message.conversation || (message.extendedTextMessage as Record<string, unknown> | null)?.text || data.body, 500);
   const senderName = text(data.pushName || data.verifiedBizName || `WhatsApp ${phone.slice(-4)}`, 100);
   const normalized = phone.startsWith("55") ? `+${phone}` : `+55${phone}`;
-  const { data: pending } = await admin.from("whatsapp_captures").select("id").eq("company_id", connection.company_id).eq("phone", normalized).eq("status", "pending").maybeSingle();
+  const { data: pending } = await admin.from("whatsapp_captures").select("id,conversation").eq("company_id", connection.company_id).eq("phone", normalized).eq("status", "pending").maybeSingle();
   if (pending?.id) {
-    const updated = await admin.from("whatsapp_captures").update({ name: senderName, conversation: conversation || undefined, created_at: new Date().toISOString() }).eq("id", pending.id);
+    const updated = await admin.from("whatsapp_captures").update({ name: senderName, conversation: appendConversation(pending.conversation, conversation), created_at: new Date().toISOString() }).eq("id", pending.id);
     if (updated.error) return NextResponse.json({ error: "Não foi possível atualizar a captura." }, { status: 500 });
     return NextResponse.json({ ok: true, queued: true, captureId: pending.id });
   }
