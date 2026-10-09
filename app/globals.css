@@ -556,8 +556,8 @@
 .landing-plan-head>div>span{color:#216f78}
 .landing-plan-head h3{font-size:22px;color:#193247}
 .landing-plan-badge{background:#e7f4f1;color:#226953}
-.landing-plan-price{margin:0;padding:25px 0 22px;border-bottom:1px solid #e4ebf0;background:transparent;box-shadow:none}
-.landing-plan-trial{display:inline-flex!important;align-items:center;padding:6px 10px;border-radius:6px;background:#e7f4f1;color:#226953!important;font-size:11px!important;font-weight:800;letter-spacing:.01em}
+.landing-plan-price{margin:0;padding:25px 0 22px;border:0;border-bottom:1px solid #e4ebf0;border-radius:0;background:transparent;box-shadow:none}
+.landing-plan-trial{display:inline-flex!important;align-items:center;margin:0!important;padding:6px 10px;border-radius:6px;background:#e7f4f1;color:#226953!important;font-size:11px!important;font-weight:800;letter-spacing:.01em}
 .landing-plan-amount{display:flex;align-items:baseline;gap:5px;margin:12px 0 4px;color:#193247}
 .landing-plan-amount span{display:inline!important;margin:0!important;color:#4c6475!important;font:700 17px Manrope!important}
 .landing-plan-amount strong{display:inline;font:800 clamp(54px,5vw,68px)/1 Manrope;color:#193247;letter-spacing:-.07em}
