@@ -110,7 +110,8 @@ const demoData: Data = {
     { id: contactIds[2], name: "Carlos Almeida", phone: "71988880003", email: null, organization: "Carlos Almeida", created_at: iso(-120) },
     { id: contactIds[3], name: "Grupo Aurora", phone: "71988880004", email: "contato@aurora.exemplo", organization: "Grupo Aurora", created_at: iso(-72) },
     ...extraContacts,
-  ],
+  ].map((contact) => ({ ...contact, custom_data: {} })),
+  contactFields: [],
   opportunities: [
     { id: opportunityIds[0], contact_id: contactIds[0], contact_name: "Mariana Souza", phone: "71988880001", organization: "Studio Aurora", title: "Proposta comercial", stage_id: "stage-proposal", stage_name: "Proposta", stage_kind: "open", owner_id: joaoId, owner_name: "João Oliveira", estimated_value: 4800, next_action_type: "Ligar", next_action_at: iso(3), next_action_note: "Confirmar escopo", status: "open", source: "Indicação", details: "Proposta enviada após a conversa inicial.", last_interaction_at: iso(-20), created_at: iso(-80), stage_entered_at: iso(-48), waiting_started_at: iso(-24) },
     { id: opportunityIds[1], contact_id: contactIds[1], contact_name: "Empresa Horizonte", phone: "71988880002", organization: "Horizonte Serviços", title: "Projeto sob medida", stage_id: "stage-negotiation", stage_name: "Em negociação", stage_kind: "open", owner_id: ownerId, owner_name: "Marina Alves", estimated_value: 8200, next_action_type: "Retorno", next_action_at: iso(-28), next_action_note: "Retomar condições", status: "open", source: "Site", details: "Cliente pediu retorno sobre prazo.", last_interaction_at: iso(-52), created_at: iso(-130), stage_entered_at: iso(-72), waiting_started_at: iso(-28) },

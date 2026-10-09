@@ -36,6 +36,7 @@ import MessageBank from "./message-bank";
 import Team from "./team";
 import FeatureGuide from "./feature-guide";
 import { AetherMark } from "./aether-logo";
+import type { ContactField } from "@/lib/contact-fields";
 import { elapsedDays, matchesSearch, pendingQueue } from "@/lib/daily-work";
 import { conflictOpportunityIds } from "@/lib/conflict-alerts";
 import { momentum, nextBestAction } from "@/lib/opportunity-guidance";
@@ -95,6 +96,7 @@ export type Contact = {
   phone: string | null;
   email: string | null;
   organization: string | null;
+  custom_data: Record<string, string | number>;
   created_at: string;
 };
 type Activity = {
@@ -144,6 +146,7 @@ export type Data = {
   history: Event[];
   owners: { id: string; display_name: string }[];
   contacts: Contact[];
+  contactFields: ContactField[];
 };
 const initial: Data = {
   stages: [],
@@ -152,6 +155,7 @@ const initial: Data = {
   history: [],
   owners: [],
   contacts: [],
+  contactFields: [],
 };
 const day = (s: string) => {
   const p = new Intl.DateTimeFormat("en-US", {

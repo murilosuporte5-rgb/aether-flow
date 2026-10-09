@@ -6,6 +6,7 @@ import { matchesSearch } from "@/lib/daily-work";
 import OperationalTimeline from "./operational-timeline";
 import WhatsAppAction from "./whatsapp-action";
 import EmailAction from "./email-action";
+import ContactCustomFields from "./contact-custom-fields";
 
 const date = (s: string | null) =>
   s
@@ -186,6 +187,7 @@ export default function Contacts({
             </p>
             {contact.email && <p className="contact-email-line">{contact.email}</p>}
             <p>Último contato: {date(last(contact.id))}</p>
+            <ContactCustomFields companyId={data.company!.id} contactId={contact.id} fields={data.contactFields || []} values={contact.custom_data || {}} refresh={refresh} />
             <EmailAction companyId={data.company!.id} contactId={contact.id} contactName={contact.name} email={contact.email} opportunityTitle={ops[0]?.title} />
             {ops[0] && (
               <WhatsAppAction

@@ -5,6 +5,8 @@ import { brandColorOrDefault } from "@/lib/company-branding";
 import { AetherMark } from "../aether-logo";
 import BrandingForm from "./branding-form";
 import ModulesForm from "./modules-form";
+import ContactFieldsForm from "./contact-fields-form";
+import type { ContactField } from "@/lib/contact-fields";
 
 export const dynamic = "force-dynamic";
 
@@ -24,15 +26,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   const company = membership && (Array.isArray(membership.companies) ? membership.companies[0] : membership.companies);
   let accentColor = brandColorOrDefault(null);
   let messagesEnabled = true;
+  let contactFields: ContactField[] = [];
   if (membership) {
-    const [branding, module] = await Promise.all([
+    const [branding, module, fields] = await Promise.all([
       supabase.from("company_branding").select("accent_color").eq("company_id", membership.company_id).maybeSingle(),
       supabase.from("company_modules").select("enabled").eq("company_id", membership.company_id).eq("module_key", "messages").maybeSingle(),
+      supabase.from("contact_field_definitions").select("id,field_key,label,field_type,active").eq("company_id", membership.company_id).order("created_at"),
     ]);
     if (branding.error) throw branding.error;
     if (module.error) throw module.error;
+    if (fields.error) throw fields.error;
     accentColor = brandColorOrDefault(branding.data?.accent_color);
     messagesEnabled = module.data?.enabled ?? true;
+    contactFields = (fields.data || []) as ContactField[];
   }
   return (
     <main className="settings-screen">
@@ -54,6 +60,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           <article className="settings-card"><div className="settings-card-icon"><Bell size={19}/></div><div><h2>Avisos da operação</h2><p>Alertas de retornos e oportunidades aparecem no painel principal.</p><span className="settings-status">Ativos no painel</span></div></article>
           {membership && company && <BrandingForm companyId={membership.company_id} companyName={company.name} initialColor={accentColor} canEdit={["owner", "admin"].includes(membership.role)} />}
           {membership && company && <ModulesForm companyId={membership.company_id} initialEnabled={messagesEnabled} canEdit={["owner", "admin"].includes(membership.role)} />}
+          {membership && company && <ContactFieldsForm companyId={membership.company_id} initialFields={contactFields} canEdit={["owner", "admin"].includes(membership.role)} />}
         </div>
       </section>
     </main>

@@ -632,6 +632,21 @@
 .settings-module-option span{display:grid;gap:3px}
 .settings-module-option strong{font-size:13px}
 .settings-module-option small{font-size:11px;color:#64788b}
+.settings-field-list{display:grid;gap:8px}
+.settings-field-list>div{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid #e0e9f0;border-radius:9px;padding:10px 12px}
+.settings-field-list span{display:grid;gap:3px}.settings-field-list strong{font-size:12px}.settings-field-list small{font-size:10px;color:#6e8091}
+.settings-field-list button{border:1px solid #cbdde5;border-radius:7px;background:#f8fbfc;color:#35617a;padding:7px 9px;font-size:11px;font-weight:800}
+.settings-field-create{display:flex;align-items:end;gap:9px;flex-wrap:wrap}
+.settings-field-create label{display:grid;gap:5px;color:#4e6375;font-size:11px;font-weight:700}
+.settings-field-create input,.settings-field-create select{border:1px solid #cbdde5;border-radius:8px;background:#fff;padding:9px;color:#193247;min-height:39px}
+.settings-field-create input{min-width:210px}.settings-field-create .primary{min-height:39px}
+.contact-custom-fields{display:grid;gap:10px;margin:22px 0;padding:16px;border:1px solid #dce7ec;border-radius:12px;background:#f8fbfc}
+.contact-custom-fields h3{margin:0 0 3px;font-size:14px}
+.contact-custom-row{display:flex;align-items:end;gap:9px}
+.contact-custom-row label{display:grid;gap:5px;flex:1;color:#435c6c;font-size:11px;font-weight:800}
+.contact-custom-row input{width:100%;min-width:0;border:1px solid #cbdde5;border-radius:8px;background:#fff;padding:8px;color:#193247}
+.contact-custom-row button{border:1px solid #216f78;border-radius:8px;background:#216f78;color:#fff;padding:9px 12px;font-size:11px;font-weight:800}
+.contact-custom-fields p{margin:0;color:#346b62;font-size:11px}
 
 .help-screen{min-height:100vh;background:#f5f8fa;color:#193247}
 .help-content{width:min(1080px,calc(100% - 32px));margin:auto;padding:32px 0 80px}

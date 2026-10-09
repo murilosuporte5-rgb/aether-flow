@@ -23,6 +23,7 @@ for check in \
   tests/company-branding-integration.sql \
   tests/company-modules-integration.sql \
   tests/crm-import-integration.sql \
+  tests/contact-fields-integration.sql \
   tests/core-acceptance.sql \
   tests/core-mutation-boundary.sql \
   tests/business-mutation-boundary.sql \

@@ -97,7 +97,7 @@ async function snapshot(s: SupabaseClient, c: string) {
       .eq("company_id", c)
       .order("updated_at", { ascending: false });
   };
-  const [stages, opps, contacts, acts, history, profiles, memberships] =
+  const [stages, opps, contacts, acts, history, profiles, memberships, contactFields] =
     await Promise.all([
       s
         .from("pipeline_stages")
@@ -105,7 +105,7 @@ async function snapshot(s: SupabaseClient, c: string) {
         .eq("company_id", c)
         .order("position"),
       loadOpportunities(),
-      s.from("contacts").select("id,company_id,name,phone,email,organization,created_at").eq("company_id", c),
+      s.from("contacts").select("id,company_id,name,phone,email,organization,custom_data,created_at").eq("company_id", c),
       s.from("activities").select("id,company_id,opportunity_id,owner_id,status,due_at,type,note,created_at").eq("company_id", c).order("due_at"),
       s
         .from("opportunity_history")
@@ -114,6 +114,7 @@ async function snapshot(s: SupabaseClient, c: string) {
         .order("created_at", { ascending: false }),
       s.from("profiles").select("id,display_name"),
       s.from("memberships").select("user_id").eq("company_id", c),
+      s.from("contact_field_definitions").select("id,field_key,label,field_type,active").eq("company_id", c).order("created_at"),
     ]);
   for (const r of [
     stages,
@@ -123,6 +124,7 @@ async function snapshot(s: SupabaseClient, c: string) {
     history,
     profiles,
     memberships,
+    contactFields,
   ])
     if (r.error) throw r.error;
   const contactMap = new Map((contacts.data || []).map((x) => [x.id, x])),
@@ -146,6 +148,7 @@ async function snapshot(s: SupabaseClient, c: string) {
   });
   return {
     contacts: contacts.data || [],
+    contactFields: contactFields.data || [],
     stages: stages.data || [],
     opportunities,
     activities: acts.data || [],
