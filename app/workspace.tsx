@@ -128,6 +128,7 @@ export type Data = {
     demo: boolean;
     pipelineVersion: number;
     accentColor?: string;
+    modules?: { messages: boolean };
   };
   companies?: {
     id: string;
@@ -626,9 +627,9 @@ export default function Workspace({
               <Users size={18} /><span>Equipe</span>
             </button>
           )}
-          <a href="/mensagens" onClick={() => setMobileMenuOpen(false)}>
+          {data.company?.modules?.messages !== false && <a href={`/mensagens?companyId=${encodeURIComponent(data.company?.id || "")}`} onClick={() => setMobileMenuOpen(false)}>
             <MessageCircle size={18} /><span>Mensagens</span>
-          </a>
+          </a>}
           <a href="/integracoes/whatsapp" onClick={() => setMobileMenuOpen(false)}>
             <ArrowUpRight size={18} /><span>WhatsApp Business</span><span className={`sidebar-connection-state ${whatsappStatus}`} title={whatsappStatus === "open" ? "WhatsApp conectado" : "WhatsApp não conectado"}><i />{whatsappStatus === "open" ? "Conectado" : whatsappStatus === "loading" ? "Verificando" : "Conectar"}</span>
           </a>
@@ -1436,7 +1437,7 @@ export default function Workspace({
                 })()}
               </details>
             </div>
-            <MessageBank companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} title={row.title} />
+            {data.company?.modules?.messages !== false && <MessageBank companyId={data.company!.id} opportunityId={row.id} phone={row.phone} name={row.contact_name} title={row.title} />}
             <div className="detail-grid">
               <div>
                 <span>Telefone</span>

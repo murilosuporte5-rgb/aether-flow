@@ -1,11 +1,26 @@
-"use client";
-import { useEffect, useState } from "react";
-type Item={id:string;name:string;body:string};
-const defaults:Item[]=[{id:"follow-up",name:"Acompanhamento",body:"Olá, {nome}. Estou entrando em contato para dar continuidade à nossa conversa sobre {oportunidade}."},{id:"proposal",name:"Proposta",body:"Olá, {nome}. Podemos conversar sobre a proposta de {oportunidade}?"}];
-export default function MessagesPage(){
- const [company,setCompany]=useState<{id:string;name:string}|null>(null),[items,setItems]=useState<Item[]>(defaults),[name,setName]=useState(""),[body,setBody]=useState("");
- useEffect(()=>{fetch("/api/workspace").then(r=>r.json()).then(async d=>{if(!d.company)return;setCompany(d.company);const r=await fetch(`/api/message-templates?companyId=${d.company.id}`);if(r.ok){const x=await r.json();if(x.items?.length)setItems(x.items);}}).catch(()=>{});},[]);
- const add=async(e:React.FormEvent)=>{e.preventDefault();if(!company||!name.trim()||!body.trim())return;const r=await fetch("/api/message-templates",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({companyId:company.id,name,body})});if(r.ok){const x=await r.json();setItems([...items,x.item]);setName("");setBody("");}};
- const remove=async(id:string)=>{if(!company)return;await fetch(`/api/message-templates?companyId=${company.id}&id=${id}`,{method:"DELETE"});setItems(items.filter(i=>i.id!==id));};
- return <main className="page-body message-bank-page"><div className="heading"><div><div className="eyebrow">BIBLIOTECA</div><h1>Mensagens prontas</h1><p>Crie modelos e escolha um deles ao abrir o WhatsApp.</p></div></div><section className="message-bank-grid"><div className="message-bank-list">{items.map(x=><article key={x.id}><strong>{x.name}</strong><p>{x.body}</p>{!defaults.some(d=>d.id===x.id)&&<button className="text-button" onClick={()=>void remove(x.id)}>Excluir</button>}</article>)}</div><form className="message-bank-form" onSubmit={add}><h2>Nova mensagem</h2><input aria-label="Nome da mensagem" placeholder="Nome da mensagem" value={name} onChange={e=>setName(e.target.value)} maxLength={80}/><textarea aria-label="Texto da mensagem" placeholder="Use {nome} e {oportunidade}" value={body} onChange={e=>setBody(e.target.value)} maxLength={1000} rows={6}/><button className="primary" disabled={!name.trim()||!body.trim()||!company}>Salvar modelo</button></form></section></main>;
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { isCompanyModuleEnabled } from "@/lib/company-modules";
+import MessagesClient from "./messages-client";
+
+export const dynamic = "force-dynamic";
+
+export default async function MessagesPage({ searchParams }: { searchParams: Promise<{ companyId?: string }> }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  const { data: memberships, error } = await supabase.from("memberships")
+    .select("company_id,companies(name,is_demo)").eq("user_id", user.id);
+  if (error) throw error;
+  const { companyId } = await searchParams;
+  const realMemberships = (memberships || []).filter((item) => {
+    const company = Array.isArray(item.companies) ? item.companies[0] : item.companies;
+    return company && !company.is_demo;
+  });
+  const membership = realMemberships.find((item) => item.company_id === companyId) || realMemberships[0];
+  if (!membership) return <main className="page-body"><h1>Nenhuma empresa disponível</h1><a href="/">Voltar ao painel</a></main>;
+  const company = Array.isArray(membership.companies) ? membership.companies[0] : membership.companies;
+  const enabled = await isCompanyModuleEnabled(supabase, membership.company_id, "messages");
+  if (!enabled) return <main className="page-body"><h1>Mensagens prontas desativadas</h1><p>Este módulo foi desativado para {company?.name || "esta empresa"}. Os modelos existentes continuam guardados.</p><a href={`/configuracoes?companyId=${membership.company_id}`}>Abrir configurações</a></main>;
+  return <MessagesClient companyId={membership.company_id} companyName={company?.name || "Empresa"} />;
 }

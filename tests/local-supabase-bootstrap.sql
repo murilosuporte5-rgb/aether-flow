@@ -1,9 +1,11 @@
 -- Disposable PostgreSQL fixture for testing the app's SQL without a Supabase service.
 -- Only auth.uid() and the auth.users columns referenced by these migrations are emulated.
 -- Run on an empty local database, never on a hosted project.
-create role anon nologin;
-create role authenticated nologin;
-create role service_role nologin;
+do $$ begin
+  if not exists(select 1 from pg_roles where rolname='anon') then create role anon nologin; end if;
+  if not exists(select 1 from pg_roles where rolname='authenticated') then create role authenticated nologin; end if;
+  if not exists(select 1 from pg_roles where rolname='service_role') then create role service_role nologin; end if;
+end $$;
 create schema auth;
 create schema extensions;
 create extension pgcrypto with schema extensions;

@@ -5,6 +5,7 @@ import { isRequestOriginAllowed } from "@/lib/request-origin";
 import { consumeRateLimit } from "@/lib/rate-limit";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { brandColorOrDefault } from "@/lib/company-branding";
+import { isCompanyModuleEnabled } from "@/lib/company-modules";
 export const dynamic = "force-dynamic";
 const fail = (error: string, status = 400) =>
   Response.json({ error }, { status });
@@ -174,6 +175,7 @@ export async function GET(request: Request) {
     const { data: branding, error: brandingError } = await ctx.s.from("company_branding")
       .select("accent_color").eq("company_id", ctx.company.id).maybeSingle();
     if (brandingError) console.warn("workspace branding unavailable", brandingError);
+    const messagesEnabled = await isCompanyModuleEnabled(ctx.s, ctx.company.id, "messages");
     return Response.json({
       company: {
         id: ctx.company.id,
@@ -181,6 +183,7 @@ export async function GET(request: Request) {
         demo: ctx.company.is_demo,
         pipelineVersion: ctx.company.pipeline_version,
         accentColor: brandColorOrDefault(branding?.accent_color),
+        modules: { messages: messagesEnabled },
       },
       companies: ctx.companies,
       template: ctx.company.company_template,
