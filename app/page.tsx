@@ -4,11 +4,13 @@ import WorkspacePage from "./workspace-page";
 
 export const dynamic = "force-dynamic";
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return user ? <WorkspacePage /> : <LandingPage />;
+  const { view } = await searchParams;
+  const initialTab = view === "pipeline" || view === "list" ? view : "today";
+  return user ? <WorkspacePage initialTab={initialTab} /> : <LandingPage />;
 }

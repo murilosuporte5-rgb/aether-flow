@@ -9,6 +9,7 @@ import {
   ChevronDown,
   Clock3,
   Columns3,
+  BookOpen,
   LayoutList,
   MessageCircle,
   Menu,
@@ -633,6 +634,9 @@ export default function Workspace({
           </a>
           <a href={`/configuracoes?companyId=${encodeURIComponent(data.company?.id || "")}`} onClick={() => setMobileMenuOpen(false)}>
             <Settings size={18} /><span>Configurações</span>
+          </a>
+          <a href="/ajuda" onClick={() => setMobileMenuOpen(false)}>
+            <BookOpen size={18} /><span>Ajuda</span>
           </a>
           <button type="button" onClick={() => {
             setTab("today");
