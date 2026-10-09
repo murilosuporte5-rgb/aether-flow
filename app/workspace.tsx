@@ -126,6 +126,7 @@ export type Data = {
     name: string;
     demo: boolean;
     pipelineVersion: number;
+    accentColor?: string;
   };
   companies?: {
     id: string;
@@ -520,7 +521,7 @@ export default function Workspace({
               ? "Hoje"
               : "Programado";
   return (
-    <div className="app">
+    <div className="app" style={{ "--company-accent": data.company?.accentColor || "#2457a5" } as React.CSSProperties}>
       <aside className="sidebar">
         <a className="brand brand-link" href="/" aria-label="Aether Flow, atualizar o painel">
           <AetherMark size={36} />
@@ -630,7 +631,7 @@ export default function Workspace({
           <a href="/integracoes/whatsapp" onClick={() => setMobileMenuOpen(false)}>
             <ArrowUpRight size={18} /><span>WhatsApp Business</span><span className={`sidebar-connection-state ${whatsappStatus}`} title={whatsappStatus === "open" ? "WhatsApp conectado" : "WhatsApp não conectado"}><i />{whatsappStatus === "open" ? "Conectado" : whatsappStatus === "loading" ? "Verificando" : "Conectar"}</span>
           </a>
-          <a href="/configuracoes" onClick={() => setMobileMenuOpen(false)}>
+          <a href={`/configuracoes?companyId=${encodeURIComponent(data.company?.id || "")}`} onClick={() => setMobileMenuOpen(false)}>
             <Settings size={18} /><span>Configurações</span>
           </a>
           <button type="button" onClick={() => {

@@ -4,6 +4,7 @@ import { seedDemo } from "@/lib/provision";
 import { isRequestOriginAllowed } from "@/lib/request-origin";
 import { consumeRateLimit } from "@/lib/rate-limit";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { brandColorOrDefault } from "@/lib/company-branding";
 export const dynamic = "force-dynamic";
 const fail = (error: string, status = 400) =>
   Response.json({ error }, { status });
@@ -170,12 +171,16 @@ export async function GET(request: Request) {
         "Seu acesso ainda não foi vinculado a uma empresa. Contate a Aether Works.",
         403,
       );
+    const { data: branding, error: brandingError } = await ctx.s.from("company_branding")
+      .select("accent_color").eq("company_id", ctx.company.id).maybeSingle();
+    if (brandingError) console.warn("workspace branding unavailable", brandingError);
     return Response.json({
       company: {
         id: ctx.company.id,
         name: ctx.company.name,
         demo: ctx.company.is_demo,
         pipelineVersion: ctx.company.pipeline_version,
+        accentColor: brandColorOrDefault(branding?.accent_color),
       },
       companies: ctx.companies,
       template: ctx.company.company_template,
