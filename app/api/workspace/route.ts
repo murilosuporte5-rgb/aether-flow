@@ -235,6 +235,8 @@ export async function POST(request: Request) {
           ? "submit_product_feedback"
           : command.kind === "undo_stage"
             ? "undo_stage_change"
+          : command.kind === "create" && Object.hasOwn(command, "customData")
+            ? "create_opportunity_with_contact_fields"
           : "apply_workspace_command";
     const args =
       command.kind === "feedback"

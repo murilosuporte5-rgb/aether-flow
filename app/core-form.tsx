@@ -13,6 +13,7 @@ import {
 } from "@/lib/execution";
 import type { Data, Row, Stage } from "./workspace";
 import { suggestFromNote } from "@/lib/note-extraction";
+import { validContactFieldValue } from "@/lib/contact-fields";
 
 export type CoreMode =
   | "create"
@@ -126,6 +127,7 @@ export default function CoreForm({
   const [confirmed, setConfirmed] = useState(false);
   const [localError, setLocalError] = useState("");
   const [existingPreview, setExistingPreview] = useState(false);
+  const [customDrafts, setCustomDrafts] = useState<Record<string, string>>({});
   const form = useRef<HTMLFormElement>(null);
   const closeCallback = useRef(onClose);
   closeCallback.current = onClose;
@@ -210,6 +212,17 @@ export default function CoreForm({
             setLocalError("Registre o resultado do contato.");
             return;
           }
+          const customData: Record<string, string | number> = {};
+          if (mode === "create") for (const field of data.contactFields.filter((item) => item.active)) {
+            const raw = (customDrafts[field.field_key] || "").trim();
+            if (!raw) continue;
+            const entry = field.field_type === "number" ? Number(raw) : raw;
+            if (!validContactFieldValue(field.field_type, entry)) {
+              setLocalError(`Valor inválido para ${field.label}.`);
+              return;
+            }
+            customData[field.field_key] = entry;
+          }
           const nextStep = close
             ? { outcome, lossReason, lossNote, winReason }
             : { type, dueAt: isoInput(due), note };
@@ -236,6 +249,7 @@ export default function CoreForm({
                 ...(mode === "create" && type
                   ? { actionType: type, dueAt: isoInput(due), note }
                   : {}),
+                ...(mode === "create" && Object.keys(customData).length ? { customData } : {}),
               }
             : mode === "complete"
               ? { activityId, nextStep, result, contactConfirmed: confirmed }
@@ -369,6 +383,19 @@ export default function CoreForm({
                 </>
               )}
             </div>
+            {mode === "create" && data.contactFields.some((field) => field.active) && <details className="more-details">
+              <summary>Campos da empresa</summary>
+              <div className="form-grid">
+                {data.contactFields.filter((field) => field.active).map((field) => <label key={field.id}>
+                  {field.label}
+                  <input type={field.field_type === "number" ? "number" : field.field_type === "date" ? "date" : "text"}
+                    step={field.field_type === "number" ? "any" : undefined}
+                    maxLength={field.field_type === "text" ? 200 : undefined}
+                    value={customDrafts[field.field_key] || ""}
+                    onChange={(event) => setCustomDrafts((current) => ({ ...current, [field.field_key]: event.target.value }))} />
+                </label>)}
+              </div>
+            </details>}
             {!quick && <details className="more-details">
               <summary>Mais detalhes</summary>
               <div className="form-grid">
